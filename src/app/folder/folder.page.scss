@@ -30,3 +30,25 @@ ion-menu-button {
 ion-content ion-toolbar {
   --background: transparent;
 }
+
+img{
+  width: 100px;
+}
+
+ion-grid{
+  width: 90%;
+  ion-row{
+    margin-bottom: 20px;
+  }
+  ion-col{
+    text-align: center;
+    ion-label{
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+}
+
+.dashboard-icon:focus{
+  outline: none;
+}
