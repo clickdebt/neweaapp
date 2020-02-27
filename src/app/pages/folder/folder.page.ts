@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-folder',
@@ -7,12 +8,16 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./folder.page.scss'],
 })
 export class FolderPage implements OnInit {
-  public folder: string;
-
-  constructor(private activatedRoute: ActivatedRoute) { }
+  
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private settingsService: SettingsService
+  ) { }
 
   ngOnInit() {
-    this.folder = this.activatedRoute.snapshot.paramMap.get('id');
+    this.settingsService.loadServerSettings().subscribe(res => {
+      console.log(res);
+    });
   }
 
 }
