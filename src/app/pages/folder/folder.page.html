@@ -1,59 +1,111 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar color="light">
     <ion-buttons  slot="start">
       <ion-menu-button color="dark"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Dashboard</ion-title>
+    <ion-title>Field Agent</ion-title>
   </ion-toolbar>
-</ion-header>
+</ion-header> -->
 
-<ion-grid class="m-t-20">
+<ion-toolbar color="light">
+  <ion-buttons slot="end">
+    <ion-button>
+      <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+  <ion-buttons slot="end">
+    <ion-button>
+      <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+  <ion-title>Field Agent</ion-title>
+</ion-toolbar>
+
+<ion-toolbar color="light">
+  <ion-grid>
+    <ion-row class="searchbar-wrpper">
+      <p class="toolbar-label">
+        Search by
+      </p>
+      <ion-col size="3">
+        <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
+          <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
+          <ion-select-option class="text-wrap">Name</ion-select-option>
+        </ion-select>
+      </ion-col>
+      <ion-col size="3">
+        <ion-input placeholder="Enter Input"></ion-input>
+      </ion-col>
+      <ion-item lines="none">
+        <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
+        <ion-label>Show Linked</ion-label>
+      </ion-item>
+      <div class="dashboard-btn-wrapper">
+        <ion-button size="small" color="secondary">Search</ion-button>
+      </div>
+    </ion-row>
+  </ion-grid>
+</ion-toolbar>
+
+<ion-grid class="dashboard-grid">
   <ion-row>
     <ion-col>
-      <div class="dashboard-icon" [routerLink]="['/job-list']">
+      <div class="dashboard-icon box1" [routerLink]="['/job-list']">
         <div>
-          <img src="../../assets/image/icons8-briefcase.svg">
+          <img src="../../assets/image/work.svg">
         </div>
         <ion-label>Job List</ion-label>
+        <p>55 active</p>
       </div>
     </ion-col>
     <ion-col>
-      <div class="dashboard-icon" [routerLink]="['/job-list']">
+      <div class="dashboard-icon box2" [routerLink]="['/job-list']">
         <div>
-          <img src="../../assets/image/icons8-combo-chart-100.png">
+          <img src="../../assets/image/pin.svg">
         </div>
         <ion-label>Visit Reports</ion-label>
+        <p>30 within 20 miles</p>
       </div>
     </ion-col>
   </ion-row>
   <ion-row>
     <ion-col>
-      <div class="dashboard-icon" [routerLink]="['/job-list']">
+      <div class="dashboard-icon box3" [routerLink]="['/job-list']">
         <div>
-          <img src="../../assets/image/icons8-google-maps.svg">
+          <img src="../../assets/image/bar-chart.svg">
         </div>
         <ion-label>Map View</ion-label>
+        <p>3 sent today</p>
       </div>
     </ion-col>
     <ion-col>
-      <div class="dashboard-icon" [routerLink]="['/job-list']">
+      <div class="dashboard-icon box4" [routerLink]="['/job-list']">
         <div>
-          <img src="../../assets/image/icons8-new-post-100.png">
+          <img src="../../assets/image/email.svg">
         </div>
         <ion-label>My Inbox</ion-label>
+        <p>5 new messages</p>
       </div>
     </ion-col>
   </ion-row>
   <ion-row>
     <ion-col>
-      <div class="dashboard-icon" [routerLink]="['/job-list']">
+      <div class="dashboard-icon box5" [routerLink]="['/job-list']">
         <div>
-          <img src="../../assets/image/icons8-document.svg">
+          <img src="../../assets/image/wallet.svg">
+        </div>
+        <ion-label>Take Payment</ion-label>
+      </div>
+    </ion-col>
+
+    <ion-col>
+      <div class="dashboard-icon box6" [routerLink]="['/job-list']">
+        <div>
+          <img src="../../assets/image/document.svg">
         </div>
         <ion-label>Documents</ion-label>
       </div>
     </ion-col>
-    <ion-col>
-    </ion-col>
+
   </ion-row>
 </ion-grid>
