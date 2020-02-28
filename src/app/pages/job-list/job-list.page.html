@@ -1,41 +1,189 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="light">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Job List</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-toolbar color="medium">
+  <ion-buttons slot="end">
+    <ion-button>
+      <ion-icon color="secondary" slot="icon-only" name="search-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+  <ion-buttons slot="end">
+    <ion-button>
+      <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+  <ion-title>Field Agent</ion-title>
+</ion-toolbar>
 
 <ion-content>
-  <ion-searchbar showCancelButton="focus"></ion-searchbar>
-  <ion-card  class="job-card">
-    <ion-card-content>
-        <ion-item details="" lines="none" >
-            <ion-checkbox ></ion-checkbox>
-        <ion-label> Benjamin Hellon (# 15107)</ion-label>
-          </ion-item>
-        
-    </ion-card-content>
 
-  </ion-card>
+  <!-- sort toolbar -->
+
+  <ion-toolbar color="light">
+    <ion-grid class="p-y-0">
+      <ion-row class="searchbar-wrpper">
+        <ion-col size="4">
+          <p class="toolbar-title">
+            Job List
+          </p>
+        </ion-col>
+        <ion-col size="3">
+          <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
+            <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
+            <ion-select-option class="text-wrap">Name</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <p class="toolbar-label">
+          Sort by
+        </p>
+        <ion-col size="3">
+          <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
+            <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
+            <ion-select-option class="text-wrap">Name</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <div class="dashboard-btn-wrapper">
+          <ion-button size="small" color="primary">
+            <ion-icon name="location-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+
+  <!-- sort toolbar -->
+
+  <!-- table -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Case ID</th>
+          <th>Ref</th>
+          <th>Name/Trading</th>
+          <th>Amount</th>
+          <th>Postcode</th>
+          <th>Davs</th>
+          <th>Details</th>
+          <th>Report</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ion-checkbox checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
+          </td>
+          <td>51234</td>
+          <td>PCN1234</td>
+          <td>Brandon Larson</td>
+          <td>100.23</td>
+          <td>GL527JU</td>
+          <td>1</td>
+          <td class="action ">
+            <ion-button size="small" color="secondary">
+              Details
+            </ion-button>
+          </td>
+          <td class="action">
+            <ion-button size="small" color="tertiary">
+              Report
+            </ion-button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
+          </td>
+          <td>51234</td>
+          <td>PCN1234</td>
+          <td>Brandon Larson</td>
+          <td>100.23</td>
+          <td>GL527JU</td>
+          <td>1</td>
+          <td class="action ">
+            <ion-button size="small" color="secondary">
+              Details
+            </ion-button>
+          </td>
+          <td class="action">
+            <ion-button size="small" color="tertiary">
+              Report
+            </ion-button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <ion-checkbox checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
+          </td>
+          <td>51234</td>
+          <td>PCN1234</td>
+          <td>Brandon Larson</td>
+          <td>100.23</td>
+          <td>GL527JU</td>
+          <td>1</td>
+          <td class="action ">
+            <ion-button size="small" color="secondary">
+              Details
+            </ion-button>
+          </td>
+          <td class="action">
+            <ion-button size="small" color="tertiary">
+              Report
+            </ion-button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
+          </td>
+          <td>51234</td>
+          <td>PCN1234</td>
+          <td>Brandon Larson</td>
+          <td>100.23</td>
+          <td>GL527JU</td>
+          <td>1</td>
+          <td class="action ">
+            <ion-button size="small" color="secondary">
+              Details
+            </ion-button>
+          </td>
+          <td class="action">
+            <ion-button size="small" color="tertiary">
+              Report
+            </ion-button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
+          </td>
+          <td>51234</td>
+          <td>PCN1234</td>
+          <td>Brandon Larson</td>
+          <td>100.23</td>
+          <td>GL527JU</td>
+          <td>1</td>
+          <td class="action ">
+            <ion-button size="small" color="secondary">
+              Details
+            </ion-button>
+          </td>
+          <td class="action">
+            <ion-button size="small" color="tertiary">
+              Report
+            </ion-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- table -->
+
+
+
 </ion-content>
-
-<div class="filter">
-  <ion-grid class="">
-    <ion-row>
-      <ion-col>
-        <div class="label">
-            <ion-icon name="swap-vertical-outline"></ion-icon>
-          <ion-label>Sort</ion-label>
-        </div>
-      </ion-col>
-      <ion-col>
-        <div class="label">
-            <ion-icon name="funnel-outline"></ion-icon>
-          <ion-label>Filter</ion-label>
-        </div>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</div>
+<ion-footer>
+  <ion-toolbar>
+      <ion-button  expand="full">Full Button</ion-button>
+  </ion-toolbar>
+</ion-footer>
