@@ -1,0 +1,51 @@
+ion-toolbar{
+    border: none;
+}
+
+.joblist-card{
+    h3{
+        display: inline-block;
+        color: #000;
+        font-weight: 600;
+    }
+    ion-col{
+        span{
+            color: #000;
+        }
+    }
+}
+
+.linked-case{
+    padding: 0;
+    h4{
+        margin: 10px auto;
+    text-align: center;
+    font-size: 14px;
+    color: #cc0092;
+    }
+    th{
+        vertical-align: bottom;
+    border-bottom: 1px solid #dee2e6;
+    color: #8d898d;
+    font-size: 12px;
+    font-weight: normal;
+    }
+    td{
+        border-bottom: 0;
+    }
+}
+
+@media (max-width: 576px) { 
+
+    .table td, .table th{
+        padding: 7px;
+        font-size: 12px;
+    }
+    .table .action ion-button{
+        width: 100%;
+        font-size: 10px;
+    }
+    .table .action{
+        padding: 3px;
+    }
+  }

@@ -18,7 +18,12 @@ const routes: Routes = [
   {
     path: 'job-list',
     loadChildren: () => import('./pages/job-list/job-list.module').then( m => m.JobListPageModule)
+  },
+  {
+    path: 'joblist-mobile',
+    loadChildren: () => import('./pages/joblist-mobile/joblist-mobile.module').then( m => m.JoblistMobilePageModule)
   }
+
 ];
 
 @NgModule({
