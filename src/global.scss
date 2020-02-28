@@ -26,7 +26,7 @@
 @import "~@ionic/angular/css/flex-utils.css";
 
 
-$spaceamounts: (5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100); // Adjust this to include the pixel amounts you need.
+$spaceamounts: (0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100); // Adjust this to include the pixel amounts you need.
 $sides: (top, bottom, left, right); // Leave this variable alone
 
 @each $space in $spaceamounts {
@@ -42,9 +42,14 @@ $sides: (top, bottom, left, right); // Leave this variable alone
 }
 
 .p-y-0{
-  padding-top: 0;
-  padding-bottom: 0;
+  padding-top: 0!important;
+  padding-bottom: 0!important;
 } 
+
+.p-x-0{
+  padding-left: 0!important;
+  padding-right: 0!important;
+}
 
 html{
     font-family: 'Raleway';
@@ -87,6 +92,7 @@ html{
   .dashboard-btn-wrapper{
     position: absolute;
     right: 5px;
+    top: 5px;
   }
 
   .toolbar-title{
@@ -97,6 +103,7 @@ html{
 // table css
 
   .table {
+    table-layout: fixed;
     width: 100%;
     max-width: 100%;
     margin-bottom: 1rem;
@@ -122,13 +129,31 @@ html{
         width: 85%;
       }
     }
+ion-icon{
+  font-size: 17px;
+}
+
+}
+
+.table tr{
+  border-bottom: 1px solid #dee2e6;
+}
+
+.no-border{
+  border: 0!important;
 }
 
 .table td, .table th {
   padding: .75rem;
   vertical-align: top;
-  border-bottom: 1px solid #dee2e6;
+ 
   text-align: left;
+}
+
+.linked-case{
+  tr:nth-of-type(even) {
+    background-color: #fff!important;
+  }
 }
 
 .table-striped tbody tr:nth-of-type(even) {
@@ -154,3 +179,5 @@ ion-footer{
     --border-radius:10px;
   }
 }
+
+

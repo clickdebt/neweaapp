@@ -19,12 +19,12 @@
   <ion-toolbar color="light">
     <ion-grid class="p-y-0">
       <ion-row class="searchbar-wrpper">
-        <ion-col size="4">
+        <ion-col size-md="4" size-xs="12">
           <p class="toolbar-title">
             Job List
           </p>
         </ion-col>
-        <ion-col size="3">
+        <ion-col size-md="3" size-xs="5">
           <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
             <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
             <ion-select-option class="text-wrap">Name</ion-select-option>
@@ -33,7 +33,7 @@
         <p class="toolbar-label">
           Sort by
         </p>
-        <ion-col size="3">
+        <ion-col size-md="3" size-xs="5">
           <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
             <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
             <ion-select-option class="text-wrap">Name</ion-select-option>
@@ -55,19 +55,23 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th></th>
-          <th>Case ID</th>
-          <th>Ref</th>
-          <th>Name/Trading</th>
-          <th>Amount</th>
-          <th>Postcode</th>
-          <th>Davs</th>
-          <th>Details</th>
-          <th>Report</th>
+          <th style="width:5%"></th>
+          <th style="width:5%"></th>
+          <th style="width:10%">Case ID</th>
+          <th style="width:15%">Ref</th>
+          <th style="width:20%">Name/Trading</th>
+          <th style="width:10%">Amount</th>
+          <th style="width:13%">Postcode</th>
+          <th style="width:7%">Davs</th>
+          <th style="width:10%">Details</th>
+          <th style="width:10%">Report</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr class="no-border">
+          <td>
+            <ion-icon name="caret-forward-outline"></ion-icon>
+          </td>
           <td>
             <ion-checkbox checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
           </td>
@@ -88,7 +92,77 @@
             </ion-button>
           </td>
         </tr>
+        <tr class="linked-case">
+          <td class="p-x-0 p-y-0" colspan=10>
+            <div>
+              <h4>Linked cases</h4>
+              <table class="table">
+                <tr class="no-border">
+                  <th style="width:2%"></th>
+                  <th style="width:2%"></th>
+                  <th style="width:10%">Case ID</th>
+                  <th style="width:15%">Ref</th>
+                  <!-- <th>Name/Trading</th> -->
+                  <th style="width:10%">Amount</th>
+                  <th style="width:15%">Offence Date</th>
+                  <th style="width:13%">Date</th>
+                  <th style="width:13%">Expiry Date</th>
+                  <th style="width:10%">Details</th>
+                  <th style="width:10%">Report</th>
+                </tr>
+                <tr class="no-border">
+                  <td>
+                  </td>
+                  <td>
+                  </td>
+                  <td>51234</td>
+                  <td>PCN1234</td>
+                  <td>654865</td>
+                  <td>2020-12-8</td>
+                  <td>2020-12-8</td>
+                  <td>2020-12-8</td>
+                  <td class="action ">
+                    <ion-button size="small" color="secondary">
+                      Details
+                    </ion-button>
+                  </td>
+                  <td class="action">
+                    <ion-button size="small" color="tertiary">
+                      Report
+                    </ion-button>
+                  </td>
+                </tr>
+                <tr class="no-border">
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td>51234</td>
+                    <td>PCN1234</td>
+                    <td>654865</td>
+                    <td>2020-12-8</td>
+                    <td>2020-12-8</td>
+                    <td>2020-12-8</td>
+                    <td class="action ">
+                      <ion-button size="small" color="secondary">
+                        Details
+                      </ion-button>
+                    </td>
+                    <td class="action">
+                      <ion-button size="small" color="tertiary">
+                        Report
+                      </ion-button>
+                    </td>
+                  </tr>
+              </table>
+            </div>
+          </td>
+        </tr>
+
         <tr>
+          <td>
+            <ion-icon name="caret-forward-outline"></ion-icon>
+          </td>
           <td>
             <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
           </td>
@@ -111,6 +185,9 @@
         </tr>
         <tr>
           <td>
+            <ion-icon name="caret-forward-outline"></ion-icon>
+          </td>
+          <td>
             <ion-checkbox checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
           </td>
           <td>51234</td>
@@ -132,6 +209,9 @@
         </tr>
         <tr>
           <td>
+            <ion-icon name="caret-forward-outline"></ion-icon>
+          </td>
+          <td>
             <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
           </td>
           <td>51234</td>
@@ -152,6 +232,9 @@
           </td>
         </tr>
         <tr>
+          <td>
+            <ion-icon name="caret-forward-outline"></ion-icon>
+          </td>
           <td>
             <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
           </td>
@@ -184,6 +267,6 @@
 </ion-content>
 <ion-footer>
   <ion-toolbar>
-      <ion-button  expand="full">Full Button</ion-button>
+    <ion-button color="secondary" expand="full">Show 2 cases on Map</ion-button>
   </ion-toolbar>
 </ion-footer>

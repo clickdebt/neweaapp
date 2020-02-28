@@ -10,3 +10,24 @@ ion-content{
     height: 40px;
     width: 50px;
 }
+
+.linked-case{
+    padding: 0;
+    h4{
+        margin: 10px auto;
+    text-align: center;
+    font-size: 14px;
+    color: #cc0092;
+    }
+    th{
+        vertical-align: bottom;
+    border-bottom: 1px solid #dee2e6;
+    color: #8d898d;
+    font-size: 12px;
+    font-weight: normal;
+    }
+    td{
+        border-bottom: 0;
+    }
+}
+
