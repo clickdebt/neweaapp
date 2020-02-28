@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Field Agent</ion-title>
+    <ion-buttons slot="start" [routerLink]="['/login']">
+      <ion-icon size="large" name="arrow-back-outline"></ion-icon>
+    </ion-buttons>
+    <ion-buttons slot="end" [routerLink]="['/add-server-setting']">
+      <ion-icon size="large" name="add-outline"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <div>NickName</div>
+      </ion-col>
+      <ion-col>
+        <div>URL</div>
+      </ion-col>
+      <ion-col>
+        <div>Active</div>
+      </ion-col>
+      <ion-col>
+        <div>Delete</div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngFor="let setting of settings">
+      <ion-col>
+        <div>{{setting.nickname}}</div>
+      </ion-col>
+      <ion-col>
+        <div>{{setting.url}}</div>
+      </ion-col>
+      <ion-col>
+        <ion-toggle (click)="changeServer(setting)" [(ngModel)]="setting.active"></ion-toggle>
+      </ion-col>
+      <ion-col>
+        <ion-buttons>
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-buttons>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

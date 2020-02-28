@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Field Agent</ion-title>
+    <ion-buttons slot="start" [routerLink]="['/server-settings']">
+      <ion-icon size="large" name="arrow-back-outline"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="settingForm" name="settingForm">
+    <ion-list lines="full" class="ion-no-margin ion-no-padding">
+      <ion-item>
+        <ion-label position="floating">Nick Name <ion-text color="danger">*</ion-text></ion-label>
+        <ion-input type="text" formControlName="nickname"></ion-input>
+        
+      </ion-item>
+      
+      <ion-item>
+        <ion-label position="floating">Company Code <ion-text color="danger">*</ion-text></ion-label>
+        <ion-input type="text" formControlName="company_code"></ion-input>
+      </ion-item>
+
+      <ion-item  *ngIf="url_array.length > 0">
+        <ion-label position="floating">URL <ion-text color="danger">*</ion-text></ion-label>
+        <ion-select placeholder="Select URL" formControlName="url">
+          <ion-select-option *ngFor="let url of url_array" value="{{url.val}}">{{url.server_url}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <div class="ion-padding ion-margin-top">
+      <ion-button expand="block" type="button" [disabled]="this.settingForm.controls['company_code'].invalid" (click)="fetchSettings()" class="ion-no-margin">Fetch Settings</ion-button>
+    </div>
+    <div class="ion-padding" *ngIf="url_array.length > 0">
+      <ion-button expand="block" type="submit" [disabled]="this.settingForm.invalid" class="ion-no-margin" (click)="saveSettings()">Add Server</ion-button>
+    </div>
+  </form>
+</ion-content>

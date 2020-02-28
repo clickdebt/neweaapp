@@ -11,7 +11,7 @@ export class SettingsService {
     this.serverURL = 'https://lateral1.com/getServerSettings.php';
   }
 
-  loadServerSettings(companyCode = 'aylesbury') {
+  loadServerSettings(companyCode) {
     const apiURL = this.serverURL + '?code=' + companyCode;
     const header = {
       'Content-Type': 'application/json'
