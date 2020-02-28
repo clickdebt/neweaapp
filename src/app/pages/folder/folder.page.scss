@@ -1,12 +1,5 @@
 
 
-ion-content ion-toolbar {
-  // --background: transparent;
-  // --border-bottom: 1px solid #d8d8d8;
-}
-
-
-
 ion-grid.dashboard-grid{
   width: 100%;
   padding: 10px;
@@ -64,35 +57,8 @@ ion-grid.dashboard-grid{
 }
 
 
-.searchbar-wrpper{
-  display: flex;
-  align-items: center;
-  position: relative;
-
-  ion-select,ion-input{
-    text-align: left;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 10px;
-    --padding-start:10px;
-   
-  }
-  .toolbar-label{
-    font-size: 14px;
-    padding-right: 5px;
-    color: grey;
-    font-weight: normal;
-    padding-left: 5px;
-  }
-  ion-item{
-    --background:transparent;
-  }
-}
 
 .dashboard-btn-wrapper{
-  position: absolute;
-  right: 5px;
   ion-button{
     height: 35px;
     width: 80px;

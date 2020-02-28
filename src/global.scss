@@ -41,6 +41,10 @@ $sides: (top, bottom, left, right); // Leave this variable alone
   }
 }
 
+.p-y-0{
+  padding-top: 0;
+  padding-bottom: 0;
+} 
 
 html{
     font-family: 'Raleway';
@@ -53,3 +57,100 @@ html{
  ion-toolbar {
     border-bottom: 1px solid #d8d8d8;
   }
+
+  .searchbar-wrpper{
+    display: flex;
+    align-items: center;
+    position: relative;
+  
+    ion-select,ion-input{
+      text-align: left;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 10px;
+      --padding-start:10px;
+     
+    }
+    .toolbar-label{
+      font-size: 14px;
+      padding-right: 5px;
+      color: grey;
+      font-weight: normal;
+      padding-left: 5px;
+    }
+    ion-item{
+      --background:transparent;
+    }
+  }
+
+  .dashboard-btn-wrapper{
+    position: absolute;
+    right: 5px;
+  }
+
+  .toolbar-title{
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+// table css
+
+  .table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    background-color: #ffff;
+    border-collapse: collapse;
+    thead{
+      background-color: #f9f9f9;
+      th{
+        vertical-align: bottom;
+        border-bottom: 1px solid #dee2e6;
+        color: #8d898d;
+        font-size: 12px;
+        font-weight: normal;
+      }
+    }
+    td{
+      color: #898588;
+      font-size: 14px;
+    }
+    .action{
+      padding: 5px 0;
+      ion-button{
+        width: 85%;
+      }
+    }
+}
+
+.table td, .table th {
+  padding: .75rem;
+  vertical-align: top;
+  border-bottom: 1px solid #dee2e6;
+  text-align: left;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+  background-color: #f9f9f9;
+}
+
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+
+// table css
+
+
+ion-footer{
+  ion-button{
+    width: 300px;
+    margin: 15px auto;
+    --border-radius:10px;
+  }
+}
