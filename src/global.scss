@@ -55,6 +55,10 @@ html{
     font-family: 'Raleway';
   }
   
+.d-block{
+  display: block;
+}
+
   .header-md:after{
       display: none;
   }
@@ -92,7 +96,7 @@ html{
   .dashboard-btn-wrapper{
     position: absolute;
     right: 5px;
-    top: 5px;
+    top: 15px;
   }
 
   .toolbar-title{

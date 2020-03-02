@@ -57,8 +57,16 @@
         <ion-icon class="m-r-10" name="chevron-down-outline"></ion-icon>
         <ion-checkbox class="m-r-10" checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
         <h3>Brandon Larson
-          <span> (#14536) </span>
+          <span class="d-block"> (#14536) </span>
         </h3>
+        <span class="d-flex">
+          <ion-button size="small" color="secondary">
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button size="small" color="tertiary">
+            <ion-icon name="reader-outline"></ion-icon>
+          </ion-button>
+        </span>
       </div>
       <ion-grid class="m-t-10">
         <ion-row>
@@ -85,10 +93,10 @@
         <table class="table">
           <tr class="no-border">
             <th style="width:20%">Case ID</th>
-            <th style="width:20%">Ref</th>
+            <th style="width:25%">Ref</th>
             <th style="width:20%">Amount</th>
-            <th style="width:20%">Details</th>
-            <th style="width:20%">Report</th>
+            <th style="width:35%" class="ion-text-center" colspan=2>Action</th>
+            <!-- <th style="width:17%">Report</th> -->
           </tr>
           <tr class="no-border">
             <td>51234</td>
@@ -96,52 +104,60 @@
             <td>654865</td>
             <td class="action ">
               <ion-button size="small" color="secondary">
-                Details
+                <ion-icon name="information-circle-outline"></ion-icon>
               </ion-button>
             </td>
             <td class="action">
               <ion-button size="small" color="tertiary">
-                Report
+                <ion-icon name="reader-outline"></ion-icon>
               </ion-button>
             </td>
           </tr>
-        
+
         </table>
       </div>
     </ion-card-content>
   </ion-card>
 
   <ion-card class="joblist-card">
-      <ion-card-content>
-        <div class="d-flex align-items-center">
-          <ion-icon class="m-r-10" name="chevron-forward-outline"></ion-icon>
-          <ion-checkbox class="m-r-10" checked="false" mode="md" color="secondary" slot="start"></ion-checkbox>
-          <h3>Brandon Larson
-            <span> (#14536) </span>
-          </h3>
-        </div>
-        <ion-grid class="m-t-10">
-          <ion-row>
-            <ion-col size="6">
-              Ref :
-              <span> PCN1234 </span>
-            </ion-col>
-            <ion-col size="6">
-              Amount :
-              <span> 100.23 </span>
-            </ion-col>
-            <ion-col size="6">
-              Postcode :
-              <span> GL527JU </span>
-            </ion-col>
-            <ion-col size="6">
-              visit :
-              <span> 3 </span>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-card-content>
-    </ion-card>
+    <ion-card-content>
+      <div class="d-flex align-items-center">
+        <ion-icon class="m-r-10" name="chevron-forward-outline"></ion-icon>
+        <ion-checkbox class="m-r-10" checked="false" mode="md" color="secondary" slot="start"></ion-checkbox>
+        <h3>Brandon Larson
+          <span class="d-block"> (#14536) </span>
+        </h3>
+        <span class="d-flex">
+          <ion-button size="small" color="secondary">
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button size="small" color="tertiary">
+            <ion-icon name="reader-outline"></ion-icon>
+          </ion-button>
+        </span>
+      </div>
+      <ion-grid class="m-t-10">
+        <ion-row>
+          <ion-col size="6">
+            Ref :
+            <span> PCN1234 </span>
+          </ion-col>
+          <ion-col size="6">
+            Amount :
+            <span> 100.23 </span>
+          </ion-col>
+          <ion-col size="6">
+            Postcode :
+            <span> GL527JU </span>
+          </ion-col>
+          <ion-col size="6">
+            visit :
+            <span> 3 </span>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
 
 
 </ion-content>

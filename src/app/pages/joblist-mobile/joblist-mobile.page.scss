@@ -7,6 +7,7 @@ ion-toolbar{
         display: inline-block;
         color: #000;
         font-weight: 600;
+        width: 80%;
     }
     ion-col{
         span{
@@ -47,5 +48,8 @@ ion-toolbar{
     }
     .table .action{
         padding: 3px;
+    }
+    .joblist-card h3{
+        width: 70%;
     }
   }
