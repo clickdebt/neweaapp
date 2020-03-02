@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { SettingsService } from 'src/app/services/settings.service';
+import { SettingsService } from 'src/app/services';
 import { Router } from '@angular/router';
 
 @Component({
@@ -34,8 +34,8 @@ export class AddServerSettingPage implements OnInit {
     this.submitted = true;
     if (this.settingForm.controls['company_code'].valid) {
       this.settingsService.loadServerSettings(this.settingForm.controls['company_code'].value).subscribe(res => {
-        if (res.data && res.data.length) {
-          const settings = JSON.parse(res.data[0].server_settings);
+        if (res['data'] && res['data'].length) {
+          const settings = JSON.parse(res['data'][0].server_settings);
 
           for (let key in settings) {
             if (key != 'features' && key != 'logo') {

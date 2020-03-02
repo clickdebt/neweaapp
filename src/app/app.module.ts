@@ -10,7 +10,8 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 
-import { SettingsService } from './services/settings.service';
+
+import { SettingsService, AuthService, CommonService } from './services';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [AppComponent],
@@ -27,6 +28,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     StatusBar,
     SplashScreen,
     SettingsService,
+    AuthService,
+    CommonService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

@@ -10,37 +10,31 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-grid>
-    <ion-row>
-      <ion-col>
-        <div>NickName</div>
-      </ion-col>
-      <ion-col>
-        <div>URL</div>
-      </ion-col>
-      <ion-col>
-        <div>Active</div>
-      </ion-col>
-      <ion-col>
-        <div>Delete</div>
-      </ion-col>
-    </ion-row>
-    <ion-row *ngFor="let setting of settings">
-      <ion-col>
-        <div>{{setting.nickname}}</div>
-      </ion-col>
-      <ion-col>
-        <div>{{setting.url}}</div>
-      </ion-col>
-      <ion-col>
-        <ion-toggle (click)="changeServer(setting)" [(ngModel)]="setting.active"></ion-toggle>
-      </ion-col>
-      <ion-col>
-        <ion-buttons>
-          <ion-icon name="trash-outline"></ion-icon>
-        </ion-buttons>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+<ion-content>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nickname</th>
+          <th class="width-35">URL</th>
+          <th>Active</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let setting of settings">
+          <td>{{setting.nickname}}</td>
+          <td>{{setting.url}}</td>
+          <td>
+            <ion-toggle mode="md" (ionChange)="changeServer(setting)" [(ngModel)]="setting.active"></ion-toggle>
+          </td>
+          <td>
+            <ion-button size="small" color="light">
+              <ion-icon name="trash-outline" color="secondary"></ion-icon>
+            </ion-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </ion-content>

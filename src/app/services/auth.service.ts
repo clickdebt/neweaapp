@@ -8,7 +8,7 @@ export class AuthService {
     constructor(
         private http: HttpClient
     ) {
-        this.serverURL = localStorage.getItem('API_URL');
+        this.serverURL = localStorage.getItem('server_url') + 'b/system/v1/';
     }
 
     authenticate(username, password) {

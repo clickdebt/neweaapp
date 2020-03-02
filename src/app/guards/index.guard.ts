@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
-
+import { CanActivate, Router } from '@angular/router';
 @Injectable({
   providedIn: 'root'
 })
 export class IndexGuard implements CanActivate {
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return true;
+  constructor(public router: Router) { }
+
+  canActivate() {
+    let token = localStorage.getItem('remote_token');
+    if (token) {
+      this.router.navigate(['home']);
+    } else {
+      return true;
+    }
   }
-  
+
 }

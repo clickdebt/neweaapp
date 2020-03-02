@@ -1,29 +1,23 @@
 <ion-app>
-  <ion-split-pane contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay">
-      <ion-content>
-        <ion-list id="inbox-list">
-          <ion-list-header>Jdunbar</ion-list-header>
-          <ion-note>https://aylesbury.nodea.lateral1.com/</ion-note>
-
-          <ion-menu-toggle auto-hide="false">
-            <ion-item [routerLink]="['/home/dashboard']" lines="none" detail="false">
-              <ion-icon slot="start" name="home-outline"></ion-icon>
-              <ion-label>Dashboard</ion-label>
-            </ion-item>
-            <ion-item [routerLink]="['/home/folder']" lines="none" detail="false">
-              <ion-icon slot="start" name="home-outline"></ion-icon>
-              <ion-label>Folder</ion-label>
-            </ion-item>
-            <ion-item [routerLink]="['/home/job-list']" lines="none" detail="false">
-              <ion-icon slot="start" name="list-outline"></ion-icon>
-              <ion-label>Job List</ion-label>
-            </ion-item>
-          </ion-menu-toggle>
-        </ion-list>
-
-      </ion-content>
-    </ion-menu>
-    <router-outlet id="main-content"></router-outlet>
-  </ion-split-pane>
+  <ion-menu contentId="main-content" type="overlay">
+    <ion-list id="inbox-list">
+      <ion-list-header>Jdunbar</ion-list-header>
+      <ion-note>https://aylesbury.nodea.lateral1.com/</ion-note>
+      <ion-menu-toggle auto-hide="false">
+        <ion-item [routerLink]="['/home/dashboard']" lines="none" detail="false">
+          <ion-icon slot="start" name="home-outline"></ion-icon>
+          <ion-label>Dashboard</ion-label>
+        </ion-item>
+        <ion-item [routerLink]="['/home/folder']" lines="none" detail="false">
+          <ion-icon slot="start" name="home-outline"></ion-icon>
+          <ion-label>Folder</ion-label>
+        </ion-item>
+        <ion-item [routerLink]="['/home/job-list']" lines="none" detail="false">
+          <ion-icon slot="start" name="list-outline"></ion-icon>
+          <ion-label>Job List</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+    </ion-list>
+  </ion-menu>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

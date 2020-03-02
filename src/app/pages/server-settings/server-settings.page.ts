@@ -16,12 +16,19 @@ export class ServerSettingsPage implements OnInit {
     }
   }
   changeServer(server) {
-    this.settings.forEach(setting => {
-      if (setting.nickname != server.nickname) {
-        console.log(setting);
-        setting.active = 0;
-      }
-    });
+    if (server.active) {
+      localStorage.removeItem('server_url');
+      localStorage.setItem('server_url', server.url);
+    }
+    if (server.active) {
+      this.settings.forEach(sett => {
+        if (sett.nickname !== server.nickname) {
+          // console.log(sett);
+          sett.active = 0;
+        }
+      });
+    }
+    localStorage.setItem('serverSettings', JSON.stringify(this.settings));
   }
 
 }
