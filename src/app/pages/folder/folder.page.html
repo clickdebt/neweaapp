@@ -18,19 +18,19 @@
 <ion-toolbar color="medium">
   <ion-grid>
     <ion-row class="searchbar-wrpper">
-      <p class="toolbar-label">
+      <p class="toolbar-label ion-hide-sm-down" >
         Search by
       </p>
-      <ion-col size="3">
+      <ion-col size-sm="3" size-xs="6">
         <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
           <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
           <ion-select-option class="text-wrap">Name</ion-select-option>
         </ion-select>
       </ion-col>
-      <ion-col size="3">
+      <ion-col size-sm="3" size-xs="6">
         <ion-input placeholder="Enter Input"></ion-input>
       </ion-col>
-      <ion-item lines="none">
+      <ion-item lines="none" >
         <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
         <ion-label>Show Linked</ion-label>
       </ion-item>

@@ -64,3 +64,13 @@ ion-grid.dashboard-grid{
     width: 80px;
   }
 }
+
+@media (max-width: 576px) { 
+
+  .dashboard-icon{
+    height: 170px;
+  }
+  .dashboard-btn-wrapper {
+    top: 50px;
+}
+}
