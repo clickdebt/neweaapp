@@ -12,11 +12,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('../pages/folder/folder.module').then( m => m.FolderPageModule)
-      },
-      {
-        path: 'folder',
-        loadChildren: () => import('../pages/folder/folder.module').then( m => m.FolderPageModule)
+        loadChildren: () => import('../pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
       },
       {
         path: 'dashboard',
@@ -26,6 +22,10 @@ const routes: Routes = [
         path: 'job-list',
         loadChildren: () => import('../pages/job-list/job-list.module').then( m => m.JobListPageModule)
       },
+      {
+        path: 'joblist-mobile',
+        loadChildren: () => import('../pages/joblist-mobile/joblist-mobile.module').then( m => m.JoblistMobilePageModule)
+      }
     ]
   }
 ];

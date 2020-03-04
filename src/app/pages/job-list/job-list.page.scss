@@ -1,33 +1,31 @@
-
-
-
-ion-content{
+ion-content {
     --background: #f9f9f9;
-  }
-  
+}
 
 .dashboard-btn-wrapper ion-button {
     height: 40px;
     width: 50px;
 }
 
-.linked-case{
+.linked-case {
     padding: 0;
-    h4{
+
+    h4 {
         margin: 10px auto;
-    text-align: center;
-    font-size: 14px;
-    color: #cc0092;
+        text-align: center;
+        font-size: 14px;
+        color: #cc0092;
     }
-    th{
+
+    th {
         vertical-align: bottom;
-    border-bottom: 1px solid #dee2e6;
-    color: #8d898d;
-    font-size: 12px;
-    font-weight: normal;
+        border-bottom: 1px solid #dee2e6;
+        color: #8d898d;
+        font-size: 12px;
+        font-weight: normal;
     }
-    td{
+
+    td {
         border-bottom: 0;
     }
 }
-

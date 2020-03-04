@@ -1,13 +1,58 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="medium">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Dashboard</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-
 <ion-content>
-
+  <ion-grid class="dashboard-grid">
+    <ion-row>
+      <ion-col>
+        <div class="dashboard-icon box1" [routerLink]="['/home/job-list']">
+          <div>
+            <img src="assets/image/work.svg">
+          </div>
+          <ion-label>Job List</ion-label>
+        </div>
+      </ion-col>
+      <ion-col>
+        <div class="dashboard-icon box2" [routerLink]="['/home/job-list']">
+          <div>
+            <img src="assets/image/pin.svg">
+          </div>
+          <ion-label>Visit Reports</ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <div class="dashboard-icon box3" [routerLink]="['/home/job-list']">
+          <div>
+            <img src="assets/image/bar-chart.svg">
+          </div>
+          <ion-label>Map View</ion-label>
+        </div>
+      </ion-col>
+      <ion-col>
+        <div class="dashboard-icon box4" [routerLink]="['/home/job-list']">
+          <div>
+            <img src="assets/image/email.svg">
+          </div>
+          <ion-label>My Inbox</ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <div class="dashboard-icon box5" [routerLink]="['/home/job-list']">
+          <div>
+            <img src="assets/image/wallet.svg">
+          </div>
+          <ion-label>Take Payment</ion-label>
+        </div>
+      </ion-col>
+      <ion-col>
+        <div class="dashboard-icon box6" [routerLink]="['/home/job-list']">
+          <div>
+            <img src="assets/image/document.svg">
+          </div>
+          <ion-label>Documents</ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

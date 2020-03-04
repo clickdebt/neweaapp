@@ -6,10 +6,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage implements OnInit {
-
+  
+  logo;
   constructor() { }
 
   ngOnInit() {
+    this.logo = localStorage.getItem('logo');
   }
 
 }

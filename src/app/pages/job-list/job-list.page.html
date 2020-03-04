@@ -1,20 +1,3 @@
-<ion-toolbar color="medium">
-  <ion-buttons slot="start">
-    <ion-menu-button></ion-menu-button>
-  </ion-buttons>
-  <ion-buttons slot="end">
-    <ion-button>
-      <ion-icon color="secondary" slot="icon-only" name="search-outline"></ion-icon>
-    </ion-button>
-  </ion-buttons>
-  <ion-buttons slot="end">
-    <ion-button>
-      <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-    </ion-button>
-  </ion-buttons>
-  <ion-title>Field Agent</ion-title>
-</ion-toolbar>
-
 <ion-content>
 
   <!-- sort toolbar -->
@@ -23,30 +6,22 @@
     <ion-grid class="p-y-0">
       <ion-row class="searchbar-wrpper">
         <ion-col size-md="4" size-xs="12">
-          <p class="toolbar-title">
-            Job List
-          </p>
+          <ion-input name="search" placeholder="Search ID, Ref, Postcode, Name"></ion-input>
         </ion-col>
-        <ion-col size-md="3" size-xs="5">
-          <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
-            <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
-            <ion-select-option class="text-wrap">Name</ion-select-option>
-          </ion-select>
-        </ion-col>
-        <p class="toolbar-label">
-          Sort by
-        </p>
-        <ion-col size-md="3" size-xs="5">
-          <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
-            <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
-            <ion-select-option class="text-wrap">Name</ion-select-option>
-          </ion-select>
-        </ion-col>
-        <div class="dashboard-btn-wrapper">
-          <ion-button size="small" color="primary">
-            <ion-icon name="location-outline"></ion-icon>
+        <ion-col size-md="8" size-xs="12">
+          <ion-button color="secondary">
+            Filter
           </ion-button>
-        </div>
+          <ion-button color="secondary">
+            Sort
+          </ion-button>
+          <ion-button color="secondary">
+            Need a Visit
+          </ion-button>
+          <ion-button color="secondary">
+            On Arrangement
+          </ion-button>
+        </ion-col>
       </ion-row>
     </ion-grid>
   </ion-toolbar>
@@ -58,32 +33,34 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th style="width:5%"></th>
-          <th style="width:5%"></th>
+          <th style="width:3%"></th>
+          <th style="width:3%"></th>
           <th style="width:10%">Case ID</th>
-          <th style="width:15%">Ref</th>
-          <th style="width:20%">Name/Trading</th>
+          <th style="width:14%">Ref</th>
+          <th style="width:20%">Name</th>
           <th style="width:10%">Amount</th>
+          <th style="width:10%">Linked</th>
           <th style="width:13%">Postcode</th>
-          <th style="width:7%">Davs</th>
+          <th style="width:7%">Visits</th>
           <th style="width:10%">Details</th>
           <th style="width:10%">Report</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="no-border">
+        <tr class="no-border" *ngFor="let case of cases">
           <td>
-            <ion-icon name="caret-forward-outline"></ion-icon>
+            <ion-icon name="caret-forward-outline" *ngIf="case.linked_cases"></ion-icon>
           </td>
           <td>
-            <ion-checkbox checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
+            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
           </td>
-          <td>51234</td>
-          <td>PCN1234</td>
-          <td>Brandon Larson</td>
-          <td>100.23</td>
-          <td>GL527JU</td>
-          <td>3</td>
+          <td>{{case.id}}- {{case.linked_cases.length}}</td>
+          <td>{{case.ref}}</td>
+          <td>{{case.debtor.debtor_name}}</td>
+          <td>{{case.d_outstanding}}</td>
+          <td>#00#</td>
+          <td>{{case.debtor.addresses[0].address_postcode}}</td>
+          <td>{{case.visitcount_total}}</td>
           <td class="action ">
             <ion-button size="small" color="secondary">
               Details
@@ -95,7 +72,7 @@
             </ion-button>
           </td>
         </tr>
-        <tr class="linked-case">
+        <!-- <tr class="linked-case">
           <td class="p-x-0 p-y-0" colspan=10>
             <div>
               <h4>Linked cases</h4>
@@ -105,7 +82,6 @@
                   <th style="width:2%"></th>
                   <th style="width:10%">Case ID</th>
                   <th style="width:15%">Ref</th>
-                  <!-- <th>Name/Trading</th> -->
                   <th style="width:10%">Amount</th>
                   <th style="width:15%">Offence Date</th>
                   <th style="width:13%">Date</th>
@@ -136,128 +112,31 @@
                   </td>
                 </tr>
                 <tr class="no-border">
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>51234</td>
-                    <td>PCN1234</td>
-                    <td>654865</td>
-                    <td>2020-12-8</td>
-                    <td>2020-12-8</td>
-                    <td>2020-12-8</td>
-                    <td class="action ">
-                      <ion-button size="small" color="secondary">
-                        Details
-                      </ion-button>
-                    </td>
-                    <td class="action">
-                      <ion-button size="small" color="tertiary">
-                        Report
-                      </ion-button>
-                    </td>
-                  </tr>
+                  <td>
+                  </td>
+                  <td>
+                  </td>
+                  <td>51234</td>
+                  <td>PCN1234</td>
+                  <td>654865</td>
+                  <td>2020-12-8</td>
+                  <td>2020-12-8</td>
+                  <td>2020-12-8</td>
+                  <td class="action ">
+                    <ion-button size="small" color="secondary">
+                      Details
+                    </ion-button>
+                  </td>
+                  <td class="action">
+                    <ion-button size="small" color="tertiary">
+                      Report
+                    </ion-button>
+                  </td>
+                </tr>
               </table>
             </div>
           </td>
-        </tr>
-
-        <tr>
-          <td>
-            <ion-icon name="caret-forward-outline"></ion-icon>
-          </td>
-          <td>
-            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
-          </td>
-          <td>51234</td>
-          <td>PCN1234</td>
-          <td>Brandon Larson</td>
-          <td>100.23</td>
-          <td>GL527JU</td>
-          <td>1</td>
-          <td class="action ">
-            <ion-button size="small" color="secondary">
-              Details
-            </ion-button>
-          </td>
-          <td class="action">
-            <ion-button size="small" color="tertiary">
-              Report
-            </ion-button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <ion-icon name="caret-forward-outline"></ion-icon>
-          </td>
-          <td>
-            <ion-checkbox checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
-          </td>
-          <td>51234</td>
-          <td>PCN1234</td>
-          <td>Brandon Larson</td>
-          <td>100.23</td>
-          <td>GL527JU</td>
-          <td>1</td>
-          <td class="action ">
-            <ion-button size="small" color="secondary">
-              Details
-            </ion-button>
-          </td>
-          <td class="action">
-            <ion-button size="small" color="tertiary">
-              Report
-            </ion-button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <ion-icon name="caret-forward-outline"></ion-icon>
-          </td>
-          <td>
-            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
-          </td>
-          <td>51234</td>
-          <td>PCN1234</td>
-          <td>Brandon Larson</td>
-          <td>100.23</td>
-          <td>GL527JU</td>
-          <td>1</td>
-          <td class="action ">
-            <ion-button size="small" color="secondary">
-              Details
-            </ion-button>
-          </td>
-          <td class="action">
-            <ion-button size="small" color="tertiary">
-              Report
-            </ion-button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <ion-icon name="caret-forward-outline"></ion-icon>
-          </td>
-          <td>
-            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
-          </td>
-          <td>51234</td>
-          <td>PCN1234</td>
-          <td>Brandon Larson</td>
-          <td>100.23</td>
-          <td>GL527JU</td>
-          <td>1</td>
-          <td class="action ">
-            <ion-button size="small" color="secondary">
-              Details
-            </ion-button>
-          </td>
-          <td class="action">
-            <ion-button size="small" color="tertiary">
-              Report
-            </ion-button>
-          </td>
-        </tr>
+        </tr> -->
       </tbody>
     </table>
   </div>

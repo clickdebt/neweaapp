@@ -51,7 +51,7 @@ export class LoginPage implements OnInit {
           if (data['result']) {
             this.commonService.dismissLoader();
             localStorage.setItem('userdata', JSON.stringify(data['data']));
-            localStorage.setItem('remote_token', JSON.stringify(data['data']['remote_token']));
+            localStorage.setItem('remote_token', data['data']['remote_token']);
             this.commonService.showToast('Successfully logged in.', 'success');
             this.router.navigate(['/home']);
           } else {

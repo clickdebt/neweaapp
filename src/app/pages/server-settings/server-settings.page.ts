@@ -9,12 +9,15 @@ export class ServerSettingsPage implements OnInit {
   settings = [];
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  ionViewWillEnter() {
     const serverSettings = localStorage.getItem('serverSettings');
     if (serverSettings) {
       this.settings = JSON.parse(serverSettings);
     }
   }
+
   changeServer(server) {
     if (server.active) {
       localStorage.removeItem('server_url');
