@@ -29,3 +29,51 @@ ion-content {
         border-bottom: 0;
     }
 }
+
+.filters {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 57px;
+    background: #ffffff;
+    height: auto;
+    z-index: 1;
+    -webkit-transform: none;
+    -moz-transform: none;
+    transform: none;
+    box-shadow: -1px 0px 10px rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    padding-bottom: 77px;
+
+    &.sort{
+        padding-bottom: 0;   
+    }
+
+    &.active {
+        display: block;
+    }
+
+    h6 {
+        margin: 10px 0;
+    }
+
+    .divider {
+        margin: 10px 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.30);
+    }
+
+    .filter-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.30);
+        height: 77px;
+    }
+
+    .filter-body {
+        height: 100%;
+        overflow: auto;
+    }
+}

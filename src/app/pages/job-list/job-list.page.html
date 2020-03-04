@@ -1,30 +1,102 @@
-<ion-content>
-
-  <!-- sort toolbar -->
-
-  <ion-toolbar color="light">
-    <ion-grid class="p-y-0">
-      <ion-row class="searchbar-wrpper">
-        <ion-col size-md="4" size-xs="12">
-          <ion-input name="search" placeholder="Search ID, Ref, Postcode, Name"></ion-input>
+<ion-toolbar color="light">
+  <ion-grid class="p-y-0">
+    <ion-row class="searchbar-wrpper">
+      <ion-col size-md="10" size-xs="7">
+        <ion-input name="search" placeholder="Search ID, Ref, Postcode, Name"></ion-input>
+      </ion-col>
+      <ion-col size-md="2" size-xs="5" class="ion-text-end">
+        <ion-button color="secondary" size="small">
+          Filters
+        </ion-button>
+        <ion-button color="secondary" size="small">
+          Sort
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-toolbar>
+<div class="filters active">
+  <div class="filter-body">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Quick Filter</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">On Arrangement</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Need a Visit</ion-button>
         </ion-col>
-        <ion-col size-md="8" size-xs="12">
-          <ion-button color="secondary">
-            Filter
-          </ion-button>
-          <ion-button color="secondary">
-            Sort
-          </ion-button>
-          <ion-button color="secondary">
-            Need a Visit
-          </ion-button>
-          <ion-button color="secondary">
-            On Arrangement
-          </ion-button>
+      </ion-row>
+      <div class="divider"></div>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Schemes</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Parking Internal Agents (16)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">CT External Agents (6)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">CT Initial Workflow (4)</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Stage</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">NOE Issued (15)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Attendance Requried (1)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Visits Complete Review Case (1)</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Status</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">On Arrangement (15)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Live (1)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Trace (1)</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Client</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">AVDC (146)</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Visit Count</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">0 (21)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">1 (2)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">2 (1)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">3 (16)</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">3+ (6)</ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
-  </ion-toolbar>
+  </div>
+  <div class="filter-footer">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="6">
+          <ion-button color="dark" size="default" fill="clear">CLEAR</ion-button>
+        </ion-col>
+        <ion-col size-xs="6" class="ion-text-end">
+          <ion-button color="secondary" size="default" fill="solid">Apply Filter</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</div>
+<div class="filters sort">
+  <div class="filter-body">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Sort</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">On Arrangement</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Need a Visit</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</div>
+<ion-content>
+
+  <!-- sort toolbar -->
 
   <!-- sort toolbar -->
 
