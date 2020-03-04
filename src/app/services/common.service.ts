@@ -23,7 +23,7 @@ export class CommonService {
     toast.present();
   }
 
-  async showLoader(content) {
+  async showLoader(content = 'Loading ...') {
     this.loader = await this.loadingController.create({
       message: content
     });
@@ -31,6 +31,7 @@ export class CommonService {
   }
 
   dismissLoader() {
-    this.loader.dismiss();
+    if (this.loader)
+      this.loader.dismiss();
   }
 }

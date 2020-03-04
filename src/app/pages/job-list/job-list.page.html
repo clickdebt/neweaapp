@@ -49,12 +49,12 @@
       <tbody>
         <tr class="no-border" *ngFor="let case of cases">
           <td>
-            <ion-icon name="caret-forward-outline" *ngIf="case.linked_cases"></ion-icon>
+            <ion-icon name="caret-forward-outline" *ngIf="case.linked_cases != ''"></ion-icon>
           </td>
           <td>
             <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
           </td>
-          <td>{{case.id}}- {{case.linked_cases.length}}</td>
+          <td>{{case.id}}</td>
           <td>{{case.ref}}</td>
           <td>{{case.debtor.debtor_name}}</td>
           <td>{{case.d_outstanding}}</td>
@@ -138,17 +138,20 @@
           </td>
         </tr> -->
       </tbody>
+      <tfoot>
+        
+      </tfoot>
     </table>
+    <ion-infinite-scroll threshold="100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   </div>
-
-
   <!-- table -->
-
-
 
 </ion-content>
 <ion-footer>
   <ion-toolbar>
-    <ion-button color="secondary" expand="full">Show 2 cases on Map</ion-button>
+    <ion-button color="secondary" expand="full" hidden>Show 2 cases on Map</ion-button>
   </ion-toolbar>
 </ion-footer>

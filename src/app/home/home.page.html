@@ -20,12 +20,12 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon size="large" (click)="logout()" name="log-out-outline"></ion-icon>
+      <ion-button (click)="confirmLogout()">
+        <ion-icon size="large" name="log-out-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-buttons class="company-logo ion-text-center" *ngIf="logo">
-      <img class="logo" [src]="logo" >
+      <img class="logo" [src]="logo">
     </ion-buttons>
     <ion-title *ngIf="!logo">Field Agent</ion-title>
   </ion-toolbar>
