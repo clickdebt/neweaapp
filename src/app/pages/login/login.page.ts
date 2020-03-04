@@ -45,17 +45,14 @@ export class LoginPage implements OnInit {
   }
   login() {
     if (this.loginForm.valid) {
-      this.commonService.showLoader('Loading...');
       this.authService.authenticate(this.loginForm.value.username, this.loginForm.value.password).subscribe(
         data => {
           if (data['result']) {
-            this.commonService.dismissLoader();
             localStorage.setItem('userdata', JSON.stringify(data['data']));
             localStorage.setItem('remote_token', data['data']['remote_token']);
             this.commonService.showToast('Successfully logged in.', 'success');
             this.router.navigate(['/home']);
           } else {
-            this.commonService.dismissLoader();
             this.commonService.showToast(data['message'], 'danger');
           }
         },

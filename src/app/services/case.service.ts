@@ -5,11 +5,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   providedIn: 'root'
 })
 export class CaseService {
-  serverURL;
   constructor(
     public http: HttpClient
   ) {
-    this.serverURL = localStorage.getItem('server_url') + 'b/system/v1/';
   }
 
   getHeaders() {
@@ -28,8 +26,10 @@ export class CaseService {
 
   }
   getCases(params) {
-    const apiURL = this.serverURL + 'cases/visit?user_id=18&limit=20';
+    const logindata = JSON.parse(localStorage.getItem('userdata'));
+    // tslint:disable-next-line: max-line-length
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v1/cases/visit?user_id=' + logindata.id + '&limit=' + params.limit + '&page=' + params.page;
     const newheader = this.getHeaders();
-    return this.http.get(apiURL, { headers: newheader });
+    return this.http.get(apiURL);
   }
 }

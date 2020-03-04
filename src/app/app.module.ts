@@ -8,10 +8,10 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 
-import { SettingsService, AuthService, CommonService, CaseService } from './services';
+import { SettingsService, AuthService, CommonService, CaseService, HttpInterceptorService } from './services';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [AppComponent],
@@ -31,6 +31,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     AuthService,
     CommonService,
     CaseService,
+    {provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true},
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
