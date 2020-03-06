@@ -63,10 +63,6 @@ html{
       display: none;
   }
 
- ion-toolbar {
-    border-bottom: 1px solid #d8d8d8;
-  }
-
   .searchbar-wrpper{
     display: flex;
     align-items: center;
@@ -195,3 +191,130 @@ ion-footer{
 }
 
 
+//Form IO
+.formio-wrapper{
+
+  formio-alerts{
+    display: none !important;
+  }
+
+  .formio-error-wrapper, .formio-warning-wrapper{
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .wizard-page{
+    padding: 0px 17px;
+    .col-form-label{
+      font-size: 0.9rem;
+    }
+  
+    .form-control {
+      border-radius: 0px;
+      box-shadow: none;
+      &:focus{
+        border-color: var(--ion-color-secondary);
+        box-shadow: none;
+        outline: 0;
+      }
+    }
+  }
+
+  .list-inline{
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid rgba(0, 0, 0, 0.22);
+    padding: 0px 17px;
+    padding-top: 17px;
+  }
+
+  nav{
+    .pagination{
+      display: flex;
+      overflow-y: hidden;
+      overflow-x: auto;
+      border-radius: 0;
+      .page-item{
+        flex: 1;
+        background: var(--ion-color-dark);
+        border: 0;
+        border-top: 1px solid var(--ion-color-light);
+        border-left: 1px solid var(--ion-color-light);
+        display: flex;
+        align-items: center;
+        &:first-child{
+          border-left: 0;
+          .page-link{
+            border-left: 0;
+          }  
+        }
+
+        &:last-child{
+          .page-link{
+            border-right: 0;
+          }  
+        }
+        .page-link{
+          border-radius: 0;
+          font-size: 1rem;
+          padding: 10px 16px;
+          color: var(--ion-color-light);
+          background: var(--ion-color-dark);
+          text-align: center;
+          border: 0;
+          border-left: 1px solid var(--ion-color-light);
+        }
+        &.active{
+          color: var(--ion-color-light);
+          background: var(--ion-color-secondary);
+          .page-link{
+            color: var(--ion-color-light);
+            background: var(--ion-color-secondary);
+          }
+        }
+      }
+    }
+  }
+
+  .btn{
+    border-radius: 0;
+    min-width: 150px;
+    text-transform: uppercase;
+    outline: 0 !important;
+    box-shadow: none !important;
+    &.btn-primary{
+      background: var(--ion-color-secondary);
+      border-color: var(--ion-color-secondary);
+      &.focus, &:focus, &.active, &:active, &.hover, &:hover{
+        background: transparent;
+        color: var(--ion-color-secondary);
+        border-color: var(--ion-color-secondary);
+      }
+    }
+    &.btn-secondary{
+      background: var(--ion-color-dark);
+      border-color: var(--ion-color-dark);
+    }
+  }
+
+  .formio-component-radio{
+    .form-radio{
+      .form-check{
+        display: inline-block;
+        margin-left: 15px;
+        &:first-of-type{
+          margin-left: 0;
+        }
+        .form-check-label{
+          input{
+            top: 1px;
+            vertical-align: middle;
+          } 
+          span{
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+  }
+}
