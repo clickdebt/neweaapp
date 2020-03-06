@@ -12,23 +12,27 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('../pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
+        loadChildren: () => import('../pages/dashboard/dashboard.module').then(m => m.DashboardPageModule)
       },
       {
         path: 'dashboard',
-        loadChildren: () => import('../pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
+        loadChildren: () => import('../pages/dashboard/dashboard.module').then(m => m.DashboardPageModule)
       },
       {
         path: 'job-list',
-        loadChildren: () => import('../pages/job-list/job-list.module').then( m => m.JobListPageModule)
+        loadChildren: () => import('../pages/job-list/job-list.module').then(m => m.JobListPageModule)
       },
       {
         path: 'joblist-mobile',
-        loadChildren: () => import('../pages/joblist-mobile/joblist-mobile.module').then( m => m.JoblistMobilePageModule)
+        loadChildren: () => import('../pages/joblist-mobile/joblist-mobile.module').then(m => m.JoblistMobilePageModule)
       },
       {
         path: 'visit-form/:id',
-        loadChildren: () => import('../pages/visit-form/visit-form.module').then( m => m.VisitFormPageModule)
+        loadChildren: () => import('../pages/visit-form/visit-form.module').then(m => m.VisitFormPageModule)
+      },
+      {
+        path: 'map-view',
+        loadChildren: () => import('../pages/map-view/map-view.module').then(m => m.MapViewPageModule)
       }
     ]
   }
@@ -38,4 +42,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class HomePageRoutingModule {}
+export class HomePageRoutingModule { }

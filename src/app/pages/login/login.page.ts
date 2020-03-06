@@ -57,7 +57,7 @@ export class LoginPage implements OnInit {
           }
         },
         err => {
-          this.commonService.showToast(err);
+          this.commonService.showToast(err, 'danger');
         }
       );
     }

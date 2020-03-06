@@ -4,3 +4,6 @@ export { CommonService } from './common.service';
 export { CaseService } from './case.service';
 export { VisitService } from './visit.service';
 export { HttpInterceptorService } from './http-interceptor.service';
+export { StorageService } from './storage.service';
+export { DatabaseService } from './database.service';
+export { MapService } from './map.service';
