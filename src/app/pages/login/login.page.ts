@@ -37,10 +37,10 @@ export class LoginPage implements OnInit {
     const serverSettings = localStorage.getItem('serverSettings');
     if (serverSettings) {
       const settings = JSON.parse(serverSettings);
-      const setting = settings.filter(sett => {
+      const setting = settings.find(sett => {
         return sett.active;
       });
-      this.setting = setting[0];
+      this.setting = setting;
     }
   }
   login() {

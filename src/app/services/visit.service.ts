@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CaseService {
+export class VisitService {
+
   constructor(
     public http: HttpClient
-  ) {
-  }
+  ) { }
 
-  getCases(params) {
+  getVisitForm() {
     const logindata = JSON.parse(localStorage.getItem('userdata'));
     // tslint:disable-next-line: max-line-length
-    const apiURL = localStorage.getItem('server_url') + 'b/system/v1/cases/visit?user_id=' + logindata.id + '&limit=' + params.limit + '&page=' + params.page;
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v1/forms/view/visit_form';
     return this.http.get(apiURL);
   }
 }

@@ -8,6 +8,8 @@ ion-content {
 }
 
 .linked-case {
+    border: 1px solid #d8d8d8;
+    box-shadow: inset 0px 1px 4px 2px #cecece;
     padding: 0;
 
     h4 {
@@ -17,6 +19,12 @@ ion-content {
         color: #cc0092;
     }
 
+    table{
+        width: 99%;
+        margin: 0 auto;
+        margin-bottom: 10px;
+    }
+    
     th {
         vertical-align: bottom;
         border-bottom: 1px solid #dee2e6;
@@ -37,8 +45,9 @@ ion-content {
     right: 0;
     top: 57px;
     background: #ffffff;
-    height: auto;
-    z-index: 1;
+    max-height: 70vh;
+    height: 100%;
+    z-index: 3;
     -webkit-transform: none;
     -moz-transform: none;
     transform: none;
@@ -47,6 +56,7 @@ ion-content {
     padding-bottom: 77px;
 
     &.sort{
+        height: auto;
         padding-bottom: 0;   
     }
 
@@ -76,4 +86,39 @@ ion-content {
         height: 100%;
         overflow: auto;
     }
+}
+
+.filter-item-list{
+    .filter-item-list-item{
+        margin-right: 3px;
+        --min-height: 10px;
+        display: inline-block;
+        border: 2px solid var(--ion-color-dark);
+        color: var(--ion-color-dark);
+        font-size: 13px;
+        text-transform: uppercase;
+        border-radius: 40px;
+        height: auto;
+        &.active{
+            --background: var(--ion-color-dark);
+            ion-label{
+                color: var(--ion-color-dark-contrast);
+            }
+        }
+        ion-label{
+            font-weight: 500;
+            margin: 5px 0;
+        }
+        ion-checkbox{
+            opacity: 0;
+            margin: 0;
+            height: 0;
+            width: 0;
+        }
+    }
+}
+.item-native{
+    color: blue;
+    height: auto;
+    min-height: initial !important;
 }

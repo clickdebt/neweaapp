@@ -25,6 +25,10 @@ const routes: Routes = [
       {
         path: 'joblist-mobile',
         loadChildren: () => import('../pages/joblist-mobile/joblist-mobile.module').then( m => m.JoblistMobilePageModule)
+      },
+      {
+        path: 'visit-form/:id',
+        loadChildren: () => import('../pages/visit-form/visit-form.module').then( m => m.VisitFormPageModule)
       }
     ]
   }

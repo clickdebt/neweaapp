@@ -11,8 +11,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 
-import { SettingsService, AuthService, CommonService, CaseService, HttpInterceptorService } from './services';
+import { SettingsService, AuthService, CommonService, CaseService, VisitService, HttpInterceptorService } from './services';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormioModule } from 'angular-formio';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -22,7 +24,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    FormioModule
   ],
   providers: [
     StatusBar,
@@ -31,6 +34,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     AuthService,
     CommonService,
     CaseService,
+    VisitService,
     {provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true},
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
