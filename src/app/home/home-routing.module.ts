@@ -25,6 +25,10 @@ const routes: Routes = [
       {
         path: 'joblist-mobile',
         loadChildren: () => import('../pages/joblist-mobile/joblist-mobile.module').then( m => m.JoblistMobilePageModule)
+      },
+      {
+        path: 'map-view',
+        loadChildren: () => import('../pages/map-view/map-view.module').then( m => m.MapViewPageModule)
       }
     ]
   }
