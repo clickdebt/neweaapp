@@ -13,7 +13,7 @@ export class CommonService {
 
   }
 
-  async showToast(msg, clr = 'success') {
+  async showToast(msg, clr = 'default') {
     const toast = await this.toastController.create({
       message: msg,
       duration: 4000,
@@ -30,8 +30,9 @@ export class CommonService {
     this.loader.present();
   }
 
-  dismissLoader() {
-    if (this.loader)
-      this.loader.dismiss();
+  async dismissLoader() {
+    if (this.loader) {
+      await this.loader.dismiss();
+    }
   }
 }

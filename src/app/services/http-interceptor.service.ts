@@ -27,16 +27,17 @@ export class HttpInterceptorService implements HttpInterceptor {
         this.commonService.showLoader();
         return next.handle(authReq).pipe(
             tap((event: HttpEvent<any>) => {
-                this.commonService.dismissLoader();
                 return event;
             }, (error: any) => {
+                this.commonService.dismissLoader();
+                this.commonService.showToast(error['error']['message']);
                 if (error.status === 401 && !req.url.includes('login')) {
-                    this.commonService.dismissLoader();
                     localStorage.removeItem('remote_token');
                     localStorage.removeItem('userdata');
                     this.router.navigate(['/login']);
-
                 }
+            }, () => {
+                this.commonService.dismissLoader();
             }));
     }
 }
