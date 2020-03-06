@@ -30,6 +30,7 @@
     "angular-formio": "^4.6.1",
     "@ionic/storage": "^2.2.0",
     "cordova-android": "^8.1.0",
+    "cordova-browser": "6.0.0",
     "cordova-plugin-googlemaps": "^2.6.2",
     "cordova-sqlite-storage": "^4.0.0",
     "core-js": "^2.5.4",
@@ -87,6 +88,7 @@
       }
     },
     "platforms": [
+      "browser",
       "android"
     ]
   }
