@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { VisitService } from 'src/app/services';
+import { StorageService } from 'src/app/services/storage.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-visit-form',
@@ -15,8 +17,12 @@ export class VisitFormPage implements OnInit {
   lat: string;
   lang: string;
   resultobj: any;
+  addressData;
   constructor(
-    private visitService: VisitService
+    private visitService: VisitService,
+    private storageService: StorageService,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -29,7 +35,7 @@ export class VisitFormPage implements OnInit {
 
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     this.formConfig = {
       options: {
         alerts: {
@@ -39,6 +45,16 @@ export class VisitFormPage implements OnInit {
           message: 'Error while submitting the form. Please try again.'
         }
       }
+    };
+    this.getLocation();
+    const casesData = await this.storageService.get('cases');
+    const visitCaseData = casesData.find(c => c.id = this.route.snapshot.params['id']);
+    this.addressData = {
+      address_ln1: visitCaseData.debtor.addresses[0].address_ln1,
+      address_ln2: visitCaseData.debtor.addresses[0].address_ln2,
+      address_ln3: visitCaseData.debtor.addresses[0].address_ln3,
+      address_town: visitCaseData.debtor.addresses[0].address_town,
+      address_postcode: visitCaseData.debtor.addresses[0].address_postcode,
     };
   }
   dataRead(obj) {
@@ -50,69 +66,26 @@ export class VisitFormPage implements OnInit {
       scheme_cat_id: 1
     };
     this.jsonString = tempObj.content;
-
     const re = /\{{([^}}]+)\}/g;
     const variables = this.jsonString.match(re);
     console.log(variables);
 
-    if (variables.length > 0) {
+    if (variables && variables.length > 0) {
       variables.forEach(variable => {
-
         let fieldkeyArr = variable.split('{{');
-        console.log(fieldkeyArr);
         fieldkeyArr = fieldkeyArr[1].split('}');
-        console.log(fieldkeyArr);
         const fieldKey = fieldkeyArr[0];
-        this.jsonString = this.jsonString.replace('{{' + fieldKey + '}}', 'saasasa');
-        console.log(this.jsonString);
-      });
-      this.jsonObject = JSON.parse(this.jsonString);
-      for (let i = 0; i < this.jsonObject.components.length; i++) {
-        for (let j = 0; j < this.jsonObject.components[i].components.length; j++) {
-          this.jsonObject.components[i].components[j].widget = 'html5';
+        if (this.addressData.hasOwnProperty(fieldKey)) {
+          console.log(fieldKey, this.addressData[fieldKey]);
+          this.jsonString = this.jsonString.replace('{{' + fieldKey + '}}', this.addressData[fieldKey]);
         }
-      }
-      // tslint:disable-next-line: prefer-for-of
-      // for (let i = 0; i < matchArr[0].length; ++i) {
-      //   const strKey = matchArr[0][i];
-      //   let fieldkeyArr = strKey.split('{{');
-      //   fieldkeyArr = fieldkeyArr[1].split('}');
-      //   const fieldKey = fieldkeyArr[0];
-      //   this.jsonString = this.jsonString.replace('{{x,y}}', this.lat + ' , ' + this.lang);
-      //   this.jsonString = this.jsonString.replace('{{' + fieldKey + '}}', 'saasasa');
-      //   this.jsonString = this.jsonString.replace('{{' + fieldKey + '}}', 'sasasasasasa');
-      // }
+      });
+      this.jsonString = this.jsonString.replace('{{x,y}}', this.lat + ' , ' + this.lang);
     }
+    this.jsonObject = JSON.parse(this.jsonString);
+  }
 
-    // this.jsonOBject = JSON.parse(this.jsonString);
-    // console.log(this.jsonOBject);
-
-    // const visitOutcomeObj = {
-    //   type: 'select',
-    //   label: 'Visit Outcome',
-    //   key: 'visit_outcome',
-    //   placeholder: 'Select Visit Outcome',
-    //   data: this.resultobj,
-    //   dataSrc: 'values',
-    //   template: '<span>{{ item.label }}</span>',
-    //   input: true
-
-    // };
-
-    // const ComponentLength = this.jsonOBject.components.length;
-    // this.jsonOBject.components[ComponentLength - 1].components.push(visitOutcomeObj);
-    // // tslint:disable-next-line: prefer-for-of
-    // for (let i = 0; i < this.jsonOBject.components.length; i++) {
-    //   // tslint:disable-next-line: prefer-for-of
-    //   for (let j = 0; j < this.jsonOBject.components[i].components.length; j++) {
-    //     this.jsonOBject.components[i].components[j].widget = 'html5';
-    //   }
-    // }
-
-
-    // // this.jsonOBject.components[0].components[3].widget= 'html5';
-    // this.jsonOBject.components[1].clickable = false;
-    // console.log(this.jsonOBject)
+  getLocation() {
 
   }
 }

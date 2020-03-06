@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CaseService } from '../../services';
-import { isArray } from 'util';
+import { Router } from '@angular/router';
+import { StorageService } from 'src/app/services/storage.service';
 @Component({
   selector: 'app-job-list',
   templateUrl: './job-list.page.html',
@@ -43,7 +44,9 @@ export class JobListPage implements OnInit {
     { val: 'Mushroom', isChecked: false, id: 3 }
   ];
   constructor(
-    private caseService: CaseService
+    private caseService: CaseService,
+    private router: Router,
+    private storageService: StorageService,
   ) { }
 
   ngOnInit() {
@@ -104,6 +107,11 @@ export class JobListPage implements OnInit {
       }
     });
   }
+
+  goToVisitForm(visitCase) {
+    localStorage.setItem('visit_case_data', JSON.stringify(visitCase));
+    this.router.navigate(['/home/visit-form/' + visitCase.id]);
+  }
   loadData(infiniteScrollEvent) {
     this.getCases(infiniteScrollEvent);
 
@@ -116,6 +124,7 @@ export class JobListPage implements OnInit {
       }
     });
     this.cases = this.cases.concat(caseData);
+    this.storageService.set('cases', this.cases);
   }
 
 }
