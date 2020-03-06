@@ -2,8 +2,8 @@
   <ion-grid class="p-y-0">
     <ion-row class="searchbar-wrpper">
       <ion-col size-md="8" size-xs="6">
-        <ion-searchbar [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel" (keyup.enter)="onInput($event)"
-          (ionCancel)="onCancel($event)" placeholder="Search ID, ref, postcode, name">
+        <ion-searchbar [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
+          (keyup.enter)="onInput($event)" (ionCancel)="onCancel($event)" placeholder="Search ID, ref, postcode, name">
         </ion-searchbar>
       </ion-col>
       <ion-col size-md="4" size-xs="6" class="ion-text-end">
@@ -149,8 +149,12 @@
         <ng-container *ngFor="let case of cases">
           <tr class="no-border">
             <td>
-              <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]" (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-forward-outline"></ion-icon>
-              <ion-icon *ngIf="case.linked_cases != '' && caseLinks[case.id]" (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-down-outline"></ion-icon>
+              <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]"
+                (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-forward-outline">
+              </ion-icon>
+              <ion-icon *ngIf="case.linked_cases != '' && caseLinks[case.id]"
+                (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-down-outline">
+              </ion-icon>
               <!-- <ion-button size="small" fill="clear" >
               </ion-button> -->
             </td>
@@ -170,7 +174,7 @@
               </ion-button>
             </td>
             <td class="action">
-              <ion-button size="small" color="tertiary" [routerLink]="['/home/visit-form/' + case.id]">
+              <ion-button size="small" color="tertiary" (click)="goToVisitForm(case)">
                 Visit
               </ion-button>
             </td>
