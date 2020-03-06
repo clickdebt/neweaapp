@@ -1,30 +1,129 @@
-<ion-content>
+<ion-toolbar color="light">
+  <ion-grid class="p-y-0">
+    <ion-row class="searchbar-wrpper">
+      <ion-col size-md="8" size-xs="6">
+        <ion-searchbar [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel" (keyup.enter)="onInput($event)"
+          (ionCancel)="onCancel($event)" placeholder="Search ID, ref, postcode, name">
+        </ion-searchbar>
+      </ion-col>
+      <ion-col size-md="4" size-xs="6" class="ion-text-end">
+        <ion-button color="secondary" size="small" (click)="showFilterDiv()">
+          Filters
+        </ion-button>
+        <ion-button color="secondary" size="small" (click)="showSortDiv()">
+          Sort
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-toolbar>
 
-  <!-- sort toolbar -->
-
-  <ion-toolbar color="light">
-    <ion-grid class="p-y-0">
-      <ion-row class="searchbar-wrpper">
-        <ion-col size-md="4" size-xs="12">
-          <ion-input name="search" placeholder="Search ID, Ref, Postcode, Name"></ion-input>
+<div class="filters" [ngClass]="{'active': showFilter}">
+  <div class="filter-body">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Quick Filter</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.val}}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
         </ion-col>
-        <ion-col size-md="8" size-xs="12">
-          <ion-button color="secondary">
-            Filter
-          </ion-button>
-          <ion-button color="secondary">
-            Sort
-          </ion-button>
-          <ion-button color="secondary">
-            Need a Visit
-          </ion-button>
-          <ion-button color="secondary">
-            On Arrangement
-          </ion-button>
+      </ion-row>
+      <div class="divider"></div>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Schemes</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of schemes" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.val}}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Stage</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of stages" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.val}}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Status</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.val}}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Client</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.val}}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Visit Count</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.val}}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
         </ion-col>
       </ion-row>
     </ion-grid>
-  </ion-toolbar>
+  </div>
+  <div class="filter-footer">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="6">
+          <ion-button color="dark" size="default" fill="clear" (click)="clearFilter()">CLEAR</ion-button>
+        </ion-col>
+        <ion-col size-xs="6" class="ion-text-end">
+          <ion-button color="secondary" size="default" fill="solid" (click)="filterCases()">Apply Filter</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</div>
+<div class="filters sort" [ngClass]="{'active': showSort}">
+  <div class="filter-body">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Sort</h6>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">On Arrangement</ion-button>
+          <ion-button shape="round" color="secondary" size="small" fill="outline">Need a Visit</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</div>
+<ion-content>
+  <!-- sort toolbar -->
 
   <!-- sort toolbar -->
 
@@ -33,113 +132,98 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th style="width:3%"></th>
-          <th style="width:3%"></th>
-          <th style="width:10%">Case ID</th>
-          <th style="width:14%">Ref</th>
-          <th style="width:20%">Name</th>
-          <th style="width:10%">Amount</th>
-          <th style="width:10%">Linked</th>
-          <th style="width:13%">Postcode</th>
-          <th style="width:7%">Visits</th>
-          <th style="width:10%">Details</th>
-          <th style="width:10%">Report</th>
+          <th width="3%"></th>
+          <th width="3%"></th>
+          <th>Case ID</th>
+          <th>Ref</th>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Linked</th>
+          <th>Postcode</th>
+          <th>Visits</th>
+          <th>Details</th>
+          <th>Visit</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="no-border" *ngFor="let case of cases">
-          <td>
-            <ion-icon name="caret-forward-outline" *ngIf="case.linked_cases != ''"></ion-icon>
-          </td>
-          <td>
-            <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
-          </td>
-          <td>{{case.id}}</td>
-          <td>{{case.ref}}</td>
-          <td>{{case.debtor.debtor_name}}</td>
-          <td>{{case.d_outstanding}}</td>
-          <td>#00#</td>
-          <td>{{case.debtor.addresses[0].address_postcode}}</td>
-          <td>{{case.visitcount_total}}</td>
-          <td class="action ">
-            <ion-button size="small" color="secondary">
-              Details
-            </ion-button>
-          </td>
-          <td class="action">
-            <ion-button size="small" color="tertiary">
-              Report
-            </ion-button>
-          </td>
-        </tr>
-        <!-- <tr class="linked-case">
-          <td class="p-x-0 p-y-0" colspan=10>
-            <div>
-              <h4>Linked cases</h4>
-              <table class="table">
-                <tr class="no-border">
-                  <th style="width:2%"></th>
-                  <th style="width:2%"></th>
-                  <th style="width:10%">Case ID</th>
-                  <th style="width:15%">Ref</th>
-                  <th style="width:10%">Amount</th>
-                  <th style="width:15%">Offence Date</th>
-                  <th style="width:13%">Date</th>
-                  <th style="width:13%">Expiry Date</th>
-                  <th style="width:10%">Details</th>
-                  <th style="width:10%">Report</th>
-                </tr>
-                <tr class="no-border">
-                  <td>
-                  </td>
-                  <td>
-                  </td>
-                  <td>51234</td>
-                  <td>PCN1234</td>
-                  <td>654865</td>
-                  <td>2020-12-8</td>
-                  <td>2020-12-8</td>
-                  <td>2020-12-8</td>
-                  <td class="action ">
-                    <ion-button size="small" color="secondary">
-                      Details
-                    </ion-button>
-                  </td>
-                  <td class="action">
-                    <ion-button size="small" color="tertiary">
-                      Report
-                    </ion-button>
-                  </td>
-                </tr>
-                <tr class="no-border">
-                  <td>
-                  </td>
-                  <td>
-                  </td>
-                  <td>51234</td>
-                  <td>PCN1234</td>
-                  <td>654865</td>
-                  <td>2020-12-8</td>
-                  <td>2020-12-8</td>
-                  <td>2020-12-8</td>
-                  <td class="action ">
-                    <ion-button size="small" color="secondary">
-                      Details
-                    </ion-button>
-                  </td>
-                  <td class="action">
-                    <ion-button size="small" color="tertiary">
-                      Report
-                    </ion-button>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </td>
-        </tr> -->
+        <ng-container *ngFor="let case of cases">
+          <tr class="no-border">
+            <td>
+              <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]" (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-forward-outline"></ion-icon>
+              <ion-icon *ngIf="case.linked_cases != '' && caseLinks[case.id]" (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-down-outline"></ion-icon>
+              <!-- <ion-button size="small" fill="clear" >
+              </ion-button> -->
+            </td>
+            <td>
+              <ion-checkbox mode="md" color="secondary" slot="start"></ion-checkbox>
+            </td>
+            <td>{{case.id}}</td>
+            <td>{{case.ref}}</td>
+            <td>{{case.debtor.debtor_name}}</td>
+            <td>{{case.d_outstanding}}</td>
+            <td>#00#</td>
+            <td>{{case.debtor.addresses[0].address_postcode}}</td>
+            <td>{{case.visitcount_total}}</td>
+            <td class="action ">
+              <ion-button size="small" color="secondary">
+                Details
+              </ion-button>
+            </td>
+            <td class="action">
+              <ion-button size="small" color="tertiary" [routerLink]="['/home/visit-form/' + case.id]">
+                Visit
+              </ion-button>
+            </td>
+          </tr>
+          <tr class="linked-case" *ngIf="case.linked_cases != '' && caseLinks[case.id]">
+            <td class="p-x-0 p-y-0" colspan=11>
+              <div>
+                <h4>Linked cases</h4>
+                <table class="table">
+                  <tr class="no-border">
+                    <th width="3%"></th>
+                    <th width="3%"></th>
+                    <th>Case ID</th>
+                    <th>Ref</th>
+                    <th>Amount</th>
+                    <th>Offence Date</th>
+                    <th>Date</th>
+                    <th>Expiry Date</th>
+                    <th>Visit Count</th>
+                    <th>Details</th>
+                    <th>Report</th>
+                  </tr>
+                  <tr class="no-border" *ngFor="let link_case of case.linked_cases">
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td>{{link_case.id}}</td>
+                    <td>{{link_case.ref}}</td>
+                    <td>{{link_case.d_outstanding}}</td>
+                    <td>{{link_case.offense_date}}</td>
+                    <td>{{link_case.date}}</td>
+                    <td>{{link_case.expiry_date}}</td>
+                    <td>{{link_case.visitcount_total}}</td>
+                    <td class="action ">
+                      <ion-button size="small" color="secondary">
+                        Details
+                      </ion-button>
+                    </td>
+                    <td class="action">
+                      <ion-button size="small" color="tertiary">
+                        Report
+                      </ion-button>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
       <tfoot>
-        
+
       </tfoot>
     </table>
     <ion-infinite-scroll threshold="100px" id="infinite-scroll" (ionInfinite)="loadData($event)">

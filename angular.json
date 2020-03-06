@@ -32,6 +32,9 @@
               }
             ],
             "styles": [
+              { 
+                "input": "src/theme/bootstrap.min.css"
+              },
               {
                 "input": "src/theme/variables.scss"
               },
