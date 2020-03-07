@@ -236,12 +236,14 @@ ion-footer{
       border-radius: 0;
       .page-item{
         flex: 1;
-        background: var(--ion-color-dark);
+        background: #b1b1b1;
         border: 0;
         border-top: 1px solid var(--ion-color-light);
         border-left: 1px solid var(--ion-color-light);
         display: flex;
         align-items: center;
+        pointer-events: none;
+        cursor: not-allowed;
         &:first-child{
           border-left: 0;
           .page-link{
@@ -255,18 +257,22 @@ ion-footer{
           }  
         }
         .page-link{
+          width: 100%;
           border-radius: 0;
           font-size: 1rem;
           padding: 10px 16px;
           color: var(--ion-color-light);
-          background: var(--ion-color-dark);
+          background: #b1b1b1;
           text-align: center;
           border: 0;
           border-left: 1px solid var(--ion-color-light);
+          padding: 16px 0px;
         }
-        &.active{
+        &.active, &.fill{
           color: var(--ion-color-light);
           background: var(--ion-color-secondary);
+          pointer-events: initial;
+          cursor: pointer;
           .page-link{
             color: var(--ion-color-light);
             background: var(--ion-color-secondary);
@@ -317,4 +323,14 @@ ion-footer{
       }
     }
   }
+}
+
+.modal-wrapper{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: initial !important;
+  width: initial !important;
 }
