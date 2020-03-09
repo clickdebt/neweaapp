@@ -25,6 +25,7 @@ export class VisitFormPage implements OnInit {
   visitedPageArr = [];
   modalDataObj: any;
   modalDataArr: any;
+  visitCaseData;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -52,13 +53,13 @@ export class VisitFormPage implements OnInit {
     this.caseId = this.route.snapshot.params.id;
     this.getLocation();
     const casesData = await this.storageService.get('cases');
-    const visitCaseData = casesData.find(c => c.id == this.caseId);
+    this.visitCaseData = casesData.find(c => c.id == this.caseId);
     this.addressData = {
-      address_ln1: visitCaseData.debtor.addresses[0].address_ln1,
-      address_ln2: visitCaseData.debtor.addresses[0].address_ln2,
-      address_ln3: visitCaseData.debtor.addresses[0].address_ln3,
-      address_town: visitCaseData.debtor.addresses[0].address_town,
-      address_postcode: visitCaseData.debtor.addresses[0].address_postcode,
+      address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
+      address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
+      address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
+      address_town: this.visitCaseData.debtor.addresses[0].address_town,
+      address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
     };
     this.visitService.getVisitForm().subscribe(res => {
       this.caseService.getVisitOutcomes(this.caseId).subscribe(response => {
@@ -138,7 +139,7 @@ export class VisitFormPage implements OnInit {
     if (event.type === 'change' && event.srcElement.name.includes('data[singlePaymentMade]')) {
       if (event.srcElement.defaultValue == 1) {
         const paymodalPage = await this.modalCtrl.create({
-          component: PaymentModalPage, componentProps: { cssClass: 'case-action-modal' }
+          component: PaymentModalPage, componentProps: { 'cssClass': 'case-action-modal', 'caseId': this.caseId }
         });
         try {
           await paymodalPage.present();
@@ -154,12 +155,12 @@ export class VisitFormPage implements OnInit {
 
       }
     } else if (event.type === 'change' && event.srcElement.name.includes('data[arrangementAgreed]')) {
-      if (event.srcElement.defaultValue === 1) {
-
+      if (event.srcElement.defaultValue == 1) {
 
         let arrmodalPage = await this.modalCtrl.create({
-          component: ArrangementModalPage, componentProps: { cssClass: 'case-action-modal', outstanding: 0 }
+          component: ArrangementModalPage, componentProps: { 'cssClass': 'case-action-modal', 'caseId': this.caseId, 'outstanding': this.visitCaseData.d_outstanding }
         });
+        
         try {
           await arrmodalPage.present();
           localStorage.setItem('isFormPage', 'true');
