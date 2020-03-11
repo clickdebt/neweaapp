@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 export class HomePage implements OnInit {
 
   logo;
+  server_url;
+  username;
   constructor(
     private alertCtrl: AlertController,
     private router: Router
@@ -19,6 +21,10 @@ export class HomePage implements OnInit {
     this.logo = localStorage.getItem('logo');
   }
 
+  ionViewWillEnter() {
+    this.server_url = localStorage.getItem('server_url');
+    this.username = JSON.parse(localStorage.getItem('userdata')).name;
+  }
   async confirmLogout() {
     const alert = await this.alertCtrl.create({
       header: 'Confirm Logout!',

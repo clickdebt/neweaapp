@@ -34,13 +34,14 @@ export class HttpInterceptorService implements HttpInterceptor {
                 return event;
             }),
             catchError(error => {
-                this.commonService.showToast(error['error']['message']);
+                this.commonService.showToast(error.error.message);
                 if (error.status === 401 && !req.url.includes('login')) {
                     this.commonService.dismissLoader();
                     localStorage.removeItem('remote_token');
                     localStorage.removeItem('userdata');
                     this.router.navigate(['/login']);
                 }
+                return Observable.throw(error.error.message || 'server error.');
             }),
             finalize(() => {
                 this.reqCount--;

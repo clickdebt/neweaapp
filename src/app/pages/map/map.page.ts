@@ -15,7 +15,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { StorageService } from 'src/app/services';
 import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { ToastController, LoadingController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-map',
@@ -39,13 +39,16 @@ export class MapPage implements OnInit {
     private storageService: StorageService,
     private nativeGeocoder: NativeGeocoder,
     private toastCtrl: ToastController,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private platform: Platform,
   ) { }
 
   ngOnInit() { }
 
   ionViewDidEnter() {
-    this.initMap();
+    this.platform.ready().then(() => {
+      this.initMap();
+    });
   }
 
   initMap() {
