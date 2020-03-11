@@ -29,4 +29,9 @@ export class CaseService {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/filter';
     return this.http.get(apiURL);
   }
+
+  getFilters() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/filter';
+    return this.http.get(apiURL);
+  }
 }

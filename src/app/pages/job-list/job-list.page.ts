@@ -123,6 +123,8 @@ export class JobListPage implements OnInit {
         this.parseCaseData(res['data']);
       }
     });
+
+    this.getFilters();
   }
 
   goToVisitForm(visitCase) {
@@ -150,5 +152,21 @@ export class JobListPage implements OnInit {
     }, err => {
       console.log(err);
     });
+  }
+  async getFilters() {
+    const filters = await this.storageService.get('filters');
+    if (filters) {
+      console.log(523);
+      this.filterMaster = filters;
+    } else {
+      console.log(123);
+      this.caseService.getFilters()
+        .subscribe(async (response: any) => {
+          if (response.data) {
+            await this.storageService.set('filters', response.data);
+            this.filterMaster = response.data;
+          }
+        });
+    }
   }
 }

@@ -31,12 +31,12 @@ const routes: Routes = [
         loadChildren: () => import('../pages/visit-form/visit-form.module').then(m => m.VisitFormPageModule)
       },
       {
-        path: 'map-view',
-        loadChildren: () => import('../pages/map-view/map-view.module').then(m => m.MapViewPageModule)
+        path: 'visit-reports',
+        loadChildren: () => import('../pages/visit-reports/visit-reports.module').then(m => m.VisitReportsPageModule)
       },
       {
-        path: 'visit-reports',
-        loadChildren: () => import('../pages/visit-reports/visit-reports.module').then( m => m.VisitReportsPageModule)
+        path: 'map',
+        loadChildren: () => import('../pages/map/map.module').then(m => m.MapPageModule)
       }
     ]
   }
