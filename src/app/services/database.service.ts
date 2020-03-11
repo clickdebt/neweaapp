@@ -37,11 +37,7 @@ export class DatabaseService {
           this.setUpDatabase();
         }
       }
-    }).catch((error) => console.log('Error :: ', error));
-  }
-
-  initDb() {
-
+    }).catch((error) => {});
   }
 
   async setUpDatabase() {
@@ -58,23 +54,21 @@ export class DatabaseService {
       hold_until TEXT,
       client_id INTEGER,
       current_status_id INTEGER,
-      current_stage_id INTEGER);`;
+      current_stage_id INTEGER,
+      data TEXT
+    );`;
 
     const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
-    console.log('--data--', data);
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
     const result = await this.select('rdeb_cases');
-    console.log('--result--', result);
   }
 
   async executeQuery(query, params = null) {
     try {
       const result = await this.database.executeSql(query, params);
       return result;
-    } catch (error) {
-      console.log('Error', error);
-    }
+    } catch (error) {}
   }
 
   async insert(tableName, params = []) {
@@ -89,13 +83,13 @@ export class DatabaseService {
     const sqlStart = `INSERT INTO rdeb_cases
     ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until,
-      client_id ) VALUES `;
+      client_id, data ) VALUES `;
 
     data.forEach((values) => {
       sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
-        "${values.hold_until}", ${values.client_id})`);
+        "${values.hold_until}", ${values.client_id}, "${encodeURI(JSON.stringify(values))}")`);
     });
 
     const promiseArray = [];

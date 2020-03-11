@@ -13,7 +13,7 @@ import {
 } from '@ionic-native/google-maps/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
-import { StorageService } from 'src/app/services';
+import { StorageService, DatabaseService } from 'src/app/services';
 import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
 import { ToastController, LoadingController, Platform } from '@ionic/angular';
 
@@ -31,9 +31,10 @@ export class MapPage implements OnInit {
   loading: any;
   circle: any;
   latLngs: LatLng[];
+  cases = [];
+  markers = [];
 
   constructor(
-    private googleMaps: GoogleMaps,
     private geolocation: Geolocation,
     private launchNavigator: LaunchNavigator,
     private storageService: StorageService,
@@ -41,50 +42,69 @@ export class MapPage implements OnInit {
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private platform: Platform,
+    private databaseService: DatabaseService
   ) { }
 
   ngOnInit() { }
 
   ionViewDidEnter() {
-    this.platform.ready().then(() => {
+    this.platform.ready().then(async () => {
+      await this.getAddresses();
       this.initMap();
     });
   }
 
-  initMap() {
-    const POINTS: BaseArrayClass<any> = new BaseArrayClass<any>([
-      {
-        position: { lng: -122.1180187, lat: 37.3960513 },
-        title: 'Ardis G Egan Intermediate School'
-      },
-      {
-        position: { lng: -122.1180190, lat: 37.3960600 },
-        title: 'Portola School'
-      },
-      {
-        position: { lng: -122.0848257, lat: 37.3818032 },
-        title: 'Isaac Newton Graham Middle School'
-      },
-      {
-        position: { lng: -122.1082962, lat: 37.3863294 },
-        title: 'Los Altos High School'
-      },
-      {
-        position: { lng: -122.013571, lat: 37.3874409 },
-        title: 'The Kings Academy'
-      },
-      {
-        position: { lng: -122.082462, lat: 37.3627189 },
-        title: 'Georgina P Blach Intermediate School'
-      },
-      {
-        position: { lng: -122.0421832, lat: 37.3766077 },
-        title: 'Benner Junior High School'
+  async getAddresses() {
+    let mapMarkers = [];
+    const data = await this.databaseService.select('rdeb_cases');
+    if (data.rows) {
+      for (let i = 0; i < data.rows.length; i++) {
+        this.cases.push(data.rows.item(i));
       }
-    ]);
+    }
+    for (const ca of this.cases) {
+      try {
+        ca.data = JSON.parse(decodeURI(ca.data));
+      } catch (error) { }
+    }
+
+    this.cases.forEach((da) => {
+      mapMarkers.push({
+        id: da.id,
+        address: da.data.debtor.addresses[0],
+        address_str: `${da.data.debtor.addresses[0].address_ln1}, ` +
+          `${da.data.debtor.addresses[0].address_ln2}, ` +
+          `${da.data.debtor.addresses[0].address_ln3}, ` +
+          `${da.data.debtor.addresses[0].address_postcode}`
+      });
+    });
+
+    mapMarkers = await this.getGeocodesLatLongs(mapMarkers);
+    mapMarkers.forEach((add) => ({
+      position: {
+        lat: add.latLng.latitude,
+        lng: add.latLng.longitude
+      },
+      title: add.address
+    }));
+    this.markers = mapMarkers;
+  }
+
+  initMap() {
+    const markerPoints = this.markers.map(d => {
+      return {
+        position: {
+          lat: d.latLng.latitude,
+          lng: d.latLng.longitude
+        },
+        title: d.address_str,
+        id: d.id
+      };
+    });
+
+    const POINTS: BaseArrayClass<any> = new BaseArrayClass<any>(markerPoints);
 
     const bounds: LatLng[] = POINTS.map((data: any, idx: number) => {
-      console.log(data);
       return data.position;
     });
 
@@ -96,7 +116,8 @@ export class MapPage implements OnInit {
       },
       zoomControl: true,
       zoom: 12,
-      streetViewControl: true
+      streetViewControl: false,
+      mapTypeControl: false
     };
 
     const element = this.mapElement.nativeElement;
@@ -151,8 +172,6 @@ export class MapPage implements OnInit {
 
     const latLng: LatLng = new LatLng(this.currLat, this.currLang);
 
-    console.log(JSON.stringify(location, null, 2));
-
     // Move the map camera to the location with animation
     await this.moveCamera(latLng);
 
@@ -203,7 +222,7 @@ export class MapPage implements OnInit {
   async addCircle() {
     const mapClickSub = this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe(async (latLng) => {
       if (this.circle) {
-        this.circle.remove();
+        await this.circle.remove();
       }
       this.circle = await this.map.addCircle({
         center: { lat: latLng[0].lat, lng: latLng[0].lng },
@@ -225,33 +244,21 @@ export class MapPage implements OnInit {
         target: this.circle.getBounds()
       });
 
-
       const data = this.circle.getBounds();
-      console.log('---latLng----', latLng);
-      console.log('---circle----', this.circle);
-      console.log('---getBounds----', data);
 
       const coveredMarkers = [];
-      console.log('---latLngs----', this.latLngs);
       for (const loc of this.latLngs) {
-        console.log('---loc----', loc);
         if (data.contains(loc)) {
           coveredMarkers.push(loc);
         }
       }
 
-      console.log('---values----', coveredMarkers);
-
       await this.navigateLocation(coveredMarkers);
 
       // Catch the CIRCLE_CLICK event
-      this.circle.on(GoogleMapsEvent.CIRCLE_CLICK).subscribe(async (latLng) => {
-        console.log('---latLng----', latLng);
-      });
+      this.circle.on(GoogleMapsEvent.CIRCLE_CLICK).subscribe(async (latLng) => { });
 
       mapClickSub.unsubscribe();
-
-
     });
   }
 
@@ -265,7 +272,6 @@ export class MapPage implements OnInit {
   async watchCurrentLocation() {
     const subscription = this.geolocation.watchPosition()
       .subscribe(position => {
-        console.log(position.coords.longitude + ' ' + position.coords.latitude);
         this.currLang = position.coords.longitude;
         this.currLat = position.coords.latitude;
       });
@@ -277,12 +283,13 @@ export class MapPage implements OnInit {
   }
 
   async getGeocodesLatLongs(addresses = []) {
-    const latLongs = [];
+    const newAddresss = [];
     for (const address of addresses) {
-      const data = await this.nativeGeocoder.forwardGeocode(address);
-      latLongs.push(data);
+      const data = await this.nativeGeocoder.forwardGeocode(address.address_str);
+      address.latLng = data[0];
+      newAddresss.push(address);
     }
-    return latLongs;
+    return newAddresss;
   }
 
   async getGeocodesAddress(locations = []) {
@@ -300,6 +307,10 @@ export class MapPage implements OnInit {
       location = `${location} , ${latLng.lat} ${latLng.lng}`;
     });
     await this.launchNavigator.navigate(location);
+  }
+
+  ionViewDidLeave() {
+
   }
 }
 

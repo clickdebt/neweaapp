@@ -33,12 +33,6 @@ export class HomePage implements OnInit {
   async ionViewDidEnter() {
     this.caseService.getCases({}).subscribe(async (response: any) => {
       await this.databaseService.setCases(response.data);
-      const data = await this.databaseService.select('rdeb_cases');
-
-      for (let i = 0; i < data.rows.length; i++) {
-        this.cases.push(data.rows.item(i));
-      }
-      console.log('----this.cases----', this.cases);
     });
   }
 
