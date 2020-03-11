@@ -9,6 +9,6 @@
   <div #mapControls>
     <ion-button ion-button (click)="myLocation()">My LOcation</ion-button>
     <ion-button ion-button (click)="addCircle()"> + Circle</ion-button>
-    <ion-button ion-button *ngIf="circle" (click)="addRouteInCircle()"> Route </ion-button>
+    <ion-button ion-button *ngIf="circle" (click)="navigateLocation()"> Route </ion-button>
   </div>
 </ion-content>
