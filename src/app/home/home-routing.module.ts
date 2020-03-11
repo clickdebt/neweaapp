@@ -31,8 +31,12 @@ const routes: Routes = [
         loadChildren: () => import('../pages/visit-form/visit-form.module').then(m => m.VisitFormPageModule)
       },
       {
+        path: 'visit-reports',
+        loadChildren: () => import('../pages/visit-reports/visit-reports.module').then(m => m.VisitReportsPageModule)
+      },
+      {
         path: 'map',
-        loadChildren: () => import('../pages/map/map.module').then( m => m.MapPageModule)
+        loadChildren: () => import('../pages/map/map.module').then(m => m.MapPageModule)
       }
     ]
   }

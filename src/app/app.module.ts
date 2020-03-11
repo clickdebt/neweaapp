@@ -19,6 +19,8 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { SettingsService, AuthService, CommonService, CaseService, VisitService, HttpInterceptorService } from './services';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FormioModule } from 'angular-formio';
+import { PaymentModalPageModule } from './pages/payment-modal/payment-modal.module';
+import { ArrangementModalPageModule } from './pages/arrangement-modal/arrangement-modal.module';
 import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 
 
@@ -36,7 +38,9 @@ import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
-    FormioModule
+    FormioModule,
+    PaymentModalPageModule,
+    ArrangementModalPageModule
   ],
   providers: [
     StatusBar,

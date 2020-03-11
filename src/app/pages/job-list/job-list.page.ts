@@ -16,32 +16,22 @@ export class JobListPage implements OnInit {
   caseLinks = [];
   searchBarValue;
   filters = [];
-  schemes = [
-    { val: 'Parking Internal Agents (16)', isChecked: false, id: 1 },
-    { val: 'CT External Agents (6)', isChecked: false, id: 2 },
-    { val: 'CT Initial Workflow (4)', isChecked: false, id: 3 },
-    { val: 'Parking Internal Agents (16)', isChecked: false, id: 4 },
-    { val: 'CT External Agents (6)', isChecked: false, id: 5 },
-    { val: 'CT Initial Workflow (4)', isChecked: false, id: 6 },
-    { val: 'Parking Internal Agents (16)', isChecked: false, id: 7 },
-    { val: 'CT External Agents (6)', isChecked: false, id: 8 },
-    { val: 'CT Initial Workflow (4)', isChecked: false, id: 9 }
+  filterMaster;
+  quick = [
+    { title: 'Need a Visit', isChecked: false, id: 'Visit', type: 'stageType' }
   ];
-  stages = [
-    { val: 'Parking Internal Agents (16)', isChecked: false, id: 1 },
-    { val: 'CT External Agents (6)', isChecked: false, id: 2 },
-    { val: 'CT Initial Workflow (4)', isChecked: false, id: 3 },
-    { val: 'Parking Internal Agents (16)', isChecked: false, id: 4 },
-    { val: 'CT External Agents (6)', isChecked: false, id: 5 },
-    { val: 'CT Initial Workflow (4)', isChecked: false, id: 6 },
-    { val: 'Parking Internal Agents (16)', isChecked: false, id: 7 },
-    { val: 'CT External Agents (6)', isChecked: false, id: 8 },
-    { val: 'CT Initial Workflow (4)', isChecked: false, id: 9 }
-  ];
-  form = [
-    { val: 'Pepperoni', isChecked: false, id: 1 },
-    { val: 'Sausage', isChecked: false, id: 2 },
-    { val: 'Mushroom', isChecked: false, id: 3 }
+  sortVal = '';
+  sortOptions = [
+    { title: 'Latest Cases', isChecked: false, value: 'id|DESC' },
+    { title: 'Scheme', isChecked: false, value: 'scheme_id|ASC' },
+    { title: 'Balance Low to High', isChecked: false, value: 'd_outstanding|ASC' },
+    { title: 'Balance High to Low', isChecked: false, value: 'd_outstanding|DESC' },
+    { title: 'Case Ref', isChecked: false, value: 'ref|ASC' },
+    { title: 'PostCode', isChecked: false, value: 'Addresses.address_postcode|ASC' },
+    { title: 'Visits Low to High', isChecked: false, value: 'visitcount_total|ASC' },
+    { title: 'Visits High to Low', isChecked: false, value: 'visitcount_total|DESC' },
+    { title: 'Visit Allocated Oldest to Newest', isChecked: false, value: 'last_allocated_date|ASC' },
+    { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date|DESC' }
   ];
   constructor(
     private caseService: CaseService,
@@ -50,6 +40,7 @@ export class JobListPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.getFilterMasterData();
   }
 
   ionViewWillEnter() {
@@ -60,6 +51,10 @@ export class JobListPage implements OnInit {
     }
   }
 
+  radioGroupChange(event) {
+    this.sortVal = event.detail.value;
+
+  }
   showFilterDiv() {
     this.showSort = false;
     this.showFilter = !this.showFilter;
@@ -69,34 +64,56 @@ export class JobListPage implements OnInit {
     this.showFilter = false;
     this.showSort = !this.showSort;
   }
-
+  clearSort() {
+    this.sortVal = '';
+  }
   clearFilter() {
+    Object.keys(this.filterMaster).forEach(key => {
+      this.filterMaster[key].forEach(elm => elm.isChecked = false);
+    });
+    this.quick.forEach(elm => {
+      elm.isChecked = false;
+    });
     this.filters = [];
-    this.form.forEach(sc => sc.isChecked = false);
-    this.schemes.forEach(sc => sc.isChecked = false);
-    this.stages.forEach(sc => sc.isChecked = false);
+    this.showFilter = false;
+    this.page = 1;
+    this.cases = [];
+    this.getCases('');
   }
 
   filterCases() {
-    const schemes = this.schemes.filter(sc => sc.isChecked).map(s => s.id);
-    this.filters['schemes'] = schemes;
+    Object.keys(this.filterMaster).forEach(key => {
+      this.filters[key] = this.filterMaster[key].filter(elm => elm.isChecked).map(s => s.id);
+    });
+    this.quick.forEach(elm => {
+      this.filters[elm.type] = [];
+      if (elm.isChecked) {
+        this.filters[elm.type] = [elm.id];
+      }
+    });
+    this.filters['sorting'] = this.sortVal;
+    this.page = 1;
+    this.cases = [];
+    this.showFilter = false;
+    this.showSort = false;
+    this.getCases('');
 
-    const stages = this.stages.filter(sc => sc.isChecked).map(s => s.id);
-    this.filters['stages'] = stages;
-
-    console.log(this.filters);
   }
   onInput() {
-    console.log(this.searchBarValue);
+    this.filters['q'] = this.searchBarValue;
+    this.filterCases();
   }
 
-
   getCases(infiniteScrollEvent) {
-    const params = {
+    let params = {
       limit: this.limit,
       page: this.page
     };
-
+    Object.keys(this.filters).forEach(fil => {
+      if (this.filters[fil].length) {
+        params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
+      }
+    });
     this.caseService.getCases(params).subscribe(res => {
       if (infiniteScrollEvent) {
         infiniteScrollEvent.target.complete();
@@ -129,24 +146,27 @@ export class JobListPage implements OnInit {
     this.storageService.set('cases', this.cases);
   }
 
+  getFilterMasterData() {
+    this.caseService.getFilterMasterData().subscribe(res => {
+      this.filterMaster = res['data'];
+    }, err => {
+      console.log(err);
+    });
+  }
   async getFilters() {
     const filters = await this.storageService.get('filters');
     if (filters) {
-      return this.setFilters(filters);
+      console.log(523);
+      this.filterMaster = filters;
+    } else {
+      console.log(123);
+      this.caseService.getFilters()
+        .subscribe(async (response: any) => {
+          if (response.data) {
+            await this.storageService.set('filters', response.data);
+            this.filterMaster = response.data;
+          }
+        });
     }
-    this.caseService.getFilters()
-      .subscribe(async (response: any) => {
-        if (response.data) {
-          await this.storageService.set('filters', response.data);
-          this.setFilters(response.data);
-        }
-      });
-  }
-
-  setFilters(filters: any = {}) {
-    this.schemes = filters.schemes;
-    this.stages = filters.stages;
-    this.schemes.forEach(scheme => scheme.isChecked = false);
-    this.stages.forEach(stage => stage.isChecked = false);
   }
 }

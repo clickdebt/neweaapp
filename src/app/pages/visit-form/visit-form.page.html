@@ -1,5 +1,6 @@
-<ion-content margin-top padding>
-  <div *ngIf="jsonObject">
-    <formio [form]="jsonObject"></formio>
+<ion-content class="ion-padding">
+  <div *ngIf="jsonObject" class="formio-wrapper">
+    <formio [form]="jsonObject" #formObj (render)="onRender($event)" (change)="onChange($event)" (nextPage)="onNext($event)"
+      [options]="formConfig.options" (submit)="onSubmit($event)" #formObj></formio>
   </div>
 </ion-content>
