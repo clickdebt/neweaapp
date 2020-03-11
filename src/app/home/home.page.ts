@@ -11,6 +11,8 @@ import { DatabaseService, CaseService } from '../services';
 export class HomePage implements OnInit {
 
   logo;
+  server_url;
+  username;
   cases = [];
 
   constructor(
@@ -24,6 +26,10 @@ export class HomePage implements OnInit {
     this.logo = localStorage.getItem('logo');
   }
 
+  ionViewWillEnter() {
+    this.server_url = localStorage.getItem('server_url');
+    this.username = JSON.parse(localStorage.getItem('userdata')).name;
+  }
   async ionViewDidEnter() {
     this.caseService.getCases({}).subscribe(async (response: any) => {
       await this.databaseService.setCases(response.data);
