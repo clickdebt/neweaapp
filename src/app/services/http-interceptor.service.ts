@@ -10,6 +10,7 @@ import { CommonService } from './common.service';
 })
 export class HttpInterceptorService implements HttpInterceptor {
 
+    reqCount = 0;
     constructor(
         private router: Router,
         private commonService: CommonService
@@ -24,20 +25,29 @@ export class HttpInterceptorService implements HttpInterceptor {
             newHeaders = newHeaders.append('Authorisation', token);
         }
         const authReq = req.clone({ headers: newHeaders });
-        this.commonService.showLoader();
+        this.reqCount++;
+        if (this.reqCount === 1) {
+            this.commonService.showLoader();
+        }
         return next.handle(authReq).pipe(
-            tap((event: HttpEvent<any>) => {
+            map((event: HttpEvent<any>) => {
                 return event;
-            }, (error: any) => {
-                this.commonService.dismissLoader();
+            }),
+            catchError(error => {
                 this.commonService.showToast(error['error']['message']);
                 if (error.status === 401 && !req.url.includes('login')) {
+                    this.commonService.dismissLoader();
                     localStorage.removeItem('remote_token');
                     localStorage.removeItem('userdata');
                     this.router.navigate(['/login']);
                 }
-            }, () => {
-                this.commonService.dismissLoader();
-            }));
+            }),
+            finalize(() => {
+                this.reqCount--;
+                if (this.reqCount === 0) {
+                    this.commonService.dismissLoader();
+                }
+            })
+        );
     }
 }

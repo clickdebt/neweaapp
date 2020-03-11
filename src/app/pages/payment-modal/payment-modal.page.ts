@@ -14,6 +14,7 @@ export class PaymentModalPage implements OnInit {
   paymentsForm: FormGroup;
   submitted: false;
   paymentObj = {};
+  // tslint:disable: max-line-length
   payment_methods = [{ id: 1, label: 'Cash' }, { id: 2, label: 'Cheque' }, { id: 4, label: 'Credit card' }, { id: 5, label: 'Debit Card' }, { id: 8, label: 'BACS' }];
   sources = [{ id: 1, label: 'Post' }, { id: 3, label: 'Phone' }, { id: 5, label: 'Client direct' }, { id: 6, label: 'Online' }, { id: 7, label: 'Other' }, { id: 9, label: 'Officer' }, { id: 11, label: 'Bank Giro' }];
   splites = [{ id: '-1', label: '[DEF]Default' }, { id: 5, label: 'Client And Scheme' }, { id: 6, label: 'Client' }, { id: 7, label: 'Scheme' }, { id: 9, label: 'Global' }];
@@ -23,8 +24,8 @@ export class PaymentModalPage implements OnInit {
     private router: Router,
     navParams: NavParams
   ) {
-      this.caseId = navParams.get('caseId');
-   }
+    this.caseId = navParams.get('caseId');
+  }
 
   ngOnInit() {
     this.initForm();
@@ -52,7 +53,7 @@ export class PaymentModalPage implements OnInit {
   save() {
     if (this.paymentsForm.valid) {
       this.paymentObj = {
-        case_id:this.caseId,
+        case_id: this.caseId,
         date: this.paymentsForm.value.date,
         amount: this.paymentsForm.value.amount,
         reference: this.paymentsForm.value.reference,

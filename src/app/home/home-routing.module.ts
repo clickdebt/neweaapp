@@ -33,6 +33,10 @@ const routes: Routes = [
       {
         path: 'map-view',
         loadChildren: () => import('../pages/map-view/map-view.module').then(m => m.MapViewPageModule)
+      },
+      {
+        path: 'visit-reports',
+        loadChildren: () => import('../pages/visit-reports/visit-reports.module').then( m => m.VisitReportsPageModule)
       }
     ]
   }

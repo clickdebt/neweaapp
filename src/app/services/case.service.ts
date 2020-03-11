@@ -11,14 +11,22 @@ export class CaseService {
   }
 
   getCases(params) {
-    const logindata = JSON.parse(localStorage.getItem('userdata'));
-    // tslint:disable-next-line: max-line-length
-    const apiURL = localStorage.getItem('server_url') + 'b/system/v1/cases/visit?user_id=' + logindata.id + '&limit=' + params.limit + '&page=' + params.page;
+    let apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/visit?1=1';
+    for (let key in params) {
+      if (params.hasOwnProperty(key) && params[key] !== '') {
+        apiURL += '&' + key + '=' + params[key];
+      }
+    }
     return this.http.get(apiURL);
   }
 
   getVisitOutcomes(caseId) {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v1/alerts/getAlertExitCodes/' + caseId;
     return this.http.get(apiURL);
-}
+  }
+
+  getFilterMasterData() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/filter';
+    return this.http.get(apiURL);
+  }
 }

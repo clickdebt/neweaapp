@@ -198,9 +198,10 @@ ion-footer{
     display: none !important;
   }
 
-  .formio-error-wrapper, .formio-warning-wrapper{
+  .has-feedback{
     background: transparent !important;
     padding: 0 !important;
+    border: 0 !important;
   }
 
   .wizard-page{
@@ -304,7 +305,7 @@ ion-footer{
   }
 
   .formio-component-radio{
-    .form-radio{
+    .form-group{
       .form-check{
         display: inline-block;
         margin-left: 15px;
