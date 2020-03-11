@@ -16,4 +16,9 @@ export class CaseService {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v1/cases/visit?user_id=' + logindata.id + '&limit=' + params.limit + '&page=' + params.page;
     return this.http.get(apiURL);
   }
+
+  getFilters() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/filter';
+    return this.http.get(apiURL);
+  }
 }

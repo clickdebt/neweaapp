@@ -8,6 +8,9 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite } from '@ionic-native/sqlite/ngx';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
+import { GoogleMaps } from '@ionic-native/google-maps/ngx';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -16,6 +19,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { SettingsService, AuthService, CommonService, CaseService, VisitService, HttpInterceptorService } from './services';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FormioModule } from 'angular-formio';
+import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 
 
 @NgModule({
@@ -45,7 +49,11 @@ import { FormioModule } from 'angular-formio';
     { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     SQLitePorter,
-    SQLite
+    SQLite,
+    GoogleMaps,
+    Geolocation,
+    NativeGeocoder,
+    LaunchNavigator
   ],
   bootstrap: [AppComponent]
 })

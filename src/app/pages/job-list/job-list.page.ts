@@ -106,6 +106,8 @@ export class JobListPage implements OnInit {
         this.parseCaseData(res['data']);
       }
     });
+
+    this.getFilters();
   }
 
   goToVisitForm(visitCase) {
@@ -127,4 +129,24 @@ export class JobListPage implements OnInit {
     this.storageService.set('cases', this.cases);
   }
 
+  async getFilters() {
+    const filters = await this.storageService.get('filters');
+    if (!filters) {
+      return this.setFilters(filters);
+    }
+    this.caseService.getFilters()
+      .subscribe(async (response: any) => {
+        if (response.data) {
+          await this.storageService.set('filters', response.data);
+          this.setFilters(response.data);
+        }
+      });
+  }
+
+  setFilters(filters) {
+    this.schemes = filters.schemes;
+    this.stages = filters.stages;
+    this.schemes.forEach(scheme => scheme.isChecked = false);
+    this.stages.forEach(stage => stage.isChecked = false);
+  }
 }
