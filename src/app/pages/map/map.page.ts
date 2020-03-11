@@ -239,7 +239,7 @@ export class MapPage implements OnInit {
 
       console.log('---values----', coveredMarkers);
 
-      await this.addRouteInCircle(coveredMarkers)
+      await this.navigateLocation(coveredMarkers);
 
       // Catch the CIRCLE_CLICK event
       this.circle.on(GoogleMapsEvent.CIRCLE_CLICK).subscribe(async (latLng) => {
@@ -292,11 +292,11 @@ export class MapPage implements OnInit {
   }
 
   async navigateLocation(destination) {
-    await this.launchNavigator.navigate(destination);
-  }
-
-  async addRouteInCircle(coveredMarkers) {
-
+    let location = '';
+    destination.forEach((latLng) => {
+      location = `${location} , ${latLng.lat} ${latLng.lng}`;
+    });
+    await this.launchNavigator.navigate(location);
   }
 }
 
