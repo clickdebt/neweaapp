@@ -131,7 +131,7 @@ export class JobListPage implements OnInit {
 
   async getFilters() {
     const filters = await this.storageService.get('filters');
-    if (!filters) {
+    if (filters) {
       return this.setFilters(filters);
     }
     this.caseService.getFilters()
@@ -143,7 +143,7 @@ export class JobListPage implements OnInit {
       });
   }
 
-  setFilters(filters) {
+  setFilters(filters: any = {}) {
     this.schemes = filters.schemes;
     this.stages = filters.stages;
     this.schemes.forEach(scheme => scheme.isChecked = false);
