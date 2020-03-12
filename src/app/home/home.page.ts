@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { DatabaseService, CaseService } from '../services';
 
 @Component({
   selector: 'app-home',
@@ -10,13 +11,29 @@ import { Router } from '@angular/router';
 export class HomePage implements OnInit {
 
   logo;
+  server_url;
+  username;
+  cases = [];
+
   constructor(
     private alertCtrl: AlertController,
-    private router: Router
+    private router: Router,
+    private databaseService: DatabaseService,
+    private caseService: CaseService
   ) { }
 
   ngOnInit() {
     this.logo = localStorage.getItem('logo');
+  }
+
+  ionViewWillEnter() {
+    this.server_url = localStorage.getItem('server_url');
+    this.username = JSON.parse(localStorage.getItem('userdata')).name;
+  }
+  async ionViewDidEnter() {
+    this.caseService.getCases({}).subscribe(async (response: any) => {
+      await this.databaseService.setCases(response.data);
+    });
   }
 
   async confirmLogout() {

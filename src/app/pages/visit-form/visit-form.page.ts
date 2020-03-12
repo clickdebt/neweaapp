@@ -6,6 +6,7 @@ import { ModalController } from '@ionic/angular';
 import { CommonService } from 'src/app/services';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 @Component({
   selector: 'app-visit-form',
   templateUrl: './visit-form.page.html',
@@ -17,15 +18,18 @@ export class VisitFormPage implements OnInit {
   formConfig;
   jsonObject: any;
   jsonString: any;
-  lat: string;
-  lang: string;
   resultobj: any;
   addressData;
   caseId;
   visitedPageArr = [];
   modalDataObj: any;
   modalDataArr: any;
+  paymentInfo;
+  arrangementInfo;
   visitCaseData;
+  caseAlerts;
+  currLang: any;
+  currLat: any;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -33,6 +37,7 @@ export class VisitFormPage implements OnInit {
     private caseService: CaseService,
     private modalCtrl: ModalController,
     private router: Router,
+    private geolocation: Geolocation,
     private commonService: CommonService
   ) { }
 
@@ -54,13 +59,15 @@ export class VisitFormPage implements OnInit {
     this.getLocation();
     const casesData = await this.storageService.get('cases');
     this.visitCaseData = casesData.find(c => c.id == this.caseId);
-    this.addressData = {
-      address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
-      address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
-      address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
-      address_town: this.visitCaseData.debtor.addresses[0].address_town,
-      address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
-    };
+    if (this.visitCaseData) {
+      this.addressData = {
+        address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
+        address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
+        address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
+        address_town: this.visitCaseData.debtor.addresses[0].address_town,
+        address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
+      };
+    }
     this.visitService.getVisitForm().subscribe(res => {
       this.caseService.getVisitOutcomes(this.caseId).subscribe(response => {
         this.addVisitOutcomeField(response['data'], res);
@@ -72,14 +79,8 @@ export class VisitFormPage implements OnInit {
     });
   }
   dataRead(obj) {
-    const tempObj = {
-      id: 1,
-      form_name: 'Visit Form',
-      content: obj.data[0].content,
-      client_id: 1,
-      scheme_cat_id: 1
-    };
-    this.jsonString = tempObj.content;
+    this.formData = obj.data[0];
+    this.jsonString = obj.data[0].content;
     const re = /\{{([^}}]+)\}/g;
     const variables = this.jsonString.match(re);
 
@@ -92,7 +93,7 @@ export class VisitFormPage implements OnInit {
           this.jsonString = this.jsonString.replace('{{' + fieldKey + '}}', this.addressData[fieldKey]);
         }
       });
-      this.jsonString = this.jsonString.replace('{{x,y}}', this.lat + ' , ' + this.lang);
+      this.jsonString = this.jsonString.replace('{{x,y}}', this.currLat + ' , ' + this.currLang);
     }
     this.jsonObject = JSON.parse(this.jsonString);
     const visitOutcomeObj = {
@@ -110,13 +111,12 @@ export class VisitFormPage implements OnInit {
     // console.log(this.jsonObject);
   }
 
-
-
   addVisitOutcomeField(result, res) {
     const resData = [];
+    this.caseAlerts = result;
     result.forEach(element => {
       const opt = {
-        value: element.id + '@@@' + element.alert_cal_id + '|' + element.name,
+        value: element.id,
         label: element.name
       };
       resData.push(opt);
@@ -126,14 +126,23 @@ export class VisitFormPage implements OnInit {
     };
     this.dataRead(res);
   }
-  getLocation() {
-    // get lat long
+
+  async getLocation() {
+    const { coords } = await this.geolocation.getCurrentPosition();
+    this.currLang = coords.longitude;
+    this.currLat = coords.latitude;
+
   }
   onRender(event) {
-    console.log(event);
+    // console.log(event);
   }
   onNext(event) {
-    console.log(event);
+    // console.log(event);
+    // if (localStorage.getItem('visited')) {
+    //   localStorage.setItem('visited', Math.max(localStorage.getItem('visited'), event.page));
+    // } else {
+    //   localStorage.setItem('visited', event.page);
+    // }
   }
   async onChange(event) {
     if (event.type === 'change' && event.srcElement.name.includes('data[singlePaymentMade]')) {
@@ -149,18 +158,19 @@ export class VisitFormPage implements OnInit {
         }
 
         const { data } = await paymodalPage.onWillDismiss();
-        if (data) {
-          console.log(data);
+        if (data && data.saved) {
+          this.paymentInfo = data.paymentObj;
         }
 
       }
     } else if (event.type === 'change' && event.srcElement.name.includes('data[arrangementAgreed]')) {
       if (event.srcElement.defaultValue == 1) {
 
-        let arrmodalPage = await this.modalCtrl.create({
-          component: ArrangementModalPage, componentProps: { 'cssClass': 'case-action-modal', 'caseId': this.caseId, 'outstanding': this.visitCaseData.d_outstanding }
+        const arrmodalPage = await this.modalCtrl.create({
+          component: ArrangementModalPage, componentProps: {
+            'cssClass': 'case-action-modal', 'caseId': this.caseId, 'outstanding': this.visitCaseData.d_outstanding
+          }
         });
-        
         try {
           await arrmodalPage.present();
           localStorage.setItem('isFormPage', 'true');
@@ -169,13 +179,50 @@ export class VisitFormPage implements OnInit {
         }
 
         const { data } = await arrmodalPage.onWillDismiss();
-        if (data) {
-          console.log(data);
+        if (data && data.saved) {
+          this.arrangementInfo = data.arrangementObj;
         }
       }
     }
   }
   onSubmit(event) {
+    console.log(event, event.data);
+    console.log(this.paymentInfo);
+    console.log(this.arrangementInfo);
+    // tslint:disable: triple-equals
+    if (this.paymentInfo == undefined) {
+      event.data.singlePaymentMade = 0;
+    }
+    if (this.arrangementInfo == undefined) {
+      event.data.arrangementAgreed = 0;
+    }
+
+    if (event.data.visit_outcome != undefined && event.data.visit_outcome != '') {
+      // tslint:disable: variable-name
+      const visit_outcome = this.caseAlerts.find(ca => ca.id == event.data.visit_outcome);
+      console.log(visit_outcome);
+      event.data.visit_outcome = visit_outcome.name;
+    }
+
+    const visit_report_data = {
+      form_data: event.data,
+      payment_data: this.paymentInfo,
+      arrangement_data: this.arrangementInfo
+    };
+
+    const form_data = {
+      form_id: this.formData.id,
+      case_id: this.caseId,
+      status: 1,
+      form_values: visit_report_data
+    };
+    console.log(form_data);
+    this.visitService.saveForm(form_data).subscribe(res => {
+      this.commonService.showToast('Data Saved Successfully.');
+      this.router.navigate(['/home/job-list']);
+    }, () => {
+      this.commonService.showToast('Something went wrong.');
+    });
 
   }
 }

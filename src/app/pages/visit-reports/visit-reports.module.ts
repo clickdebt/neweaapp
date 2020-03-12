@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { MapViewPageRoutingModule } from './map-view-routing.module';
+import { VisitReportsPageRoutingModule } from './visit-reports-routing.module';
 
-import { MapViewPage } from './map-view.page';
+import { VisitReportsPage } from './visit-reports.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    MapViewPageRoutingModule
+    VisitReportsPageRoutingModule
   ],
-  declarations: [MapViewPage]
+  declarations: [VisitReportsPage]
 })
-export class MapViewPageModule {}
+export class VisitReportsPageModule {}

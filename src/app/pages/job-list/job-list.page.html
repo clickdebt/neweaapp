@@ -25,9 +25,9 @@
         <ion-col size-xs="12">
           <h6>Quick Filter</h6>
           <ion-list class="filter-item-list">
-            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+            <ion-item *ngFor="let entry of quick" class="filter-item-list-item" lines="none"
               [ngClass]="{'active': entry.isChecked}">
-              <ion-label>{{entry.val}}</ion-label>
+              <ion-label>{{entry.title}}</ion-label>
               <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
             </ion-item>
           </ion-list>
@@ -35,60 +35,72 @@
       </ion-row>
       <div class="divider"></div>
       <ion-row>
-        <ion-col size-xs="12">
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.schemes">
           <h6>Schemes</h6>
           <ion-list class="filter-item-list">
-            <ion-item *ngFor="let entry of schemes" class="filter-item-list-item" lines="none"
+            <ion-item *ngFor="let entry of filterMaster.schemes" class="filter-item-list-item" lines="none"
               [ngClass]="{'active': entry.isChecked}">
-              <ion-label>{{entry.val}}</ion-label>
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
               <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
             </ion-item>
           </ion-list>
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-xs="12">
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.stages">
           <h6>Stage</h6>
           <ion-list class="filter-item-list">
-            <ion-item *ngFor="let entry of stages" class="filter-item-list-item" lines="none"
+            <ion-item *ngFor="let entry of filterMaster.stages" class="filter-item-list-item" lines="none"
               [ngClass]="{'active': entry.isChecked}">
-              <ion-label>{{entry.val}}</ion-label>
+              <ion-label>{{entry.name}} ({{entry.count}})</ion-label>
               <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
             </ion-item>
           </ion-list>
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-xs="12">
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.statuses">
           <h6>Status</h6>
           <ion-list class="filter-item-list">
-            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+            <ion-item *ngFor="let entry of filterMaster.statuses" class="filter-item-list-item" lines="none"
               [ngClass]="{'active': entry.isChecked}">
-              <ion-label>{{entry.val}}</ion-label>
+              <ion-label>{{entry.status_name}} ({{entry.count}})</ion-label>
               <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
             </ion-item>
           </ion-list>
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-xs="12">
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.clients">
           <h6>Client</h6>
           <ion-list class="filter-item-list">
-            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+            <ion-item *ngFor="let entry of filterMaster.clients" class="filter-item-list-item" lines="none"
               [ngClass]="{'active': entry.isChecked}">
-              <ion-label>{{entry.val}}</ion-label>
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
               <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
             </ion-item>
           </ion-list>
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-xs="12">
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.outstandingAmount">
+          <h6>Outstanding Amount</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.outstandingAmount" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.visitCounts">
           <h6>Visit Count</h6>
           <ion-list class="filter-item-list">
-            <ion-item *ngFor="let entry of form" class="filter-item-list-item" lines="none"
+            <ion-item *ngFor="let entry of filterMaster.visitCounts" class="filter-item-list-item" lines="none"
               [ngClass]="{'active': entry.isChecked}">
-              <ion-label>{{entry.val}}</ion-label>
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
               <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
             </ion-item>
           </ion-list>
@@ -115,8 +127,27 @@
       <ion-row>
         <ion-col size-xs="12">
           <h6>Sort</h6>
-          <ion-button shape="round" color="secondary" size="small" fill="outline">On Arrangement</ion-button>
-          <ion-button shape="round" color="secondary" size="small" fill="outline">Need a Visit</ion-button>
+          <ion-list class="filter-item-list">
+            <ion-radio-group value="sort" (ionChange)="radioGroupChange($event)">
+              <ion-item *ngFor="let entry of sortOptions" class="filter-item-list-item" lines="none"
+                [ngClass]="{'active': entry.value == sortVal}">
+                <ion-label>{{entry.title}}</ion-label>
+                <ion-radio slot="start" value="{{entry.value}}"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <div class="filter-footer">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="6">
+          <ion-button color="dark" size="default" fill="clear" (click)="clearSort()">CLEAR</ion-button>
+        </ion-col>
+        <ion-col size-xs="6" class="ion-text-end">
+          <ion-button color="secondary" size="default" fill="solid" (click)="filterCases()">Apply SORT</ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -174,7 +205,8 @@
               </ion-button>
             </td>
             <td class="action">
-              <ion-button size="small" color="tertiary" (click)="goToVisitForm(case)">
+              <ion-button size="small" color="tertiary" (click)="goToVisitForm(case)"
+                *ngIf="case.stage.stage_type.stage_type == 'Visit'">
                 Visit
               </ion-button>
             </td>

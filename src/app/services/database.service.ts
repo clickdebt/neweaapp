@@ -24,46 +24,79 @@ export class DatabaseService {
     this.platform.ready().then(async () => {
 
       if (this.platform.is('android') || this.platform.is('ios')) {
+
         this.database = await this.sqlite.create({
           name: 'fieldAgentV3.db',
           location: 'default'
         });
 
         const value = await this.storageService.get('database_filled');
-
         if (value) {
           this.databaseReady.next(true);
         } else {
           this.setUpDatabase();
         }
       }
-    }).catch((error) => console.log('Error :: ', error));
+    }).catch((error) => {});
   }
 
   async setUpDatabase() {
-    const sql = `CREATE TABLE IF NOT EXISTS developer(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,skill TEXT,yearsOfExperience INTEGER);
-    INSERT INTO developer(name, skill, yearsOfExperience) VALUES ('Simon', 'Ionic', '4');
-    INSERT INTO developer(name, skill, yearsOfExperience) VALUES ('Jorge', 'Firebase', '2');
-    INSERT INTO developer(name, skill, yearsOfExperience) VALUES ('Max', 'Startup', '5');`;
+    const sql = `CREATE TABLE IF NOT EXISTS rdeb_cases(
+      id INTEGER PRIMARY KEY,
+      ref TEXT,
+      scheme_id INTEGER,
+      date DATE,
+      d_outstanding DOUBLE INT,
+      visitcount_total INTEGER,
+      last_allocated_date DATETIME,
+      custom5 TEXT,
+      manual_link_id INTEGER,
+      hold_until TEXT,
+      client_id INTEGER,
+      current_status_id INTEGER,
+      current_stage_id INTEGER,
+      data TEXT
+    );`;
 
     const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
-    console.log('--data--', data);
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
-    const result = await this.select('developer');
-    console.log('--result--', result);
+    const result = await this.select('rdeb_cases');
   }
 
-  async executeQuery(query, params = []) {
-    const result = await this.database.executeSql(query, params);
-    return result;
+  async executeQuery(query, params = null) {
+    try {
+      const result = await this.database.executeSql(query, params);
+      return result;
+    } catch (error) {}
   }
 
   async insert(tableName, params = []) {
     const fields = params.map(item => item.name);
     const values = params.map(item => item.value);
-    const result = await this.database.executeSql(`INSERT INTO ${tableName} (${fields.toString()}) values (${values.toString()})`);
+    const result = await this.database.executeSql(`INSERT INTO ${tableName} (${fields.toString()}) VALUES (${values.toString()})`);
     return result;
+  }
+
+  async setCases(data) {
+    const sql = [];
+    const sqlStart = `INSERT INTO rdeb_cases
+    ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
+      last_allocated_date, custom5, manual_link_id, hold_until,
+      client_id, data ) VALUES `;
+
+    data.forEach((values) => {
+      sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
+        "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
+        "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
+        "${values.hold_until}", ${values.client_id}, "${encodeURI(JSON.stringify(values))}")`);
+    });
+
+    const promiseArray = [];
+    sql.forEach((query) => promiseArray.push(this.executeQuery(query)));
+    await Promise.all(promiseArray)
+      .then((res: any) => { })
+      .catch((error) => { });
   }
 
   async select(tableName) {
