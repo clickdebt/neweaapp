@@ -9,7 +9,8 @@ import {
   BaseArrayClass,
   GoogleMapsAnimation,
   MyLocation,
-  LatLngBounds
+  LatLngBounds,
+  Spherical
 } from '@ionic-native/google-maps/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
@@ -33,6 +34,8 @@ export class MapPage implements OnInit {
   latLngs: LatLng[];
   cases = [];
   markers = [];
+  coveredMarker = [];
+  route: any;
 
   constructor(
     private geolocation: Geolocation,
@@ -125,6 +128,8 @@ export class MapPage implements OnInit {
 
     POINTS.forEach(async (data: any) => {
       data.disableAutoPan = true;
+      const item = this.markers.filter(m => m.id = data.id);
+      console.log('--------id---------', item);
       const marker: Marker = await this.map.addMarker(data);
       marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe((params) => this.onMarkerClick(params));
       marker.on(GoogleMapsEvent.INFO_CLICK).subscribe((params) => this.onMarkerClick(params));
@@ -224,12 +229,13 @@ export class MapPage implements OnInit {
       if (this.circle) {
         await this.circle.remove();
       }
+
       this.circle = await this.map.addCircle({
         center: { lat: latLng[0].lat, lng: latLng[0].lng },
         radius: 3000,
-        strokeColor: '#CC0092',
+        strokeColor: '#AA00FF',
         strokeWidth: 5,
-        fillColor: '#CC0092',
+        fillColor: '#00880055',
         fillOpacity: 0.1,
         strokeOpacity: 1.0,
         clickable: true,
@@ -238,6 +244,15 @@ export class MapPage implements OnInit {
         zIndex: 1
       });
 
+      const temp = this.map.fromPointToLatLng(this.circle.radius());
+      // const marker: Marker = this.map.addMarkerSync({
+      //   position: positions[0],
+      //   draggable: true,
+      //   title: 'Drag me!'
+      // });
+      // marker.trigger(GoogleMapsEvent.MARKER_CLICK);
+
+
       this.map.set('fillOpacity', 0.1);
 
       this.map.animateCamera({
@@ -245,6 +260,7 @@ export class MapPage implements OnInit {
       });
 
       const data = this.circle.getBounds();
+      const center = this.circle.getCenter();
 
       const coveredMarkers = [];
       for (const loc of this.latLngs) {
@@ -252,11 +268,12 @@ export class MapPage implements OnInit {
           coveredMarkers.push(loc);
         }
       }
-
-      await this.navigateLocation(coveredMarkers);
+      this.coveredMarker = coveredMarkers;
 
       // Catch the CIRCLE_CLICK event
-      this.circle.on(GoogleMapsEvent.CIRCLE_CLICK).subscribe(async (latLng) => { });
+      this.circle.on(GoogleMapsEvent.CIRCLE_CLICK).subscribe(async (latLng) => {
+
+       });
 
       mapClickSub.unsubscribe();
     });
@@ -301,16 +318,23 @@ export class MapPage implements OnInit {
     return latLongs;
   }
 
-  async navigateLocation(destination) {
+  async navigateLocation() {
+    console.log('----------Destination-------------', this.coveredMarker);
     let location = '';
-    destination.forEach((latLng) => {
+    this.coveredMarker.forEach((latLng) => {
       location = `${location} , ${latLng.lat} ${latLng.lng}`;
     });
     await this.launchNavigator.navigate(location);
   }
 
-  ionViewDidLeave() {
-
+  async createRoute() {
+    this.route = this.map.addPolylineSync({
+      points: this.coveredMarker,
+      color: '#AA00FF',
+      width: 10,
+      geodesic: true,
+      clickable: true  // clickable = false in default
+    });
   }
 }
 
