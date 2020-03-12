@@ -46,6 +46,7 @@ export class JobListPage implements OnInit {
   ionViewWillEnter() {
     this.showFilter = false;
     this.showSort = false;
+    // this.getFilters();
     if (!(this.cases.length > 0)) {
       this.getCases('');
     }
@@ -123,8 +124,6 @@ export class JobListPage implements OnInit {
         this.parseCaseData(res['data']);
       }
     });
-
-    this.getFilters();
   }
 
   goToVisitForm(visitCase) {
@@ -154,19 +153,17 @@ export class JobListPage implements OnInit {
     });
   }
   async getFilters() {
-    const filters = await this.storageService.get('filters');
-    if (filters) {
-      console.log(523);
-      this.filterMaster = filters;
-    } else {
-      console.log(123);
+    // const filters = await this.storageService.get('filters');
+    // if (filters) {
+    //   this.filterMaster = filters;
+    // } else {
       this.caseService.getFilters()
         .subscribe(async (response: any) => {
           if (response.data) {
-            await this.storageService.set('filters', response.data);
+            // await this.storageService.set('filters', response.data);
             this.filterMaster = response.data;
           }
         });
-    }
+    // }
   }
 }

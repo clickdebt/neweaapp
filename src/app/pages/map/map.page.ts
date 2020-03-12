@@ -163,7 +163,6 @@ export class MapPage implements OnInit {
   }
 
   async myLocation() {
-    this.map.clear();
 
     this.loading = await this.loadingCtrl.create({
       message: 'Please wait...'
@@ -320,11 +319,11 @@ export class MapPage implements OnInit {
 
   async navigateLocation() {
     console.log('----------Destination-------------', this.coveredMarker);
-    let location = '';
-    this.coveredMarker.forEach((latLng) => {
-      location = `${location} , ${latLng.lat} ${latLng.lng}`;
-    });
-    await this.launchNavigator.navigate(location);
+    // let location = '';
+    // this.coveredMarker.forEach((latLng) => {
+    //   location = `${location} , ${latLng.lat} ${latLng.lng}`;
+    // });
+    await this.launchNavigator.navigate(`${this.currLat} ${this.currLang}`);
   }
 
   async createRoute() {

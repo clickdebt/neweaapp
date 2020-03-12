@@ -38,7 +38,6 @@ export class PaymentModalPage implements OnInit {
       reference: ['', [Validators.required]],
       method: ['1', [Validators.required]],
       source: ['1', [Validators.required]],
-      client_direct: ['0', [Validators.required]],
       note: ['', []],
       financial_split_override_id: ['-1'],
     });
@@ -53,12 +52,10 @@ export class PaymentModalPage implements OnInit {
   save() {
     if (this.paymentsForm.valid) {
       this.paymentObj = {
-        case_id: this.caseId,
         date: this.paymentsForm.value.date,
         amount: this.paymentsForm.value.amount,
         reference: this.paymentsForm.value.reference,
         method: this.paymentsForm.value.method,
-        client_direct: this.paymentsForm.value.client_direct,
         source: this.paymentsForm.value.source,
         financial_split_override_id: this.paymentsForm.value.financial_split_override_id,
         payment_notes: this.paymentsForm.value.note

@@ -34,4 +34,14 @@ export class CaseService {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/filter';
     return this.http.get(apiURL);
   }
+
+  getVisitReports(params) {
+    let apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/visit_reports?1=1';
+    for (let key in params) {
+      if (params.hasOwnProperty(key) && params[key] !== '') {
+        apiURL += '&' + key + '=' + params[key];
+      }
+    }
+    return this.http.get(apiURL);
+  }
 }

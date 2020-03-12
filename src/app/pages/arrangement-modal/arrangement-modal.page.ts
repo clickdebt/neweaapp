@@ -52,16 +52,15 @@ export class ArrangementModalPage implements OnInit {
   save() {
     if (this.arrangementForm.valid) {
       this.arrangementObj = {
-        case_id: this.caseId,
-        frequency: this.arrangementForm.value.frequency,
+        freq: this.arrangementForm.value.frequency,
         amount: this.arrangementForm.value.amount,
         ref_amount: this.arrangementForm.value.ref_amount,
         method: this.arrangementForm.value.method,
         source: this.arrangementForm.value.source,
         start: this.arrangementForm.value.start,
-        differentFirstPayment: this.arrangementForm.value.differentFirstPayment,
-        firstPaymentAmount: this.arrangementForm.value.firstPaymentAmount,
-        firstPaymentDate: this.arrangementForm.value.firstPaymentDate,
+        different_first_payment: this.arrangementForm.value.differentFirstPayment,
+        first_amount: this.arrangementForm.value.firstPaymentAmount,
+        first_date: this.arrangementForm.value.firstPaymentDate,
         note: this.arrangementForm.value.note
       };
       this.modalCtrl.dismiss({

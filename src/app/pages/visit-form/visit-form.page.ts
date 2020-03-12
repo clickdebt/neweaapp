@@ -6,6 +6,7 @@ import { ModalController } from '@ionic/angular';
 import { CommonService } from 'src/app/services';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 @Component({
   selector: 'app-visit-form',
   templateUrl: './visit-form.page.html',
@@ -17,8 +18,6 @@ export class VisitFormPage implements OnInit {
   formConfig;
   jsonObject: any;
   jsonString: any;
-  lat: string;
-  lang: string;
   resultobj: any;
   addressData;
   caseId;
@@ -29,6 +28,8 @@ export class VisitFormPage implements OnInit {
   arrangementInfo;
   visitCaseData;
   caseAlerts;
+  currLang: any;
+  currLat: any;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -36,6 +37,7 @@ export class VisitFormPage implements OnInit {
     private caseService: CaseService,
     private modalCtrl: ModalController,
     private router: Router,
+    private geolocation: Geolocation,
     private commonService: CommonService
   ) { }
 
@@ -91,7 +93,7 @@ export class VisitFormPage implements OnInit {
           this.jsonString = this.jsonString.replace('{{' + fieldKey + '}}', this.addressData[fieldKey]);
         }
       });
-      this.jsonString = this.jsonString.replace('{{x,y}}', this.lat + ' , ' + this.lang);
+      this.jsonString = this.jsonString.replace('{{x,y}}', this.currLat + ' , ' + this.currLang);
     }
     this.jsonObject = JSON.parse(this.jsonString);
     const visitOutcomeObj = {
@@ -124,8 +126,12 @@ export class VisitFormPage implements OnInit {
     };
     this.dataRead(res);
   }
-  getLocation() {
-    // get lat long
+
+  async getLocation() {
+    const { coords } = await this.geolocation.getCurrentPosition();
+    this.currLang = coords.longitude;
+    this.currLat = coords.latitude;
+
   }
   onRender(event) {
     // console.log(event);
@@ -195,6 +201,7 @@ export class VisitFormPage implements OnInit {
       // tslint:disable: variable-name
       const visit_outcome = this.caseAlerts.find(ca => ca.id == event.data.visit_outcome);
       console.log(visit_outcome);
+      event.data.visit_outcome = visit_outcome.name;
     }
 
     const visit_report_data = {
@@ -211,9 +218,10 @@ export class VisitFormPage implements OnInit {
     };
     console.log(form_data);
     this.visitService.saveForm(form_data).subscribe(res => {
-      console.log(res);
-    }, err => {
-      console.log(err);
+      this.commonService.showToast('Data Saved Successfully.');
+      this.router.navigate(['/home/job-list']);
+    }, () => {
+      this.commonService.showToast('Something went wrong.');
     });
 
   }

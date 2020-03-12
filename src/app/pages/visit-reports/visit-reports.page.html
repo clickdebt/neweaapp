@@ -1,9 +1,57 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>visit-reports</ion-title>
-  </ion-toolbar>
-</ion-header>
-
+<ion-toolbar color="light">
+  <ion-grid class="p-y-0">
+    <ion-row class="searchbar-wrpper">
+      <ion-col size-md="8" size-xs="6">
+        <ion-searchbar [(ngModel)]="caseId" [showCancelButton]="shouldShowCancel"
+          (keyup.enter)="onInput($event)" (ionCancel)="onInput($event)" placeholder="Search Case ID">
+        </ion-searchbar>
+      </ion-col>
+      <ion-col size-md="4" size-xs="6" class="ion-text-end">
+        <ion-select placeholder="Select Duration" [(ngModel)]="created_at"(ionChange)="onInput()">
+          <ion-select-option value="0">Today</ion-select-option>
+          <ion-select-option value="3">Last 3 Days</ion-select-option>
+          <ion-select-option value="7">Last Week</ion-select-option>
+          <ion-select-option value="30">Last Month</ion-select-option>
+          <ion-select-option value="-1">All Time</ion-select-option>
+        </ion-select>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-toolbar>
 <ion-content>
+  <!-- sort toolbar -->
+
+  <!-- sort toolbar -->
+
+  <!-- table -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Time</th>
+          <th>Address</th>
+          <th>Postcode</th>
+          <th>Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let report of visitReports">
+          <tr class="no-border">
+            <td>{{report.case_id}}</td>
+            <td>{{report.created_at}}</td>
+            <td>{{report.address}}</td>
+            <td>{{report.postcode}}</td>
+            <td>{{report.outcome}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <ion-infinite-scroll threshold="100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+  <!-- table -->
 
 </ion-content>
