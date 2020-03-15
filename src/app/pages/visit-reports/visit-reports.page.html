@@ -7,7 +7,7 @@
         </ion-searchbar>
       </ion-col>
       <ion-col size-md="4" size-xs="6" class="ion-text-end">
-        <ion-select placeholder="Select Duration" [(ngModel)]="created_at"(ionChange)="onInput()">
+        <ion-select placeholder="Select Duration" [(ngModel)]="created_at" (ionChange)="onInput($event)">
           <ion-select-option value="0">Today</ion-select-option>
           <ion-select-option value="3">Last 3 Days</ion-select-option>
           <ion-select-option value="7">Last Week</ion-select-option>

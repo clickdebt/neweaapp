@@ -22,6 +22,7 @@ import { FormioModule } from 'angular-formio';
 import { PaymentModalPageModule } from './pages/payment-modal/payment-modal.module';
 import { ArrangementModalPageModule } from './pages/arrangement-modal/arrangement-modal.module';
 import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
+import { Network } from '@ionic-native/network/ngx';
 
 
 @NgModule({
@@ -57,7 +58,8 @@ import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
     GoogleMaps,
     Geolocation,
     NativeGeocoder,
-    LaunchNavigator
+    LaunchNavigator,
+    Network
   ],
   bootstrap: [AppComponent]
 })

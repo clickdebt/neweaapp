@@ -21,6 +21,7 @@ export class JobListPage implements OnInit {
     { title: 'Need a Visit', isChecked: false, id: 'Visit', type: 'stageType' }
   ];
   sortVal = '';
+  shouldShowCancel: boolean;
   sortOptions = [
     { title: 'Latest Cases', isChecked: false, value: 'id|DESC' },
     { title: 'Scheme', isChecked: false, value: 'scheme_id|ASC' },
@@ -100,7 +101,7 @@ export class JobListPage implements OnInit {
     this.getCases('');
 
   }
-  onInput() {
+  onInput(event) {
     this.filters['q'] = this.searchBarValue;
     this.filterCases();
   }
@@ -157,13 +158,13 @@ export class JobListPage implements OnInit {
     // if (filters) {
     //   this.filterMaster = filters;
     // } else {
-      this.caseService.getFilters()
-        .subscribe(async (response: any) => {
-          if (response.data) {
-            // await this.storageService.set('filters', response.data);
-            this.filterMaster = response.data;
-          }
-        });
+    this.caseService.getFilters()
+      .subscribe(async (response: any) => {
+        if (response.data) {
+          // await this.storageService.set('filters', response.data);
+          this.filterMaster = response.data;
+        }
+      });
     // }
   }
 }

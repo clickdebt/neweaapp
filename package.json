@@ -25,6 +25,7 @@
     "@ionic-native/google-maps": "^5.5.0",
     "@ionic-native/launch-navigator": "^5.22.0",
     "@ionic-native/native-geocoder": "^5.22.0",
+    "@ionic-native/network": "^5.22.0-beta-1",
     "@ionic-native/splash-screen": "^5.0.0",
     "@ionic-native/sqlite": "^5.22.0",
     "@ionic-native/sqlite-porter": "^5.22.0",
@@ -39,6 +40,7 @@
     "cordova-plugin-geolocation": "^4.0.2",
     "cordova-plugin-googlemaps": "^2.6.2",
     "cordova-plugin-nativegeocoder": "^3.2.2",
+    "cordova-plugin-network-information": "^2.0.2",
     "cordova-sqlite-storage": "^4.0.0",
     "core-js": "^2.5.4",
     "rxjs": "~6.5.1",
@@ -98,7 +100,8 @@
       "cordova-plugin-nativegeocoder": {},
       "uk.co.workingedge.phonegap.plugin.launchnavigator": {
         "GOOGLE_API_KEY_FOR_ANDROID": "AIzaSyB2SD46TH6aRspJzp_jvIBFTFv-AlN_mUQ"
-      }
+      },
+      "cordova-plugin-network-information": {}
     },
     "platforms": [
       "browser",

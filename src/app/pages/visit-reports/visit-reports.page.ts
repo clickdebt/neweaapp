@@ -7,7 +7,7 @@ import { CaseService } from 'src/app/services';
   styleUrls: ['./visit-reports.page.scss'],
 })
 export class VisitReportsPage implements OnInit {
-
+  shouldShowCancel: boolean;
   visitReports = [];
   limit = 20;
   page = 1;
@@ -50,7 +50,7 @@ export class VisitReportsPage implements OnInit {
         console.log(error);
       });
   }
-  onInput() {
+  onInput(event) {
     this.page = 1;
     this.visitReports = [];
     this.getReports('');
