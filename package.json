@@ -38,7 +38,7 @@
     "cordova-plugin-actionsheet": "^2.3.3",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.2",
-    "cordova-plugin-googlemaps": "^2.6.2",
+    "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
     "cordova-plugin-nativegeocoder": "^3.2.2",
     "cordova-plugin-network-information": "^2.0.2",
     "cordova-sqlite-storage": "^4.0.0",
@@ -91,11 +91,7 @@
         "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
       },
       "cordova-plugin-ionic-keyboard": {},
-      "cordova-plugin-googlemaps": {
-        "API_KEY_FOR_ANDROID": "AIzaSyChblfLhXrYqDeTJ7eJ8QzWOpQozbbS4EI",
-        "PLAY_SERVICES_VERSION": "15.0.1",
-        "ANDROID_SUPPORT_V4_VERSION": "27.+"
-      },
+      "cordova-plugin-googlemaps": {},
       "cordova-plugin-geolocation": {},
       "cordova-plugin-nativegeocoder": {},
       "uk.co.workingedge.phonegap.plugin.launchnavigator": {
