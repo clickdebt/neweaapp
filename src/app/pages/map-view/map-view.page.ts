@@ -119,8 +119,8 @@ export class MapViewPage implements OnInit {
   }
   async getCurrentLocation() {
     const { coords } = await this.geolocation.getCurrentPosition();
-    // this.currLang = coords.longitude;
-    // this.currLat = coords.latitude;
+    this.currLang = coords.longitude;
+    this.currLat = coords.latitude;
     return coords;
   }
 
@@ -289,7 +289,6 @@ export class MapViewPage implements OnInit {
         }
 
       }, (response, status) => {
-
         if (status === 'OK') {
           this.directionsDisplay.setDirections(response);
           this.directionsDisplay.setMap(this.map);
