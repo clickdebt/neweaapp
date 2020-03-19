@@ -44,4 +44,11 @@ export class CaseService {
     }
     return this.http.get(apiURL);
   }
+
+  geoCodeAddress(location) {
+    if (location != 'undefined') {
+      const apiURL = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=AIzaSyB2SD46TH6aRspJzp_jvIBFTFv-AlN_mUQ';
+      return this.http.get(apiURL);
+    }
+  }
 }

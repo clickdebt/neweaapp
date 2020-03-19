@@ -11,22 +11,26 @@ import { CommonService } from './common.service';
 export class HttpInterceptorService implements HttpInterceptor {
 
     reqCount = 0;
+    noHeaderRequest = 'maps.googleapis.com';
     constructor(
         private router: Router,
         private commonService: CommonService
     ) { }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
-        const token = localStorage.getItem('remote_token');
         let newHeaders = req.headers;
-        newHeaders.append('Content-Type', 'application/json').append('Accept', 'application/json');
-        if (token) {
-            newHeaders = newHeaders.append('Authorisation', token);
+        if (!req.url.includes(this.noHeaderRequest)) {
+            const token = localStorage.getItem('remote_token');
+
+            newHeaders.append('Content-Type', 'application/json').append('Accept', 'application/json');
+            if (token) {
+                newHeaders = newHeaders.append('Authorisation', token);
+            }
         }
+
         const authReq = req.clone({ headers: newHeaders });
         this.reqCount++;
-        if (this.reqCount === 1) {
+        if (this.reqCount === 1 && !req.url.includes('nonblocking')) {
             this.commonService.showLoader();
         }
         return next.handle(authReq).pipe(
