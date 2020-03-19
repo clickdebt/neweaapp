@@ -53,7 +53,7 @@ export class MapPage implements OnInit {
   ionViewDidEnter() {
     this.platform.ready().then(async () => {
       await this.getAddresses();
-      this.initMap();
+      await this.initMap();
     });
   }
 

@@ -41,6 +41,10 @@ const routes: Routes = [
       {
         path: 'case-details/:id',
         loadChildren: () => import('../pages/case-details/case-details.module').then(m => m.CaseDetailsPageModule)
+      },
+      {
+        path: 'map-view',
+        loadChildren: () => import('../pages/map-view/map-view.module').then(m => m.MapViewPageModule)
       }
     ]
   }
