@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { SettingsService } from 'src/app/services';
+import { SettingsService, CommonService } from 'src/app/services';
 import { Router } from '@angular/router';
 
 @Component({
@@ -16,6 +16,7 @@ export class AddServerSettingPage implements OnInit {
     private formBuilder: FormBuilder,
     private settingsService: SettingsService,
     private router: Router,
+    private commonService: CommonService
   ) { }
 
   ngOnInit() {
@@ -54,18 +55,26 @@ export class AddServerSettingPage implements OnInit {
     const serverSettings = localStorage.getItem('serverSettings');
     let setting = { nickname: this.settingForm.controls['nickname'].value, url: this.settingForm.controls['url'].value, active: 0 };
     let ss = [];
-    if ((ss = JSON.parse(serverSettings)).length > 0) {
+    if (serverSettings) {
+      ss = JSON.parse(serverSettings)
+    }
+    if (ss.length > 0) {
       if (!(ss.find(s => s.url == setting.url))) {
         if (!ss.find(s => s.active == true)) {
           setting.active = 1
         }
         ss.push(setting);
+        this.commonService.showToast('Server added successfully');
+      } else {
+        this.commonService.showToast('Server already added');
       }
     } else {
       setting.active = 1;
       localStorage.setItem('server_url', this.settingForm.controls['url'].value);
       ss.push(setting);
+      this.commonService.showToast('Server added successfully');
     }
+    this.settingForm.reset();
     localStorage.setItem('serverSettings', JSON.stringify(ss));
     this.router.navigate(['server-settings']);
   }

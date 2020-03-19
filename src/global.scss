@@ -223,10 +223,15 @@ ion-footer{
 
   .list-inline{
     display: flex;
-    justify-content: space-between;
+    // justify-content: space-between;
     border-top: 1px solid rgba(0, 0, 0, 0.22);
     padding: 0px 17px;
     padding-top: 17px;
+    justify-content: center;
+    flex-wrap: wrap;
+    .list-inline-item{
+      margin-bottom: 5px;
+    }
   }
 
   nav{
