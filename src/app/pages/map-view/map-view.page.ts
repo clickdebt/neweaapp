@@ -1,7 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { DatabaseService, CaseService, CommonService } from 'src/app/services';
+import { DatabaseService, CaseService, CommonService, StorageService } from 'src/app/services';
 import { Geocoder } from '@ionic-native/google-maps/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Router } from '@angular/router';
 declare var google;
 
 @Component({
@@ -13,7 +14,6 @@ export class MapViewPage implements OnInit {
   @ViewChild('map', { static: false }) mapElement: ElementRef;
 
   isMapDirectionVisible;
-  gmarker = [];
   map: any;
   cases = [];
   directionsService = new google.maps.DirectionsService();
@@ -32,46 +32,61 @@ export class MapViewPage implements OnInit {
   infowindow: any;
   page = 1;
   limit = 20;
+  apiReq;
+  icons = {
+    red: 'assets/icon/pin-red.png',
+    grey: 'assets/icon/pin-grey.png'
+  };
 
   constructor(
-    private databaseService: DatabaseService,
     private commonService: CommonService,
     private caseService: CaseService,
     private geolocation: Geolocation,
+    private storageService: StorageService,
+    private router: Router
   ) { }
 
   ngOnInit() {
   }
 
-  async ionViewWillEnter() {
+  async ionViewDidEnter() {
+    this.page = 1;
+    this.markers = [];
     this.getCurrentLocation();
     this.getCases();
     this.initMap();
   }
-
-  getCases() {
-    this.caseService.getCases({ page: this.page++, limit: this.limit, nonblocking: 1 }).subscribe((res: any) => {
+  ionViewWillLeave() {
+    this.storageService.remove('selected_cases_for_map');
+    this.apiReq.unsubscribe();
+  }
+  async getCases() {
+    const caseIds = await this.storageService.get('selected_cases_for_map');
+    let params: any;
+    if (caseIds) {
+      params = { cases: caseIds, nonblocking: 1 }
+    } else {
+      params = { page: this.page++, limit: this.limit, nonblocking: 1 };
+    }
+    this.apiReq = this.caseService.getCases(params).subscribe((res: any) => {
       this.cases = this.cases.concat(res.data);
       if (res.data && res.data.length) {
         this.getAddresses(res.data);
-        this.getCases();
+        if (!caseIds) {
+          this.getCases();
+        }
       }
     });
   }
   getAddresses(cases) {
     if (cases) {
       cases.forEach((da) => {
-        const obj = {
-          id: da.id,
-          address: da.debtor.addresses[0],
-          case: da,
-          address_str: `${da.debtor.addresses[0].address_ln1}, ` +
-            `${da.debtor.addresses[0].address_ln2}, ` +
-            `${da.debtor.addresses[0].address_ln3}, ` +
-            `${da.debtor.addresses[0].address_postcode}`,
-          location: {}
-        };
-        this.getGeocodesLatLongs(obj);
+        da.address_str = `${da.debtor.addresses[0].address_ln1}, ` +
+          `${da.debtor.addresses[0].address_ln2}, ` +
+          `${da.debtor.addresses[0].address_ln3}, ` +
+          `${da.debtor.addresses[0].address_postcode}`;
+        da.location = {};
+        this.getGeocodesLatLongs(da);
       });
 
     }
@@ -93,20 +108,35 @@ export class MapViewPage implements OnInit {
 
   setCaseMarkers(obj) {
     if (obj.location) {
+      const isVisit = obj.stage.stage_type.stage_type === 'Visit' ? true : false;
       const contentString = '<div id="content">' +
-        '<h3>(Case # ' + obj.id + ')</h3>' +
+        '<h5>(Case # ' + obj.id + ')</h5>' +
         '<div id="bodyContent">' +
         '<p> <b>' + obj.address_str + '</b></p>' +
+        (obj.debtor.debtor_name ? '<p> <b>' + obj.debtor.debtor_name + '</b></p>' : '') +
+        (obj.debtor.debtor_mobile ? '<p> <b>' + obj.debtor.debtor_mobile + '</b></p>' : '') +
+        (obj.debtor.debtor_phone ? '<p> <b>' + obj.debtor.debtor_phone + '</b></p>' : '') +
         '</div>' +
         '</div>' +
-        '<button id="' + obj.id + '" class="' + obj.id + ' btn btn-primary visitButton">Visit Case</button>';
+        (isVisit ? '<button id="' + obj.id + '" class="' + obj.id + ' btn btn-primary visitButton">Visit Case</button>' : '');
       const infowindow = new google.maps.InfoWindow({
         content: contentString
       });
+      google.maps.event.addDomListener(infowindow, 'domready', () => {
+        const btn = document.querySelector('.visitButton');
+        google.maps.event.addDomListener(btn, 'click', () => {
+          const caseId = btn.getAttribute('id');
+          if (caseId) {
+            this.router.navigate(['/home/visit-form/' + caseId]);
+          }
+        });
+      });
+      const markerIcon = isVisit ? this.icons.red : this.icons.grey;
       const marker = new google.maps.Marker({
         position: obj.location,
         title: obj.address_str,
         map: this.map,
+        icon: markerIcon
       });
       this.markers.push(marker);
 
@@ -256,7 +286,7 @@ export class MapViewPage implements OnInit {
         }
       }
     });
-    console.log(this.polygonMarkers);
+    // console.log(this.polygonMarkers);
   }
 
   addPolyPoints(event) {
