@@ -372,7 +372,7 @@
 </ion-content>
 <ion-footer>
   <ion-toolbar>
-    <ion-button *ngIf="selectedCaseIds.length>0" color="secondary" expand="full">Show {{selectedCaseIds.length}} cases
+    <ion-button *ngIf="selectedCaseIds.length>0" (click)="showCasesOnMap()" color="secondary"  expand="full">Show {{selectedCaseIds.length}} cases
       on Map</ion-button>
   </ion-toolbar>
 </ion-footer>

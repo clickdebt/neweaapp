@@ -36,7 +36,7 @@ export class JobListPage implements OnInit {
     { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date|DESC' }
   ];
   isMobile = false;
-  selectedCaseIds: any[] = []
+  selectedCaseIds: any[] = [];
   constructor(
     private caseService: CaseService,
     private router: Router,
@@ -179,13 +179,17 @@ export class JobListPage implements OnInit {
   selectCase(event, caseId) {
     if (event.detail.checked) {
       if (!this.selectedCaseIds.includes(caseId)) {
-        this.selectedCaseIds.push(caseId)
+        this.selectedCaseIds.push(caseId);
       }
     } else {
       if (this.selectedCaseIds.includes(caseId)) {
-        this.selectedCaseIds.splice(this.selectedCaseIds.indexOf(caseId), 1)
+        this.selectedCaseIds.splice(this.selectedCaseIds.indexOf(caseId), 1);
       }
     }
+  }
+  showCasesOnMap() {
+    this.storageService.set('selected_cases_for_map', this.selectedCaseIds);
+    this.router.navigate(['home/map-view']);
   }
   goToCaseDetails(currentCaseData) {
     this.router.navigate(['/home/case-details/' + currentCaseData.id]);
