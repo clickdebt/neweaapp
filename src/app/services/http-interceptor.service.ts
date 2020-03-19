@@ -30,7 +30,7 @@ export class HttpInterceptorService implements HttpInterceptor {
 
         const authReq = req.clone({ headers: newHeaders });
         this.reqCount++;
-        if (this.reqCount === 1) {
+        if (this.reqCount === 1 && !req.url.includes('nonblocking')) {
             this.commonService.showLoader();
         }
         return next.handle(authReq).pipe(
