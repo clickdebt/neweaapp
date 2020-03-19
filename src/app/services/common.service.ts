@@ -13,7 +13,7 @@ export class CommonService {
 
   }
 
-  async showToast(msg, clr = 'default') {
+  async showToast(msg, clr = 'light') {
     const toast = await this.toastController.create({
       message: msg,
       duration: 4000,
