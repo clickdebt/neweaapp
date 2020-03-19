@@ -10,5 +10,38 @@
 </ion-header>
 
 <ion-content>
+  <ion-item>
+    <ion-icon (click)="changeSoundSetting()" size="large" slot="end" [name]="volumeClass"></ion-icon>
+  </ion-item>
 
+
+
+
+  <ion-grid>
+    <ion-row size="3" class="ion-margin-top ion-justify-content-center">
+      <div class="position-relative">
+        <div class="current" [ngStyle]="getOverlayStyle()">
+          {{10 - progress}}
+        </div>
+        <round-progress class="progressRound" [current]="progress" [max]="10" [color]="'#ff0000'"
+          [background]="'#eaeaea'" [radius]="radius" [stroke]="20" [rounded]="true" [clockwise]="true" [duration]="10"
+          [animation]="'easeInOutQuart'" [animationDelay]="0">
+        </round-progress>
+      </div>
+    </ion-row>
+    <ion-row class="ion-margin-top ion-justify-content-center">
+      <ion-col size="3">
+        <ion-buttons class="ion-justify-content-center">
+          <ion-button size="small" shape="round" fill="solid" [disabled]="isPause" color="tertiary" (click)="pausePanicCounter()">
+            Pause
+          </ion-button>
+          <ion-button size="small" shape="round" fill="solid" [disabled]="isStart" color="tertiary" (click)="startPanicCounter()">
+            Start
+          </ion-button>
+          <ion-button size="small" shape="round" fill="solid" color="tertiary" (click)="dismiss()">Cancel
+          </ion-button>
+        </ion-buttons>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
