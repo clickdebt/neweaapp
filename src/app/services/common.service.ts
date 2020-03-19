@@ -17,7 +17,7 @@ export class CommonService {
     const toast = await this.toastController.create({
       message: msg,
       duration: 4000,
-      position: 'top',
+      position: 'bottom',
       color: clr
     });
     toast.present();

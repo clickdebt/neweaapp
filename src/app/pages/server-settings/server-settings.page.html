@@ -29,7 +29,7 @@
             <ion-toggle mode="md" (ionChange)="changeServer(setting)" [(ngModel)]="setting.active"></ion-toggle>
           </td>
           <td>
-            <ion-button size="small" color="light">
+            <ion-button size="small" color="light" (click)="deleteServer(setting)">
               <ion-icon name="trash-outline" color="secondary"></ion-icon>
             </ion-button>
           </td>

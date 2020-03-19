@@ -36,6 +36,9 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-buttons slot="end">
+      <ion-button (click)="openPanicModal()">
+        <ion-icon  size="large" name="alert-circle"></ion-icon>
+      </ion-button>
       <ion-button (click)="confirmLogout()">
         <ion-icon size="large" name="log-out-outline"></ion-icon>
       </ion-button>

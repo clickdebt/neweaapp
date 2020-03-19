@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CaseService } from '../../services';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storage.service';
+import { Platform } from '@ionic/angular';
 @Component({
   selector: 'app-job-list',
   templateUrl: './job-list.page.html',
@@ -34,13 +35,17 @@ export class JobListPage implements OnInit {
     { title: 'Visit Allocated Oldest to Newest', isChecked: false, value: 'last_allocated_date|ASC' },
     { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date|DESC' }
   ];
+  isMobile = false;
+  selectedCaseIds: any[] = []
   constructor(
     private caseService: CaseService,
     private router: Router,
     private storageService: StorageService,
+    private platform: Platform
   ) { }
 
   ngOnInit() {
+    this.isMobile = this.platform.is('mobile')
     this.getFilterMasterData();
   }
 
@@ -137,9 +142,13 @@ export class JobListPage implements OnInit {
   }
   parseCaseData(caseData) {
     caseData.forEach(elem => {
+      elem['linkedCasesTotalBalance'] = 0
       // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
       if (elem.linked_cases != '') {
         elem.linked_cases = Object.values(elem.linked_cases);
+        elem['linkedCasesTotalBalance'] = elem.linked_cases.reduce((accumulator, currentValue) => {
+          return accumulator + parseFloat(currentValue.d_outstanding);
+        }, 0)
       }
     });
     this.cases = this.cases.concat(caseData);
@@ -166,5 +175,19 @@ export class JobListPage implements OnInit {
         }
       });
     // }
+  }
+  selectCase(event, caseId) {
+    if (event.detail.checked) {
+      if (!this.selectedCaseIds.includes(caseId)) {
+        this.selectedCaseIds.push(caseId)
+      }
+    } else {
+      if (this.selectedCaseIds.includes(caseId)) {
+        this.selectedCaseIds.splice(this.selectedCaseIds.indexOf(caseId), 1)
+      }
+    }
+  }
+  goToCaseDetails(currentCaseData) {
+    this.router.navigate(['/home/case-details/' + currentCaseData.id]);
   }
 }
