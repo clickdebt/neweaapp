@@ -33,5 +33,11 @@ export class ServerSettingsPage implements OnInit {
     }
     localStorage.setItem('serverSettings', JSON.stringify(this.settings));
   }
-
+  deleteServer(server) {
+    if (server.active) {
+      localStorage.removeItem('server_url');
+    }
+    this.settings.splice(this.settings.indexOf(server), 1)
+    localStorage.setItem('serverSettings', JSON.stringify(this.settings));
+  }
 }
