@@ -57,8 +57,7 @@ export class VisitFormPage implements OnInit {
   async ionViewWillEnter() {
     this.caseId = this.route.snapshot.params.id;
     this.getLocation();
-    const casesData = await this.storageService.get('cases');
-    this.visitCaseData = casesData.find(c => c.id == this.caseId);
+    this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'))
     if (this.visitCaseData) {
       this.addressData = {
         address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,

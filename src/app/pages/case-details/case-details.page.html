@@ -1,9 +1,56 @@
-<ion-header>
+<ion-header class="shadow">
   <ion-toolbar>
     <ion-title>case-details</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
+  <ion-list>
+    <div class="ion-margin-top">
+      <ion-item class="item-stable" (click)="toggleGroup(caseMarkers)" ng-class="{active: isGroupShown(caseMarkers)}">
+        <ion-icon [name]="isGroupShown(caseMarkers) ? 'remove-outline' : 'add-outline'"></ion-icon>
+        <ion-label>
+          <h2>Case Markers</h2>
+        </ion-label>
+      </ion-item>
+      <ion-list class="ion-no-border item-accordion   ion-margin-start" [hidden]="!isGroupShown(caseMarkers)">
+        <ion-button size="default" [color]="colorCondition(caseMarker.value)"
+          *ngFor="let caseMarker of caseMarkers.fields">
+          {{caseMarker.label}}
+        </ion-button>
+      </ion-list>
+    </div>
 
+    <div class="ion-margin-top">
+      <ion-item class="item-stable" (click)="toggleGroup(currentCaseData)"
+        ng-class="{active: isGroupShown(currentCaseData)}">
+        <ion-icon [name]="isGroupShown(currentCaseData) ? 'remove-outline' : 'add-outline'"></ion-icon>
+        <ion-label>
+          <h2>Debtor</h2>
+        </ion-label>
+      </ion-item>
+    </div>
+
+  </ion-list>
 </ion-content>
+
+<ion-footer>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size-md="3">
+        <ion-item>
+          <ion-select (ionChange)="onSelectChange($event)" value="" okText="Okay" cancelText="Dismiss">
+            <ion-select-option value="">Select an Action</ion-select-option>
+            <ion-select-option value="Add Note">Add Note</ion-select-option>
+            <ion-select-option value="Add Vulnerablity Status">Add Vulnerablity Status</ion-select-option>
+            <ion-select-option value="Add H&S Status">Add H&S Status</ion-select-option>
+            <ion-select-option value="On Hold">On Hold</ion-select-option>
+            <ion-select-option value="Add Fee">Add Fee</ion-select-option>
+            <ion-select-option value="Deallocate case">Deallocate case</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-footer>
