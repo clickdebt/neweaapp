@@ -23,7 +23,7 @@ import { PaymentModalPageModule } from './pages/payment-modal/payment-modal.modu
 import { ArrangementModalPageModule } from './pages/arrangement-modal/arrangement-modal.module';
 import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { Network } from '@ionic-native/network/ngx';
-
+import { NativeAudio } from '@ionic-native/native-audio/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -59,7 +59,8 @@ import { Network } from '@ionic-native/network/ngx';
     Geolocation,
     NativeGeocoder,
     LaunchNavigator,
-    Network
+    Network,
+    NativeAudio
   ],
   bootstrap: [AppComponent]
 })
