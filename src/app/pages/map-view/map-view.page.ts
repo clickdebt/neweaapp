@@ -1,10 +1,9 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { DatabaseService, CaseService, CommonService, StorageService } from 'src/app/services';
-import { Geocoder } from '@ionic-native/google-maps/ngx';
+import { CaseService, CommonService, StorageService } from 'src/app/services';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Router } from '@angular/router';
 declare var google;
-
+import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 @Component({
   selector: 'app-map-view',
   templateUrl: './map-view.page.html',
@@ -37,13 +36,15 @@ export class MapViewPage implements OnInit {
     red: 'assets/icon/pin-red.png',
     grey: 'assets/icon/pin-grey.png'
   };
+  destination: string;
 
   constructor(
     private commonService: CommonService,
     private caseService: CaseService,
     private geolocation: Geolocation,
     private storageService: StorageService,
-    private router: Router
+    private router: Router,
+    private launchNavigator: LaunchNavigator
   ) { }
 
   ngOnInit() {
@@ -52,7 +53,7 @@ export class MapViewPage implements OnInit {
   async ionViewDidEnter() {
     this.page = 1;
     this.markers = [];
-    this.getCurrentLocation();
+    // this.getCurrentLocation();
     this.getCases();
     this.initMap();
   }
@@ -319,9 +320,16 @@ export class MapViewPage implements OnInit {
         }
 
       }, (response, status) => {
+        this.destination = '';
         if (status === 'OK') {
-          this.directionsDisplay.setDirections(response);
-          this.directionsDisplay.setMap(this.map);
+          if (response.routes.length > 0) {
+            this.routeLegs = response.routes[0].legs;
+            this.routeLegs.forEach(leg => {
+              this.destination = this.destination + ' to:' + leg.end_address;
+            });
+            this.directionsDisplay.setDirections(response);
+            this.directionsDisplay.setMap(this.map);
+          }
           // const camOption = {
           //   target: start,
           //   zoom: 16,
@@ -335,5 +343,9 @@ export class MapViewPage implements OnInit {
         }
       });
     }
+  }
+
+  async navigateLocation() {
+    await this.launchNavigator.navigate(this.destination);
   }
 }
