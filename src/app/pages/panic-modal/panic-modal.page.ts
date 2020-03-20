@@ -25,7 +25,10 @@ export class PanicModalPage implements OnInit {
     private platform: Platform,
     private commonService: CommonService,
     private sosService: SosService,
-    private geolocation: Geolocation) { }
+    private geolocation: Geolocation) {
+
+    this.getCurrentLocation()
+  }
 
   ngOnInit() {
   }
@@ -84,10 +87,7 @@ export class PanicModalPage implements OnInit {
 
   async playSiren() {
     if (!this.isMuted)
-      await this.nativeAudio.play('siren').then((response) => {
-        console.log(response);
-
-      });
+      await this.nativeAudio.play('siren');
   }
 
   async sendSosRequest() {
