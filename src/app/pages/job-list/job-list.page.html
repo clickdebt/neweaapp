@@ -290,7 +290,7 @@
             <span class="d-block"> (#{{case.id}}) </span>
           </h3>
           <span class="d-flex">
-            <ion-button size="small" color="secondary">
+            <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
               <ion-icon name="information-circle-outline"></ion-icon>
             </ion-button>
             <ion-button size="small" color="tertiary" *ngIf="case.stage.stage_type.stage_type == 'Visit'"
