@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { CaseDetailsPageRoutingModule } from './case-details-routing.module';
 
 import { CaseDetailsPage } from './case-details.page';
+import { HighlightPipe } from '../../pipes/highlight.pipe';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { CaseDetailsPage } from './case-details.page';
     IonicModule,
     CaseDetailsPageRoutingModule
   ],
-  declarations: [CaseDetailsPage]
+  declarations: [CaseDetailsPage, HighlightPipe]
 })
-export class CaseDetailsPageModule {}
+export class CaseDetailsPageModule { }

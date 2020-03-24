@@ -222,10 +222,10 @@
                     <th width="3%"></th>
                     <th>Case ID</th>
                     <th>Ref</th>
+                    <th>Name</th>
                     <th>Amount</th>
-                    <th>Offence Date</th>
                     <th>Date</th>
-                    <th>Expiry Date</th>
+                    <th>Postcode</th>
                     <th>Visit Count</th>
                     <th>Details</th>
                     <th>Visit</th>
@@ -239,18 +239,18 @@
                     </td>
                     <td>{{link_case.id}}</td>
                     <td>{{link_case.ref}}</td>
+                    <td>{{link_case.debtor.debtor_name}}</td>
                     <td>{{link_case.d_outstanding}}</td>
-                    <td>{{link_case.offense_date}}</td>
                     <td>{{link_case.date}}</td>
-                    <td>{{link_case.expiry_date}}</td>
+                    <td>{{link_case.debtor.addresses[0].address_postcode}}</td>
                     <td>{{link_case.visitcount_total}}</td>
                     <td class="action ">
-                      <ion-button size="small" color="secondary">
+                      <ion-button size="small" color="secondary" (click)="goToCaseDetails(link_case)">
                         Details
                       </ion-button>
                     </td>
                     <td class="action">
-                      <ion-button size="small" color="tertiary">
+                      <ion-button size="small" color="tertiary" (click)="goToVisitForm(link_case)">
                         Visit
                       </ion-button>
                     </td>
@@ -265,7 +265,7 @@
 
       </tfoot>
     </table>
-    <ion-infinite-scroll threshold="100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll threshold=" 100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
       <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
       </ion-infinite-scroll-content>
     </ion-infinite-scroll>
@@ -290,7 +290,7 @@
             <span class="d-block"> (#{{case.id}}) </span>
           </h3>
           <span class="d-flex">
-            <ion-button size="small" color="secondary">
+            <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
               <ion-icon name="information-circle-outline"></ion-icon>
             </ion-button>
             <ion-button size="small" color="tertiary" *ngIf="case.stage.stage_type.stage_type == 'Visit'"
@@ -329,14 +329,14 @@
               <div class="d-flex align-items-center">
                 <ion-checkbox class="m-r-10" mode="md" color="secondary" (ionChange)="selectCase($event,link_case.id)"
                   slot="start"></ion-checkbox>
-                <h3>{{case.debtor.debtor_name}}
+                <h3>{{link_case.debtor.debtor_name}}
                   <span class="d-block"> (#{{link_case.id}}) </span>
                 </h3>
                 <span class="d-flex">
-                  <ion-button size="small" color="secondary">
+                  <ion-button size="small" color="secondary" (click)="goToCaseDetails(link_case)">
                     <ion-icon name="information-circle-outline"></ion-icon>
                   </ion-button>
-                  <ion-button size="small" color="tertiary">
+                  <ion-button size="small" color="tertiary" (click)="goToVisitForm(link_case)">
                     <ion-icon name="reader-outline"></ion-icon>
                   </ion-button>
                 </span>
@@ -350,6 +350,14 @@
                   <ion-col size="6">
                     Amount :
                     <span> {{link_case.d_outstanding}} </span>
+                  </ion-col>
+                  <ion-col size="6">
+                    Postcode :
+                    <span> {{link_case.debtor.addresses[0].address_postcode}} </span>
+                  </ion-col>
+                  <ion-col size="6">
+                    visit :
+                    <span> {{link_case.visitcount_total}} </span>
                   </ion-col>
                   <ion-col size="12">
                     Date :
@@ -372,7 +380,8 @@
 </ion-content>
 <ion-footer>
   <ion-toolbar>
-    <ion-button *ngIf="selectedCaseIds.length>0" (click)="showCasesOnMap()" color="secondary"  expand="full">Show {{selectedCaseIds.length}} cases
+    <ion-button *ngIf="selectedCaseIds.length>0" (click)="showCasesOnMap()" color="secondary" expand="full">Show
+      {{selectedCaseIds.length}} cases
       on Map</ion-button>
   </ion-toolbar>
 </ion-footer>

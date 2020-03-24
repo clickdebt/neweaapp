@@ -1,0 +1,22 @@
+.bg-main {
+  --ion-background-color: #d4d2d2;
+  color: #342e32;
+}
+.text-color-light {
+  color: #726e72 !important;
+}
+.card-title-bg {
+  --ion-background-color: #f1f1f1;
+}
+.history-bg {
+  background-color: #f1f1f1;
+}
+.highlight {
+  background-color: #ffff00 !important;
+}
+.searchbar-clear-icon {
+  display: none !important;
+}
+.medium-contrast {
+  color: var(--ion-color-medium-contrast);
+}
