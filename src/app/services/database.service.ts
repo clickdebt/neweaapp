@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { StorageService } from './storage.service';
 import { BehaviorSubject } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
-
+import * as moment from 'moment';
 @Injectable({
   providedIn: 'root'
 })
@@ -37,11 +37,11 @@ export class DatabaseService {
           this.setUpDatabase();
         }
       }
-    }).catch((error) => {});
+    }).catch((error) => { });
   }
 
   async setUpDatabase() {
-    const sql = `CREATE TABLE IF NOT EXISTS rdeb_cases(
+    const rdebCases = `CREATE TABLE IF NOT EXISTS rdeb_cases(
       id INTEGER PRIMARY KEY,
       ref TEXT,
       scheme_id INTEGER,
@@ -58,6 +58,29 @@ export class DatabaseService {
       data TEXT
     );`;
 
+    const visitForm = `CREATE TABLE IF NOT EXISTS visit_form(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+      form TEXT
+    );`;
+
+    const filterMaster = `CREATE TABLE IF NOT EXISTS visit_form(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+      form TEXT
+    );`;
+
+
+    const visitReports = `CREATE TABLE IF NOT EXISTS visit_reports(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+      case_id INTEGER,
+      form_data TEXT,
+      created_at TEXT,
+      is_sync INTEGER,
+      visit_form_data_id INTEGER,
+    );`;
+
+
+    const sql = rdebCases + visitForm + visitReports;
+
     const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
@@ -68,7 +91,7 @@ export class DatabaseService {
     try {
       const result = await this.database.executeSql(query, params);
       return result;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async insert(tableName, params = []) {
@@ -97,6 +120,20 @@ export class DatabaseService {
     await Promise.all(promiseArray)
       .then((res: any) => { })
       .catch((error) => { });
+  }
+
+  async setVisitForm(data) {
+    const sql = `INSERT INTO visit_form
+    ( form ) VALUES ('${data[0].content}');`;
+
+    this.executeQuery(sql)
+      .then((res: any) => {
+      }, error => {
+        console.log(error);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   async select(tableName) {

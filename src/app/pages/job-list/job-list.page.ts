@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CaseService } from '../../services';
+import { CaseService, DatabaseService } from '../../services';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storage.service';
 import { Platform } from '@ionic/angular';
+import { NetworkService } from 'src/app/services/network.service';
 @Component({
   selector: 'app-job-list',
   templateUrl: './job-list.page.html',
@@ -41,11 +42,13 @@ export class JobListPage implements OnInit {
     private caseService: CaseService,
     private router: Router,
     private storageService: StorageService,
-    private platform: Platform
+    private platform: Platform,
+    private networkService: NetworkService,
+    private databaseService: DatabaseService
   ) { }
 
   ngOnInit() {
-    this.isMobile = this.platform.is('mobile')
+    this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
   }
 
@@ -155,12 +158,19 @@ export class JobListPage implements OnInit {
     this.storageService.set('cases', this.cases);
   }
 
-  getFilterMasterData() {
-    this.caseService.getFilterMasterData().subscribe(res => {
-      this.filterMaster = res['data'];
-    }, err => {
-      console.log(err);
-    });
+  async getFilterMasterData() {
+    if (this.networkService.getCurrentNetworkStatus() == 1) {
+      this.caseService.getFilterMasterData().subscribe(res => {
+        this.filterMaster = res['data'];
+      }, err => {
+        console.log(err);
+      });
+    } else {
+      const data = await this.databaseService.select('filter_master_data');
+      if (data.rows) {
+        // this.filterMaster = data.rows.item;
+      }
+    }
   }
   async getFilters() {
     // const filters = await this.storageService.get('filters');
