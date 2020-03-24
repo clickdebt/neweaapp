@@ -202,6 +202,7 @@ export class JobListPage implements OnInit {
     this.router.navigate(['home/map-view']);
   }
   goToCaseDetails(currentCaseData) {
+    localStorage.setItem('detais_case_data', JSON.stringify(currentCaseData));
     this.router.navigate(['/home/case-details/' + currentCaseData.id]);
   }
 }
