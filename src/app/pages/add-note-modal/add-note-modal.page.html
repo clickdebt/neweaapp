@@ -1,0 +1,34 @@
+<ion-header class="shadow">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon size="large" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-grid>
+    <ion-row class="modal-header ion-margin-horizontal ion-justify-content-center">
+      <ion-item lines="none" class="font-size-21">
+        <ion-label>Add Note</ion-label>
+      </ion-item>
+    </ion-row>
+    <ion-row class="ion-margin-top">
+      <ion-item class="w-100" lines="none">
+        <ion-textarea [(ngModel)]="note" rows="10" placeholder="Note"></ion-textarea>
+      </ion-item>
+    </ion-row>
+    <ion-row class="ion-margin-top ion-justify-content-center">
+      <ion-button color="secondary" (click)="save()">
+        Save
+      </ion-button>
+      <ion-button color="secondary" (click)="cancel()">
+        Cancel
+      </ion-button>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

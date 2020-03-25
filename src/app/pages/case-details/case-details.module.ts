@@ -8,13 +8,19 @@ import { CaseDetailsPageRoutingModule } from './case-details-routing.module';
 
 import { CaseDetailsPage } from './case-details.page';
 import { HighlightPipe } from '../../pipes/highlight.pipe';
+import { AddNoteModalPageModule } from '../add-note-modal/add-note-modal.module';
+import { OnHoldModalPageModule } from '../on-hold-modal/on-hold-modal.module';
+import { AddFeeModalPageModule } from '../add-fee-modal/add-fee-modal.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    CaseDetailsPageRoutingModule
+    CaseDetailsPageRoutingModule,
+    AddNoteModalPageModule,
+    OnHoldModalPageModule,
+    AddFeeModalPageModule
   ],
   declarations: [CaseDetailsPage, HighlightPipe]
 })

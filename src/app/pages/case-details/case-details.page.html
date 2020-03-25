@@ -542,14 +542,11 @@
     <ion-row class="ion-justify-content-center">
       <ion-col size-md="3">
         <ion-item>
-          <ion-select (ionChange)="onSelectChange($event)" value="" okText="Okay" cancelText="Dismiss">
-            <ion-select-option value="">Select an Action</ion-select-option>
-            <ion-select-option value="Add Note">Add Note</ion-select-option>
-            <ion-select-option value="Add Vulnerablity Status">Add Vulnerablity Status</ion-select-option>
-            <ion-select-option value="Add H&S Status">Add H&S Status</ion-select-option>
-            <ion-select-option value="On Hold">On Hold</ion-select-option>
-            <ion-select-option value="Add Fee">Add Fee</ion-select-option>
-            <ion-select-option value="Deallocate case">Deallocate case</ion-select-option>
+          <ion-select [(ngModel)]="SelectedAction" (ionFocus)="onSelectChange($event)" value="" okText="Okay"
+            cancelText="Dismiss">
+            <ion-select-option disabled="true" value="">Select an Action</ion-select-option>
+            <ion-select-option [value]="action" *ngFor="let action of actions">{{action}}
+            </ion-select-option>
           </ion-select>
         </ion-item>
       </ion-col>

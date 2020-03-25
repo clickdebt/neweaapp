@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AlertController, ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { DatabaseService, CaseService } from '../services';
-import { PanicModalPage } from '../pages/panic-modal/panic-modal.page'
+import { PanicModalPage } from '../pages/panic-modal/panic-modal.page';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',

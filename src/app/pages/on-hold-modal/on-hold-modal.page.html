@@ -1,0 +1,53 @@
+<ion-header class="shadow">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon size="large" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <form>
+    <ion-grid>
+      <ion-row class="modal-header ion-margin-horizontal ion-justify-content-center">
+        <ion-item lines="none" class="font-size-21">
+          <ion-label>Status</ion-label>
+        </ion-item>
+      </ion-row>
+      <ion-row class="ion-margin">
+        <ion-item class="w-100" lines="none">
+          <ion-label position="fixed" class="ion-margin-end">No of Days:</ion-label>
+          <ion-input [(ngModel)]="formData.days" [ngModelOptions]="{standalone: true}"
+            (ionChange)="onDaysChange($event)" placeholder="No of Days" type="number">
+          </ion-input>
+        </ion-item>
+      </ion-row>
+      <ion-row class="ion-margin">
+        <ion-item class="w-100" lines="none">
+          <ion-label position="fixed" class="ion-margin-end">Hold Until:</ion-label>
+          <ion-datetime class="w-100" disabled="true" displayFormat="DD/MM/YYYY" [(ngModel)]="formData.date"
+            [ngModelOptions]="{standalone: true}">
+          </ion-datetime>
+        </ion-item>
+      </ion-row>
+      <ion-row class="ion-margin">
+        <ion-item class="w-100" lines="none">
+          <ion-label position="fixed" class="ion-margin-end">Note:</ion-label>
+          <ion-textarea [(ngModel)]="formData.note" rows="2" [ngModelOptions]="{standalone: true}" placeholder="Note">
+          </ion-textarea>
+        </ion-item>
+      </ion-row>
+      <ion-row class="ion-margin-top ion-justify-content-center">
+        <ion-button type="submit" color="secondary" (click)="save()">
+          Save
+        </ion-button>
+        <ion-button color="secondary" (click)="cancel()">
+          Cancel
+        </ion-button>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>

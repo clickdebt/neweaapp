@@ -2,6 +2,10 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StorageService } from 'src/app/services';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
+import { ModalController, AlertController } from '@ionic/angular';
+import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
+import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
+import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
 
 @Component({
   selector: 'app-case-details',
@@ -39,16 +43,22 @@ export class CaseDetailsPage implements OnInit {
   historyDataIndex = 10;
   searchBarValue = '';
   historyFilterData: any[] = [];
+  actions: string[];
+  SelectedAction = '';
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private storageService: StorageService,
-    private caseDetailsService: CaseDetailsService) { }
+    private caseDetailsService: CaseDetailsService,
+    private modalCtrl: ModalController,
+    private alertCtrl: AlertController,
+  ) { }
 
   ngOnInit() {
     this.caseId = this.route.snapshot.params.id;
     this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
     this.currentCaseData.show = false;
+    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status', 'On Hold', 'Add Fee', 'Deallocate case'];
   }
 
   async ionViewWillEnter() {
@@ -62,7 +72,20 @@ export class CaseDetailsPage implements OnInit {
   }
 
   onSelectChange(event) {
-    // console.log(event);
+    if (this.SelectedAction === 'Add Note') {
+      this.addNote();
+    } else if (this.SelectedAction === 'Add Vulnerablity Status') {
+      this.addValnerablityStatus();
+    } else if (this.SelectedAction === 'Add H&S Status') {
+      this.addHSStatus();
+    } else if (this.SelectedAction === 'Deallocate case') {
+      this.deallocateCase();
+    } else if (this.SelectedAction === 'On Hold') {
+      this.onHold();
+    } else if (this.SelectedAction === 'Add Fee') {
+      this.addFee();
+    }
+    this.SelectedAction = '';
   }
 
   toggleShow(object) {
@@ -167,5 +190,99 @@ export class CaseDetailsPage implements OnInit {
       });
       console.log(this.caseDetails);
     });
+  }
+
+  async addNote() {
+    const AddNoteModal = await this.modalCtrl.create({
+      component: AddNoteModalPage,
+      componentProps: {
+        caseId: this.caseId
+      }
+    });
+    await AddNoteModal.present();
+  }
+
+  async addValnerablityStatus() {
+    const alert = await this.alertCtrl.create({
+      header: 'Set Vulnerable Marker',
+      message: 'Are you sure you want to Set Vulnerable Marker?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Save',
+          handler: () => {
+            console.log('save');
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async addHSStatus() {
+    const alert = await this.alertCtrl.create({
+      header: 'Set H&S Status',
+      message: 'Are you sure you want to Set H&S Status?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Save',
+          handler: () => {
+            console.log('save');
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async onHold() {
+    const OnHoldModal = await this.modalCtrl.create({
+      component: OnHoldModalPage,
+      componentProps: {
+        caseId: this.caseId
+      }
+    });
+    await OnHoldModal.present();
+  }
+  async addFee() {
+    const AddFeeModal = await this.modalCtrl.create({
+      component: AddFeeModalPage,
+      componentProps: {
+        caseId: this.caseId
+      }
+    });
+    await AddFeeModal.present();
+  }
+  async deallocateCase() {
+    const alert = await this.alertCtrl.create({
+      header: 'Deallocate Case',
+      message: 'Are you sure you want to Deallocate Case?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Save',
+          handler: () => {
+            console.log('save');
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 }
