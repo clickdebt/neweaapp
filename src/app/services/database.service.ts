@@ -41,7 +41,7 @@ export class DatabaseService {
   }
 
   async setUpDatabase() {
-    const rdebCases = `CREATE TABLE IF NOT EXISTS rdeb_cases(
+    const rdebCases = `CREATE TABLE IF NOT EXISTS rdebt_cases(
       id INTEGER PRIMARY KEY,
       ref TEXT,
       scheme_id INTEGER,
@@ -58,17 +58,6 @@ export class DatabaseService {
       data TEXT
     );`;
 
-    const visitForm = `CREATE TABLE IF NOT EXISTS visit_form(
-      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-      form TEXT
-    );`;
-
-    const filterMaster = `CREATE TABLE IF NOT EXISTS visit_form(
-      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-      form TEXT
-    );`;
-
-
     const visitReports = `CREATE TABLE IF NOT EXISTS visit_reports(
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
       case_id INTEGER,
@@ -78,13 +67,12 @@ export class DatabaseService {
       visit_form_data_id INTEGER,
     );`;
 
-
-    const sql = rdebCases + visitForm + visitReports;
+    const sql = rdebCases + visitReports;
 
     const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
-    const result = await this.select('rdeb_cases');
+    const result = await this.select('rdebt_cases');
   }
 
   async executeQuery(query, params = null) {
@@ -103,16 +91,17 @@ export class DatabaseService {
 
   async setCases(data) {
     const sql = [];
-    const sqlStart = `INSERT INTO rdeb_cases
+    const sqlStart = `INSERT INTO rdebt_cases
     ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until,
-      client_id, data ) VALUES `;
+      client_id, current_status_id, current_stage_id, data ) VALUES `;
 
     data.forEach((values) => {
       sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
-        "${values.hold_until}", ${values.client_id}, "${encodeURI(JSON.stringify(values))}")`);
+        "${values.hold_until}", ${values.client_id}, ${values.current_status_id},
+         ${values.current_stage_id}, "${encodeURI(JSON.stringify(values))}")`);
     });
 
     const promiseArray = [];
@@ -123,17 +112,11 @@ export class DatabaseService {
   }
 
   async setVisitForm(data) {
-    const sql = `INSERT INTO visit_form
-    ( form ) VALUES ('${data[0].content}');`;
+    this.storageService.set('visit_form', data);
+  }
 
-    this.executeQuery(sql)
-      .then((res: any) => {
-      }, error => {
-        console.log(error);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  async setFilterMasterData(data) {
+    await this.storageService.set('filters', data);
   }
 
   async select(tableName) {

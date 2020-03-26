@@ -35,11 +35,16 @@ export class HomePage implements OnInit {
   }
   async ionViewDidEnter() {
     if (this.platform.is('android') || this.platform.is('ios')) {
-      this.caseService.getCases({}).subscribe(async (response: any) => {
+      this.caseService.getCases({}, 1).subscribe(async (response: any) => {
         await this.databaseService.setCases(response.data);
       });
       this.visitService.getVisitForm().subscribe(async (response: any) => {
         await this.databaseService.setVisitForm(response.data);
+      });
+      this.caseService.getFilterMasterData().subscribe(async (response: any) => {
+        this.databaseService.setFilterMasterData(response.data);
+      }, err => {
+        console.log(err);
       });
     }
   }
