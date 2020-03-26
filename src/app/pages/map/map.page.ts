@@ -59,7 +59,7 @@ export class MapPage implements OnInit {
 
   async getAddresses() {
     let mapMarkers = [];
-    const data = await this.databaseService.select('rdeb_cases');
+    const data = await this.databaseService.select('rdebt_cases');
     if (data.rows) {
       for (let i = 0; i < data.rows.length; i++) {
         this.cases.push(data.rows.item(i));

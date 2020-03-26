@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { DatabaseService, CaseService } from '../services';
+import { DatabaseService, CaseService, VisitService } from '../services';
 import { PanicModalPage } from '../pages/panic-modal/panic-modal.page'
 @Component({
   selector: 'app-home',
@@ -16,11 +16,13 @@ export class HomePage implements OnInit {
   cases = [];
 
   constructor(
+    private platform: Platform,
     private alertCtrl: AlertController,
     private router: Router,
     private databaseService: DatabaseService,
     private caseService: CaseService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private visitService: VisitService
   ) { }
 
   ngOnInit() {
@@ -32,9 +34,19 @@ export class HomePage implements OnInit {
     this.username = JSON.parse(localStorage.getItem('userdata')).name;
   }
   async ionViewDidEnter() {
-    this.caseService.getCases({}).subscribe(async (response: any) => {
-      await this.databaseService.setCases(response.data);
-    });
+    if (this.platform.is('android') || this.platform.is('ios')) {
+      this.caseService.getCases({}, 1).subscribe(async (response: any) => {
+        await this.databaseService.setCases(response.data);
+      });
+      this.visitService.getVisitForm().subscribe(async (response: any) => {
+        await this.databaseService.setVisitForm(response.data);
+      });
+      this.caseService.getFilterMasterData().subscribe(async (response: any) => {
+        this.databaseService.setFilterMasterData(response.data);
+      }, err => {
+        console.log(err);
+      });
+    }
   }
 
   async confirmLogout() {

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CaseService } from '../../services';
+import { CaseService, DatabaseService } from '../../services';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storage.service';
 import { Platform } from '@ionic/angular';
+import { NetworkService } from 'src/app/services/network.service';
 @Component({
   selector: 'app-job-list',
   templateUrl: './job-list.page.html',
@@ -41,18 +42,19 @@ export class JobListPage implements OnInit {
     private caseService: CaseService,
     private router: Router,
     private storageService: StorageService,
-    private platform: Platform
+    private platform: Platform,
+    private networkService: NetworkService,
+    private databaseService: DatabaseService
   ) { }
 
   ngOnInit() {
-    this.isMobile = this.platform.is('mobile')
+    this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
   }
 
   ionViewWillEnter() {
     this.showFilter = false;
     this.showSort = false;
-    // this.getFilters();
     if (!(this.cases.length > 0)) {
       this.getCases('');
     }
@@ -121,15 +123,74 @@ export class JobListPage implements OnInit {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
       }
     });
-    this.caseService.getCases(params).subscribe(res => {
-      if (infiniteScrollEvent) {
-        infiniteScrollEvent.target.complete();
+    if (this.networkService.getCurrentNetworkStatus() == 1) {
+      this.caseService.getCases(params).subscribe((res: any) => {
+        if (infiniteScrollEvent) {
+          infiniteScrollEvent.target.complete();
+        }
+        if (res.result) {
+          this.page++;
+          this.parseCaseData(res.data);
+        }
+      });
+    } else {
+      let query = 'select * from rdebt_cases where 1 = 1 ';
+      let p = [];
+      for (let key in params) {
+        if (params.hasOwnProperty(key) && params[key] !== '') {
+          if (key !== 'limit' && key !== 'page') {
+            if (key === 'stages') {
+              query += ' and current_stage_id in ? ';
+              p.push('(' + params[key] + ')');
+            } else if (key === 'schemes') {
+              query += ' and scheme_id in ? ';
+              p.push('(' + params[key] + ')');
+            } else if (key === 'statuses') {
+              query += ' and current_status_id in ? ';
+              p.push('(' + params[key] + ')');
+            } else if (key === 'clients') {
+              query += ' and client_id in ? ';
+              p.push('(' + params[key] + ')');
+            } else if (key === 'visitCounts') {
+              let vcquery = ' visitcount_total in ? ';
+              p.push('(' + params[key] + ')');
+              if (params[key].indexOf('4') !== -1) {
+                vcquery += ' or visitcount_total > ? ';
+                p.push('4');
+              }
+              query += ' and (' + vcquery + ') ';
+            } else if (key === 'stageType') {
+              query += ' and scheme_id in ? ';
+              p.push('(' + params[key] + ')');
+            } else if (key === 'outstandingAmount') {
+              const osfilter = params[key].split(',');
+              let osQuery = [];
+              osfilter.forEach(element => {
+                if (element.indexOf('-') !== -1) {
+                  osQuery.push(' d_outstanding between ? and ? ') ;
+                  const oa = element.split('-');
+                  p.push(oa[0]);
+                  p.push(oa[1]);
+                } else if (element.indexOf('>') !== -1) {
+                  osQuery.push(' d_outstanding > ? ') ;
+                  // ---------------------------------------------------------- get 2000 from >2000 string
+                  p.push(2000);
+                } else if (element === 'equals to zero') {
+                  osQuery.push(' d_outstanding = 0 ');
+                }
+              });
+              query +=  ' and ( ' + osQuery.join(' or ') + ') ';
+            } else if (key === 'stageType') {
+
+              // query += ' ' + key + 'in ? and ';
+              // p.push('(' + params[key] + ')');
+            }
+          }
+        }
       }
-      if (res['result']) {
-        this.page++;
-        this.parseCaseData(res['data']);
-      }
-    });
+      this.databaseService.executeQuery(query, p);
+    }
+
   }
 
   goToVisitForm(visitCase) {
@@ -142,40 +203,34 @@ export class JobListPage implements OnInit {
   }
   parseCaseData(caseData) {
     caseData.forEach(elem => {
-      elem['linkedCasesTotalBalance'] = 0
+      elem.linkedCasesTotalBalance = 0;
       // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
       if (elem.linked_cases != '') {
         elem.linked_cases = Object.values(elem.linked_cases);
-        elem['linkedCasesTotalBalance'] = elem.linked_cases.reduce((accumulator, currentValue) => {
+        elem.linkedCasesTotalBalance = elem.linked_cases.reduce((accumulator, currentValue) => {
           return accumulator + parseFloat(currentValue.d_outstanding);
-        }, 0)
+        }, 0);
       }
     });
     this.cases = this.cases.concat(caseData);
     this.storageService.set('cases', this.cases);
   }
 
-  getFilterMasterData() {
-    this.caseService.getFilterMasterData().subscribe(res => {
-      this.filterMaster = res['data'];
-    }, err => {
-      console.log(err);
-    });
-  }
-  async getFilters() {
-    // const filters = await this.storageService.get('filters');
-    // if (filters) {
-    //   this.filterMaster = filters;
-    // } else {
-    this.caseService.getFilters()
-      .subscribe(async (response: any) => {
-        if (response.data) {
-          // await this.storageService.set('filters', response.data);
-          this.filterMaster = response.data;
-        }
+  async getFilterMasterData() {
+    if (this.networkService.getCurrentNetworkStatus() == 1) {
+      this.caseService.getFilterMasterData().subscribe((res: any) => {
+        this.filterMaster = res.data;
+      }, err => {
+        console.log(err);
       });
-    // }
+    } else {
+      const filters = await this.storageService.get('filters');
+      if (filters) {
+        this.filterMaster = filters;
+      }
+    }
   }
+
   selectCase(event, caseId) {
     if (event.detail.checked) {
       if (!this.selectedCaseIds.includes(caseId)) {

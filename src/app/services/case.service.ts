@@ -10,12 +10,15 @@ export class CaseService {
   ) {
   }
 
-  getCases(params) {
+  getCases(params, download = 0) {
     let apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/visit?1=1';
     for (let key in params) {
       if (params.hasOwnProperty(key) && params[key] !== '') {
         apiURL += '&' + key + '=' + params[key];
       }
+    }
+    if (download) {
+      apiURL += '&downaloading=1';
     }
     return this.http.get(apiURL);
   }

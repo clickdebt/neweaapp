@@ -12,6 +12,7 @@ export class HttpInterceptorService implements HttpInterceptor {
 
     reqCount = 0;
     noHeaderRequest = 'maps.googleapis.com';
+    loaderText = '';
     constructor(
         private router: Router,
         private commonService: CommonService
@@ -19,6 +20,9 @@ export class HttpInterceptorService implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         let newHeaders = req.headers;
+        if (req.url.includes('downaloading')) {
+            this.loaderText = 'Downloading Data';
+        }
         if (!req.url.includes(this.noHeaderRequest)) {
             const token = localStorage.getItem('remote_token');
 
