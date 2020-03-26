@@ -29,9 +29,16 @@ export class AddNoteModalPage implements OnInit {
     this.dismiss();
   }
   save() {
-    this.caseActionService.saveNoteData(this.note, this.caseId).subscribe((response: any) => {
-      this.commonService.showToast(response.message, 'success');
-      this.dismiss();
-    });
+    if (this.note) {
+      const data = {
+        note: this.note,
+        display_client: 1,
+        display_officer: 1
+      };
+      this.caseActionService.saveNoteData(data, this.caseId).subscribe((response: any) => {
+        this.commonService.showToast(response.message, 'success');
+        this.dismiss();
+      });
+    }
   }
 }

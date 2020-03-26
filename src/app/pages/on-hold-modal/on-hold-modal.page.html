@@ -17,7 +17,7 @@
           <ion-label>Status</ion-label>
         </ion-item>
       </ion-row>
-      <ion-row class="ion-margin">
+      <!-- <ion-row class="ion-margin">
         <ion-item class="w-100" lines="none">
           <ion-label position="fixed" class="ion-margin-end">No of Days:</ion-label>
           <ion-input [(ngModel)]="formData.days" [ngModelOptions]="{standalone: true}"
@@ -32,7 +32,7 @@
             [ngModelOptions]="{standalone: true}">
           </ion-datetime>
         </ion-item>
-      </ion-row>
+      </ion-row> -->
       <ion-row class="ion-margin">
         <ion-item class="w-100" lines="none">
           <ion-label position="fixed" class="ion-margin-end">Note:</ion-label>
@@ -41,7 +41,7 @@
         </ion-item>
       </ion-row>
       <ion-row class="ion-margin-top ion-justify-content-center">
-        <ion-button type="submit" color="secondary" (click)="save()">
+        <ion-button type="submit" [disabled]="formData.note?.length<1" color="secondary" (click)="save()">
           Save
         </ion-button>
         <ion-button color="secondary" (click)="cancel()">

@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" *ngIf="currentCaseData">
   <ion-list lines="none">
     <!-- case Markers starts -->
     <div class="ion-margin-top">
@@ -40,10 +40,10 @@
             <span>Debtor Name:</span>
           </ion-col>
           <ion-col class="text-color-light">
-            <span>{{currentCaseData.debtor.debtor_name}}</span>
+            <span>{{currentCaseData.debtor?.debtor_name}}</span>
           </ion-col>
         </ion-row>
-        <ion-row *ngFor="let address of currentCaseData.debtor.addresses,let i=index">
+        <ion-row *ngFor="let address of currentCaseData.debtor?.addresses,let i=index">
           <ion-col>
             <span>Address {{i+1}}: </span>
           </ion-col>
@@ -57,7 +57,7 @@
             <span>Contact</span>
           </ion-col>
           <ion-col class="text-color-light">
-            <span>{{currentCaseData.debtor.debtor_mobile}}</span>
+            <span>{{currentCaseData.debtor?.debtor_mobile}}</span>
           </ion-col>
         </ion-row>
       </ion-grid>

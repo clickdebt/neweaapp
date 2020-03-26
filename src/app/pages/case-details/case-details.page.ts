@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { StorageService } from 'src/app/services';
+import { StorageService, CommonService } from 'src/app/services';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { ModalController, AlertController } from '@ionic/angular';
 import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
 import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
+import { CaseActionService } from 'src/app/services/case-action.service';
 
 @Component({
   selector: 'app-case-details',
@@ -52,30 +53,39 @@ export class CaseDetailsPage implements OnInit {
     private caseDetailsService: CaseDetailsService,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
+    private caseActionService: CaseActionService,
+    private commonService: CommonService
   ) { }
 
   ngOnInit() {
     this.caseId = this.route.snapshot.params.id;
-    this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
-    this.currentCaseData.show = false;
-    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status', 'On Hold', 'Add Fee', 'Deallocate case'];
   }
 
   async ionViewWillEnter() {
-    this.getCaseMarkers();
-    this.getSummary();
-    this.getClient();
-    this.getfinancialDetails();
-    this.getCaseDetails();
-    this.getHistory();
-    this.getPayments();
+    this.loadInitData();
   }
 
+  loadInitData() {
+    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status', 'On Hold', 'Add Fee', 'Deallocate case'];
+    if (localStorage.getItem('detais_case_data')) {
+      this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
+      this.getCaseMarkers();
+      this.getSummary();
+      this.getClient();
+      this.getfinancialDetails();
+      this.getCaseDetails();
+      this.getHistory();
+      this.getPayments();
+    } else {
+      this.router.navigate(['/home/job-list']);
+    }
+    this.currentCaseData.show = false;
+  }
   onSelectChange(event) {
     if (this.SelectedAction === 'Add Note') {
       this.addNote();
-    } else if (this.SelectedAction === 'Add Vulnerablity Status') {
-      this.addValnerablityStatus();
+    } else if (this.SelectedAction === 'Add Vulnerability Status') {
+      this.addValnerabilityStatus();
     } else if (this.SelectedAction === 'Add H&S Status') {
       this.addHSStatus();
     } else if (this.SelectedAction === 'Deallocate case') {
@@ -202,7 +212,7 @@ export class CaseDetailsPage implements OnInit {
     await AddNoteModal.present();
   }
 
-  async addValnerablityStatus() {
+  async addValnerabilityStatus() {
     const alert = await this.alertCtrl.create({
       header: 'Set Vulnerable Marker',
       message: 'Are you sure you want to Set Vulnerable Marker?',
@@ -216,7 +226,13 @@ export class CaseDetailsPage implements OnInit {
         {
           text: 'Save',
           handler: () => {
-            console.log('save');
+            this.caseActionService.saveVulnerableMarker(this.caseId).subscribe((response: any) => {
+              if (response.data.result) {
+                this.commonService.showToast(response.data.message, 'success');
+              } else {
+                this.commonService.showToast(response.data.message, 'danger');
+              }
+            });
           }
         }
       ]
@@ -277,8 +293,29 @@ export class CaseDetailsPage implements OnInit {
         },
         {
           text: 'Save',
-          handler: () => {
-            console.log('save');
+          handler: async () => {
+            const data = {
+              field_agent_id: -1
+            };
+            this.caseActionService.deAllocationCase(data, this.caseId).
+              subscribe(async (response) => {
+                let cases = await this.storageService.get('cases');
+                console.log(cases);
+                cases = cases.filter((currentCase) => {
+                  if (currentCase.id === this.caseId) {
+                    return false;
+                  } else {
+                    if (currentCase.linked_cases) {
+                      currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
+                    }
+                    return true;
+                  }
+                });
+                this.storageService.set('cases', cases);
+                localStorage.removeItem('detais_case_data');
+                localStorage.setItem('detais_case_data_deallocated', 'true');
+                this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
+              });
           }
         }
       ]

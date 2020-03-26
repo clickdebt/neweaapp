@@ -45,14 +45,19 @@ export class JobListPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.isMobile = this.platform.is('mobile')
+    this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+
     this.showFilter = false;
     this.showSort = false;
     // this.getFilters();
+    if (localStorage.getItem('detais_case_data_deallocated') === 'true') {
+      this.cases = await this.storageService.get('cases');
+      localStorage.removeItem('detais_case_data_deallocated');
+    }
     if (!(this.cases.length > 0)) {
       this.getCases('');
     }

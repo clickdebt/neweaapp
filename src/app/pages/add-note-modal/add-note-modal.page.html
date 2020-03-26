@@ -18,11 +18,11 @@
     </ion-row>
     <ion-row class="ion-margin-top">
       <ion-item class="w-100" lines="none">
-        <ion-textarea [(ngModel)]="note" rows="10" placeholder="Note"></ion-textarea>
+        <ion-textarea [(ngModel)]="note" rows="10" placeholder="Note" required></ion-textarea>
       </ion-item>
     </ion-row>
     <ion-row class="ion-margin-top ion-justify-content-center">
-      <ion-button color="secondary" (click)="save()">
+      <ion-button [disabled]="note?.length<1" color="secondary" (click)="save()">
         Save
       </ion-button>
       <ion-button color="secondary" (click)="cancel()">

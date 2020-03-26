@@ -32,5 +32,12 @@ export class CaseActionService {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${caseId}/field?source=API`;
     return this.http.get(apiURL);
   }
-
+  saveOnHoldStatus(data, caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_status/${caseId}?source=API`;
+    return this.http.post(apiURL, data);
+  }
+  deAllocationCase(data, caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent//${caseId}?source=API`;
+    return this.http.post(apiURL, data);
+  }
 }
