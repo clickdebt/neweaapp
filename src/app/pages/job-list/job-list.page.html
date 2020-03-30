@@ -201,7 +201,8 @@
             <td>{{case.debtor.addresses[0].address_postcode}}</td>
             <td>{{case.visitcount_total}}</td>
             <td class="action ">
-              <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
+              <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                (click)="goToCaseDetails(case)">
                 Details
               </ion-button>
             </td>
@@ -245,7 +246,8 @@
                     <td>{{link_case.debtor.addresses[0].address_postcode}}</td>
                     <td>{{link_case.visitcount_total}}</td>
                     <td class="action ">
-                      <ion-button size="small" color="secondary" (click)="goToCaseDetails(link_case)">
+                      <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                        (click)="goToCaseDetails(link_case)">
                         Details
                       </ion-button>
                     </td>
@@ -290,7 +292,8 @@
             <span class="d-block"> (#{{case.id}}) </span>
           </h3>
           <span class="d-flex">
-            <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
+            <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+              (click)="goToCaseDetails(case)">
               <ion-icon name="information-circle-outline"></ion-icon>
             </ion-button>
             <ion-button size="small" color="tertiary" *ngIf="case.stage.stage_type.stage_type == 'Visit'"
@@ -333,7 +336,8 @@
                   <span class="d-block"> (#{{link_case.id}}) </span>
                 </h3>
                 <span class="d-flex">
-                  <ion-button size="small" color="secondary" (click)="goToCaseDetails(link_case)">
+                  <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                    (click)="goToCaseDetails(link_case)">
                     <ion-icon name="information-circle-outline"></ion-icon>
                   </ion-button>
                   <ion-button size="small" color="tertiary" (click)="goToVisitForm(link_case)">

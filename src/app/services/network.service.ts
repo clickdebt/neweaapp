@@ -4,8 +4,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ToastController, Platform } from '@ionic/angular';
 
 export enum ConnectionStatus {
-  Online,
-  Offline
+  Offline,
+  Online
 }
 
 @Injectable({

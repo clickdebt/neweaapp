@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { VisitService, CaseService } from 'src/app/services';
+import { VisitService, CaseService, DatabaseService } from 'src/app/services';
 import { StorageService } from 'src/app/services/storage.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
@@ -7,6 +7,8 @@ import { CommonService } from 'src/app/services';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import * as moment from 'moment';
+import { NetworkService } from 'src/app/services/network.service';
 @Component({
   selector: 'app-visit-form',
   templateUrl: './visit-form.page.html',
@@ -38,7 +40,9 @@ export class VisitFormPage implements OnInit {
     private modalCtrl: ModalController,
     private router: Router,
     private geolocation: Geolocation,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private databaseService: DatabaseService,
+    private networkService: NetworkService
   ) { }
 
   ngOnInit() {
@@ -185,9 +189,9 @@ export class VisitFormPage implements OnInit {
     }
   }
   onSubmit(event) {
-    console.log(event, event.data);
-    console.log(this.paymentInfo);
-    console.log(this.arrangementInfo);
+    // console.log(event, event.data);
+    // console.log(this.paymentInfo);
+    // console.log(this.arrangementInfo);
     // tslint:disable: triple-equals
     if (this.paymentInfo == undefined) {
       event.data.singlePaymentMade = 0;
@@ -216,12 +220,26 @@ export class VisitFormPage implements OnInit {
       form_values: visit_report_data
     };
     console.log(form_data);
-    this.visitService.saveForm(form_data).subscribe(res => {
-      this.commonService.showToast('Data Saved Successfully.');
+    let visitFormData = [
+      { name: 'case_id', value: this.caseId },
+      { name: 'form_data', value: form_data },
+      { name: 'created_at', value: moment().format('YYYY-MM-DD hh:mm:ss') },
+    ];
+    if (this.networkService.getCurrentNetworkStatus() == 1) {
+      this.visitService.saveForm(form_data).subscribe((res: any) => {
+        visitFormData.push({ name: 'is_sync', value: 1 });
+        visitFormData.push({ name: 'visit_form_data_id', value: res.data.id });
+        this.databaseService.insert('visit_reports', visitFormData);
+        this.commonService.showToast('Data Saved Successfully.');
+        this.router.navigate(['/home/job-list']);
+      }, () => {
+        this.commonService.showToast('Something went wrong.');
+      });
+    } else {
+      visitFormData.push({ name: 'is_sync', value: 0 });
+      this.databaseService.insert('visit_reports', visitFormData);
+      this.commonService.showToast('Data Saved Locally.');
       this.router.navigate(['/home/job-list']);
-    }, () => {
-      this.commonService.showToast('Something went wrong.');
-    });
-
+    }
   }
 }

@@ -299,21 +299,22 @@ export class CaseDetailsPage implements OnInit {
             };
             this.caseActionService.deAllocationCase(data, this.caseId).
               subscribe(async (response) => {
-                let cases = await this.storageService.get('cases');
-                console.log(cases);
-                cases = cases.filter((currentCase) => {
-                  if (currentCase.id === this.caseId) {
-                    return false;
-                  } else {
-                    if (currentCase.linked_cases) {
-                      currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
-                    }
-                    return true;
-                  }
-                });
-                this.storageService.set('cases', cases);
-                localStorage.removeItem('detais_case_data');
-                localStorage.setItem('detais_case_data_deallocated', 'true');
+                // TODO
+                // let cases = await this.storageService.get('cases');
+                // console.log(cases);
+                // cases = cases.filter((currentCase) => {
+                //   if (currentCase.id === this.caseId) {
+                //     return false;
+                //   } else {
+                //     if (currentCase.linked_cases) {
+                //       currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
+                //     }
+                //     return true;
+                //   }
+                // });
+                // this.storageService.set('cases', cases);
+                // localStorage.removeItem('detais_case_data');
+                // localStorage.setItem('detais_case_data_deallocated', 'true');
                 this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
               });
           }
