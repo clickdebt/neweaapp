@@ -1,0 +1,74 @@
+<ion-header class="shadow">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon size="large" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row class="modal-header ion-margin-horizontal ion-justify-content-center">
+      <ion-item lines="none" class="font-size-21">
+        <ion-label>Add Fees</ion-label>
+      </ion-item>
+    </ion-row>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size-md="3" class="ion-margin-top">
+        <ion-item lines="none">
+          <ion-select [(ngModel)]="selectedFeeOption" (ionChange)="onSelectChange($event)" value="" okText="Okay"
+            cancelText="Dismiss">
+            <ion-select-option disabled="true" value="">Select a fee option</ion-select-option>
+            <ion-select-option [value]="feeOption.id" *ngFor="let feeOption of feeOptions">{{feeOption.name}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-grid>
+    <ion-row class="ion-margin-top">
+      <ion-toolbar class="fee-title">
+        <ion-title>Fees</ion-title>
+      </ion-toolbar>
+    </ion-row>
+    <ion-row *ngFor="let feeAction of feeActions" class="ion-margin ion-padding fee-body-bg">
+      <ion-col class="d-flex" size-md="8" size="12">
+        <div class="label-width">
+          <ion-label position="fixed">Fee Name:</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{feeAction.fee.name}}</span>
+      </ion-col>
+      <ion-col class="d-flex" size-md="4" size="12">
+        <div class="label-width">
+          <ion-label>Date Added:</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{feeAction.dateentered}}</span>
+      </ion-col>
+      <ion-col class="d-flex" size-md="8" size="12">
+        <div class="label-width">
+          <ion-label>Amount:</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{feeAction.fixed_amount_total}}</span>
+      </ion-col>
+      <ion-col class="d-flex" size-md="8" size="12">
+        <div class="label-width">
+          <ion-label>VAT:</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{feeAction.fixed_amount_vat}}</span>
+      </ion-col>
+      <ion-col class="d-flex" size-md="4" size="12">
+        <div class="label-width">
+          <ion-label>Action:</ion-label>
+        </div>
+        <ion-button size="small" color="danger" (click)="delete(feeAction.cf_id)">
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

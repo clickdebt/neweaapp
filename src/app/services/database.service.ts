@@ -64,7 +64,7 @@ export class DatabaseService {
       form_data TEXT,
       created_at TEXT,
       is_sync INTEGER,
-      visit_form_data_id INTEGER,
+      visit_form_data_id INTEGER
     );`;
 
     const sql = rdebCases + visitReports;
@@ -78,8 +78,12 @@ export class DatabaseService {
   async executeQuery(query, params = null) {
     try {
       const result = await this.database.executeSql(query, params);
+      console.log('exexute query', result);
+
       return result;
-    } catch (error) { }
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 
   async insert(tableName, params = []) {
@@ -88,10 +92,19 @@ export class DatabaseService {
     const result = await this.database.executeSql(`INSERT INTO ${tableName} (${fields.toString()}) VALUES (${values.toString()})`);
     return result;
   }
+  async updateVisitForm(is_sync, visit_form_data_id, form_id) {
+    const updateQuery = `update visit_reports set is_sync = ${is_sync} and
+    visit_form_data_id=${visit_form_data_id} where id = ${form_id}`;
+    return this.executeQuery(updateQuery);
+  }
+  async getUnsyncVisitForms() {
+    const query = 'Select * from visit_reports where is_sync = 0';
+    return this.executeQuery(query);
+  }
 
   async setCases(data) {
     const sql = [];
-    const sqlStart = `INSERT INTO rdebt_cases
+    const sqlStart = `insert or replace INTO rdebt_cases
     ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until,
       client_id, current_status_id, current_stage_id, data ) VALUES `;
@@ -105,14 +118,16 @@ export class DatabaseService {
     });
 
     const promiseArray = [];
-    sql.forEach((query) => promiseArray.push(this.executeQuery(query)));
+    sql.forEach(async (query) => promiseArray.push(this.executeQuery(query)));
     await Promise.all(promiseArray)
-      .then((res: any) => { })
+      .then((res: any) => {
+        console.log(res);
+      })
       .catch((error) => { });
   }
 
   async setVisitForm(data) {
-    this.storageService.set('visit_form', data);
+    await this.storageService.set('visit_form', data);
   }
 
   async setFilterMasterData(data) {
@@ -130,5 +145,11 @@ export class DatabaseService {
 
   getDatabaseState() {
     return this.databaseReady.asObservable();
+  }
+  async setDownloadStatus(data) {
+    await this.storageService.set('downloadStatus', data);
+  }
+  async getDownloadStatus() {
+    return await this.storageService.get('downloadStatus');
   }
 }
