@@ -38,6 +38,7 @@ export class JobListPage implements OnInit {
   ];
   isMobile = false;
   selectedCaseIds: any[] = [];
+  currentNetworkStatus;
   constructor(
     private caseService: CaseService,
     private router: Router,
@@ -52,9 +53,11 @@ export class JobListPage implements OnInit {
     this.getFilterMasterData();
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+    this.currentNetworkStatus = this.networkService.getCurrentNetworkStatus();
     this.showFilter = false;
     this.showSort = false;
+    // this.getFilters();
     if (!(this.cases.length > 0)) {
       this.getCases('');
     }
@@ -113,7 +116,7 @@ export class JobListPage implements OnInit {
     this.filterCases();
   }
 
-  getCases(infiniteScrollEvent) {
+  async getCases(infiniteScrollEvent) {
     let params = {
       limit: this.limit,
       page: this.page
@@ -134,52 +137,52 @@ export class JobListPage implements OnInit {
         }
       });
     } else {
-      let query = 'select * from rdebt_cases where 1 = 1 ';
+      let query = 'select * from rdebt_cases where 1 = 1';
       let p = [];
       for (let key in params) {
         if (params.hasOwnProperty(key) && params[key] !== '') {
           if (key !== 'limit' && key !== 'page') {
             if (key === 'stages') {
-              query += ' and current_stage_id in ? ';
-              p.push('(' + params[key] + ')');
+              query += ' and current_stage_id in ( ? ) ';
+              p.push(params[key]);
             } else if (key === 'schemes') {
-              query += ' and scheme_id in ? ';
-              p.push('(' + params[key] + ')');
+              query += ' and scheme_id in ( ? )';
+              p.push(params[key]);
             } else if (key === 'statuses') {
-              query += ' and current_status_id in ? ';
-              p.push('(' + params[key] + ')');
+              query += ' and current_status_id in ( ? )';
+              p.push(params[key]);
             } else if (key === 'clients') {
-              query += ' and client_id in ? ';
-              p.push('(' + params[key] + ')');
+              query += ' and client_id in ( ? )';
+              p.push(params[key]);
             } else if (key === 'visitCounts') {
-              let vcquery = ' visitcount_total in ? ';
-              p.push('(' + params[key] + ')');
+              let vcquery = ' visitcount_total in ( ? ) ';
+              p.push(params[key]);
               if (params[key].indexOf('4') !== -1) {
                 vcquery += ' or visitcount_total > ? ';
                 p.push('4');
               }
               query += ' and (' + vcquery + ') ';
             } else if (key === 'stageType') {
-              query += ' and scheme_id in ? ';
-              p.push('(' + params[key] + ')');
+              query += ' and scheme_id in ( ? )';
+              p.push(params[key]);
             } else if (key === 'outstandingAmount') {
               const osfilter = params[key].split(',');
               let osQuery = [];
               osfilter.forEach(element => {
                 if (element.indexOf('-') !== -1) {
-                  osQuery.push(' d_outstanding between ? and ? ') ;
+                  osQuery.push(' d_outstanding between ? and ? ');
                   const oa = element.split('-');
                   p.push(oa[0]);
                   p.push(oa[1]);
                 } else if (element.indexOf('>') !== -1) {
-                  osQuery.push(' d_outstanding > ? ') ;
+                  osQuery.push(' d_outstanding > ? ');
                   // ---------------------------------------------------------- get 2000 from >2000 string
                   p.push(2000);
                 } else if (element === 'equals to zero') {
                   osQuery.push(' d_outstanding = 0 ');
                 }
               });
-              query +=  ' and ( ' + osQuery.join(' or ') + ') ';
+              query += ' and ( ' + osQuery.join(' or ') + ') ';
             } else if (key === 'stageType') {
 
               // query += ' ' + key + 'in ? and ';
@@ -188,7 +191,23 @@ export class JobListPage implements OnInit {
           }
         }
       }
-      this.databaseService.executeQuery(query, p);
+      query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
+      this.databaseService.executeQuery(query, p).then((data) => {
+        const results: any[] = [];
+        let item;
+        for (let i = 0; i < data.rows.length; i++) {
+          item = data.rows.item(i);
+          item.data = JSON.parse(decodeURI(item.data));
+          results.push(item.data);
+        }
+        if (data.rows.length > 0) {
+          this.page++;
+          this.parseCaseData(results);
+        }
+        if (infiniteScrollEvent) {
+          infiniteScrollEvent.target.complete();
+        }
+      });
     }
 
   }
