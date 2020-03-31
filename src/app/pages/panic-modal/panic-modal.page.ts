@@ -30,10 +30,7 @@ export class PanicModalPage implements OnInit {
     this.getCurrentLocation()
   }
 
-  ngOnInit() {
-  }
-
-  async ionViewDidEnter() {
+  async ngOnInit() {
     await this.nativeAudio.preloadSimple('score_0', 'assets/audio/10.wav');
     await this.nativeAudio.preloadSimple('score_1', 'assets/audio/9.wav');
     await this.nativeAudio.preloadSimple('score_2', 'assets/audio/8.wav');
@@ -46,6 +43,10 @@ export class PanicModalPage implements OnInit {
     await this.nativeAudio.preloadSimple('score_9', 'assets/audio/1.wav');
     await this.nativeAudio.preloadSimple('score_10', 'assets/audio/0.wav');
     await this.nativeAudio.preloadSimple('siren', 'assets/audio/SOS-alarm.wav');
+  }
+
+  ionViewDidEnter() {
+
   }
 
   async dismiss() {
@@ -91,11 +92,10 @@ export class PanicModalPage implements OnInit {
   }
 
   async sendSosRequest() {
-    await this.playSiren()
-    //TODO
-    // this.sosService.sendSOS(this.storedCaseId, this.lat, this.lng).then((responseObj) => {
-    //   this.setSOSTemplate(responseObj);
-    // })
+    await this.playSiren();
+    this.sosService.sendSOS(0, this.lat, this.lng).subscribe((responseObj) => {
+      this.setSOSTemplate(responseObj);
+    });
   }
 
   setSOSTemplate(responseObj) {
