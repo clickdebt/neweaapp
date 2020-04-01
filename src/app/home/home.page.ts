@@ -6,7 +6,7 @@ import { PanicModalPage } from '../pages/panic-modal/panic-modal.page'
 import { forkJoin } from 'rxjs';
 import { NetworkService } from '../services/network.service';
 import * as moment from 'moment';
-
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -18,7 +18,8 @@ export class HomePage implements OnInit {
   server_url;
   username;
   cases = [];
-
+  bgSubscription;
+  bgNetworkSubscription;
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -28,7 +29,8 @@ export class HomePage implements OnInit {
     private modalCtrl: ModalController,
     private visitService: VisitService,
     private networkService: NetworkService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private backgroundMode: BackgroundMode,
   ) { }
 
   ngOnInit() {
@@ -39,6 +41,7 @@ export class HomePage implements OnInit {
   ionViewWillEnter() {
     this.server_url = localStorage.getItem('server_url');
     this.username = JSON.parse(localStorage.getItem('userdata')).name;
+    this.startBackgroundEvent();
   }
   async ionViewDidEnter() {
     if ((this.platform.is('android') || this.platform.is('ios'))
@@ -51,7 +54,7 @@ export class HomePage implements OnInit {
           filterMasterData: this.caseService.getFilterMasterData()
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data);
-          await this.databaseService.setVisitForm(response.visitFormdata);
+          await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setDownloadStatus({
             status: true,
@@ -111,18 +114,42 @@ export class HomePage implements OnInit {
   syncOfflineVisitForm() {
     this.networkService.onNetworkChange().subscribe((response) => {
       if (response === 1) {
-        this.databaseService.getUnsyncVisitForms().then((data) => {
-          if (data) {
-            let currentFormData;
-            for (let i = 0; i < data.rows.length; i++) {
-              currentFormData = data.rows.item(i);
-              this.visitService.saveForm(currentFormData).subscribe(async (res: any) => {
-                await this.databaseService.updateVisitForm(1, res.data.id, currentFormData.id);
-              });
-            }
-          }
-        });
+        this.saveUnsyncVisitForms();
       }
     });
+  }
+
+  startBackgroundEvent() {
+    this.backgroundMode.setDefaults({ title: 'Field Agent', ticker: 'Field Agent', text: 'Running in Background' });
+    this.backgroundMode.enable();
+    this.bgSubscription = this.backgroundMode.on('activate').subscribe(() => {
+      this.bgNetworkSubscription = this.networkService.onNetworkChange().subscribe((data: any) => {
+        if (data === 1) {
+          this.saveUnsyncVisitForms();
+        }
+      });
+    });
+    this.backgroundMode.on('deactivate').subscribe(() => {
+      this.bgSubscription.unsubscribe();
+      this.bgNetworkSubscription.unsubscribe();
+    });
+  }
+
+  async saveUnsyncVisitForms() {
+    if (!await this.storageService.get('isVisitFormSync')) {
+      this.databaseService.getUnsyncVisitForms().then(async (data) => {
+        if (data) {
+          let currentFormData;
+          for (let i = 0; i < data.rows.length; i++) {
+            currentFormData = data.rows.item(i);
+            currentFormData.form_data = JSON.parse(decodeURI(currentFormData.form_data));
+            this.visitService.saveForm(currentFormData.form_data).subscribe(async (res: any) => {
+              await this.databaseService.updateVisitForm(1, res.data.id, currentFormData.id);
+            });
+          }
+          await this.storageService.set('isVisitFormSync', true);
+        }
+      });
+    }
   }
 }

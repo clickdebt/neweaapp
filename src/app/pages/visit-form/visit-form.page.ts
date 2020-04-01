@@ -71,15 +71,22 @@ export class VisitFormPage implements OnInit {
         address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
       };
     }
-    this.visitService.getVisitForm().subscribe(res => {
-      this.caseService.getVisitOutcomes(this.caseId).subscribe(response => {
-        this.addVisitOutcomeField(response['data'], res);
+    if (this.networkService.getCurrentNetworkStatus() === 1) {
+      this.visitService.getVisitForm().subscribe(res => {
+        this.caseService.getVisitOutcomes(this.caseId).subscribe(response => {
+          this.addVisitOutcomeField(response['data'], res);
+        }, err => {
+          console.log(err);
+        });
       }, err => {
         console.log(err);
       });
-    }, err => {
-      console.log(err);
-    });
+    } else {
+      const visitFrom: any = {};
+      visitFrom.data = await this.storageService.get('visit_form');
+      // TODO: getVisitOutcomes offline api
+      this.addVisitOutcomeField([], visitFrom);
+    }
   }
   dataRead(obj) {
     this.formData = obj.data[0];
@@ -188,7 +195,7 @@ export class VisitFormPage implements OnInit {
       }
     }
   }
-  onSubmit(event) {
+  async onSubmit(event) {
     // console.log(event, event.data);
     // console.log(this.paymentInfo);
     // console.log(this.arrangementInfo);
@@ -222,8 +229,8 @@ export class VisitFormPage implements OnInit {
     console.log(form_data);
     let visitFormData = [
       { name: 'case_id', value: this.caseId },
-      { name: 'form_data', value: form_data },
-      { name: 'created_at', value: moment().format('YYYY-MM-DD hh:mm:ss') },
+      { name: 'form_data', value: `'${encodeURI(JSON.stringify(form_data))}'` },
+      { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
     ];
     if (this.networkService.getCurrentNetworkStatus() == 1) {
       this.visitService.saveForm(form_data).subscribe((res: any) => {
@@ -237,9 +244,13 @@ export class VisitFormPage implements OnInit {
       });
     } else {
       visitFormData.push({ name: 'is_sync', value: 0 });
-      this.databaseService.insert('visit_reports', visitFormData);
-      this.commonService.showToast('Data Saved Locally.');
-      this.router.navigate(['/home/job-list']);
+      this.databaseService.insert('visit_reports', visitFormData).then(async (data) => {
+        await this.storageService.set('isVisitFormSync', false);
+        this.commonService.showToast('Data Saved Locally.');
+        this.router.navigate(['/home/job-list']);
+      }, (error) => {
+      });
+
     }
   }
 }

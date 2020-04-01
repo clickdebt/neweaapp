@@ -24,6 +24,7 @@ import { ArrangementModalPageModule } from './pages/arrangement-modal/arrangemen
 import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { Network } from '@ionic-native/network/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -60,7 +61,8 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx';
     NativeGeocoder,
     LaunchNavigator,
     Network,
-    NativeAudio
+    NativeAudio,
+    BackgroundMode
   ],
   bootstrap: [AppComponent]
 })
