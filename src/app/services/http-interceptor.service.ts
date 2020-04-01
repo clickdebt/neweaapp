@@ -49,7 +49,7 @@ export class HttpInterceptorService implements HttpInterceptor {
                     localStorage.removeItem('userdata');
                     this.router.navigate(['/login']);
                 }
-                return Observable.throw(error.error.message || 'server error.');
+                return throwError(error.error.message || 'server error.');
             }),
             finalize(() => {
                 this.reqCount--;
