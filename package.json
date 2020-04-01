@@ -20,11 +20,12 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
+    "@ionic-native/background-mode": "^5.23.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/geolocation": "^5.22.0",
     "@ionic-native/google-maps": "^5.5.0",
     "@ionic-native/launch-navigator": "^5.22.0",
-    "@ionic-native/native-audio": "^5.22.0",
+    "@ionic-native/native-audio": "^5.23.0",
     "@ionic-native/native-geocoder": "^5.22.0",
     "@ionic-native/network": "^5.22.0-beta-1",
     "@ionic-native/splash-screen": "^5.0.0",
@@ -38,6 +39,7 @@
     "cordova-android": "^8.1.0",
     "cordova-browser": "6.0.0",
     "cordova-plugin-actionsheet": "^2.3.3",
+    "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.2",
     "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
@@ -100,7 +102,8 @@
         "GOOGLE_API_KEY_FOR_ANDROID": "AIzaSyB2SD46TH6aRspJzp_jvIBFTFv-AlN_mUQ"
       },
       "cordova-plugin-network-information": {},
-      "cordova-plugin-nativeaudio": {}
+      "cordova-plugin-nativeaudio": {},
+      "cordova-plugin-background-mode": {}
     },
     "platforms": [
       "browser",

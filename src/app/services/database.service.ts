@@ -62,7 +62,7 @@ export class DatabaseService {
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
       case_id INTEGER,
       form_data TEXT,
-      created_at TEXT,
+      created_at DATETIME,
       is_sync INTEGER,
       visit_form_data_id INTEGER
     );`;
@@ -89,8 +89,7 @@ export class DatabaseService {
   async insert(tableName, params = []) {
     const fields = params.map(item => item.name);
     const values = params.map(item => item.value);
-    const result = await this.database.executeSql(`INSERT INTO ${tableName} (${fields.toString()}) VALUES (${values.toString()})`);
-    return result;
+    return this.executeQuery(`INSERT INTO ${tableName} (${fields.toString()}) VALUES (${values.toString()})`);
   }
   async updateVisitForm(is_sync, visit_form_data_id, form_id) {
     const updateQuery = `update visit_reports set is_sync = ${is_sync} and
@@ -98,7 +97,7 @@ export class DatabaseService {
     return this.executeQuery(updateQuery);
   }
   async getUnsyncVisitForms() {
-    const query = 'Select * from visit_reports where is_sync = 0';
+    const query = 'Select * from visit_reports where 1 = 1 and is_sync = 0';
     return this.executeQuery(query);
   }
 
