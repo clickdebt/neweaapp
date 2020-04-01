@@ -1,3 +1,11 @@
+<ion-header class="shadow">
+  <ion-toolbar class="ion-text-center">
+    <ion-buttons slot="start" [routerLink]="['/home/job-list']">
+      <ion-icon size="large" name="arrow-back-outline"></ion-icon>
+    </ion-buttons>
+    <ion-title>#{{caseId}}</ion-title>
+  </ion-toolbar>
+</ion-header>
 <ion-content class="ion-padding">
   <div *ngIf="jsonObject" class="formio-wrapper">
     <formio [form]="jsonObject" #formObj (render)="onRender($event)" (change)="onChange($event)" (nextPage)="onNext($event)"
