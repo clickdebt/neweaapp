@@ -53,7 +53,7 @@ export class MapViewPage implements OnInit {
   async ionViewDidEnter() {
     this.page = 1;
     this.markers = [];
-    // this.getCurrentLocation();
+    this.getCurrentLocation();
     this.getCases();
     this.initMap();
   }

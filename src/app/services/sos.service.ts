@@ -9,7 +9,8 @@ export class SosService {
   constructor(public http: HttpClient) { }
 
   sendSOS(caseId, lat, lng) {
-    const apiURL = localStorage.getItem('server_url') + 'b/sms/actions/send_sos_request/' + caseId + '/' + lat + '/' + lng + '?source=API';
+    // tslint:disable-next-line: max-line-length
+    const apiURL = `${localStorage.getItem('server_url')}b/system/v3/cases/send_sos_message/?case_id=${caseId}&lat=${lat}&lng=${lng}&source=API`;
     console.log(apiURL);
     return this.http.get(apiURL);
   }
