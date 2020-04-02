@@ -7,6 +7,7 @@ import { forkJoin } from 'rxjs';
 import { NetworkService } from '../services/network.service';
 import * as moment from 'moment';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { Network } from '@ionic-native/network/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -31,17 +32,21 @@ export class HomePage implements OnInit {
     private networkService: NetworkService,
     private storageService: StorageService,
     private backgroundMode: BackgroundMode,
+    private network: Network,
   ) { }
 
   ngOnInit() {
     this.logo = localStorage.getItem('logo');
     this.syncOfflineVisitForm();
+    this.platform.pause.subscribe(() => {
+      console.log('pause');
+      this.startBackgroundEvent();
+    });
   }
 
   ionViewWillEnter() {
     this.server_url = localStorage.getItem('server_url');
     this.username = JSON.parse(localStorage.getItem('userdata')).name;
-    this.startBackgroundEvent();
   }
   async ionViewDidEnter() {
     if ((this.platform.is('android') || this.platform.is('ios'))
@@ -51,11 +56,13 @@ export class HomePage implements OnInit {
         forkJoin({
           cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
-          filterMasterData: this.caseService.getFilterMasterData()
+          filterMasterData: this.caseService.getFilterMasterData(),
+          visitOutcomes: this.caseService.getVisitOutcomes(0)
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
+          await this.databaseService.setvisitOutcomes(response.visitOutcomes.data);
           await this.databaseService.setDownloadStatus({
             status: true,
             time: moment().format('YYYY-MM-DD hh:mm:ss')
@@ -132,6 +139,7 @@ export class HomePage implements OnInit {
     this.backgroundMode.on('deactivate').subscribe(() => {
       this.bgSubscription.unsubscribe();
       this.bgNetworkSubscription.unsubscribe();
+      this.backgroundMode.disable();
     });
   }
 
