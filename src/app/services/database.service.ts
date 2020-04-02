@@ -132,6 +132,9 @@ export class DatabaseService {
   async setFilterMasterData(data) {
     await this.storageService.set('filters', data);
   }
+  async setvisitOutcomes(data) {
+    await this.storageService.set('visitOutcomes', data);
+  }
 
   async select(tableName) {
     try {

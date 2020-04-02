@@ -32,6 +32,7 @@ export class VisitFormPage implements OnInit {
   caseAlerts;
   currLang: any;
   currLat: any;
+  visitOutcome;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -84,8 +85,11 @@ export class VisitFormPage implements OnInit {
     } else {
       const visitFrom: any = {};
       visitFrom.data = await this.storageService.get('visit_form');
-      // TODO: getVisitOutcomes offline api
-      this.addVisitOutcomeField([], visitFrom);
+      this.visitOutcome = await this.storageService.get('visitOutcomes');
+      if (!this.visitOutcome) {
+        this.visitOutcome = [];
+      }
+      this.addVisitOutcomeField(this.visitOutcome, visitFrom);
     }
   }
   dataRead(obj) {
