@@ -48,11 +48,15 @@
         </ion-row>
         <ion-row *ngFor="let address of currentCaseData.debtor?.addresses,let i=index">
           <ion-col>
-            <span>Address {{i+1}}: </span>
+            <span>Address: </span>
           </ion-col>
           <ion-col class="text-color-light">
-            <span>{{address.address_ln1}},{{address.address_ln2}},
-              {{address.address_ln3}} , {{address.address_town}} , {{address.address_postcode}}</span>
+            <span>
+              {{address.address_ln1}}
+              {{address.address_ln2 ? ', ' +address.address_ln2 : ''}}
+              {{address.address_ln3 ? ', ' +address.address_ln3 : ''}}
+              {{address.address_town ? ', ' +address.address_town : ''}}
+              {{address.address_postcode ? ', ' +address.address_postcode : ''}}</span>
           </ion-col>
         </ion-row>
         <ion-row>
@@ -83,7 +87,7 @@
             <span>Client Reference:</span>
           </ion-col>
           <ion-col class="text-color-light">
-            <span>{{caseDetails.client.client_ref}}</span>
+            <span>{{caseDetails.cl_ref}}</span>
           </ion-col>
         </ion-row>
         <ion-row>
