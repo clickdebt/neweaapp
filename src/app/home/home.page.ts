@@ -130,16 +130,19 @@ export class HomePage implements OnInit {
     this.backgroundMode.setDefaults({ title: 'Field Agent', ticker: 'Field Agent', text: 'Running in Background' });
     this.backgroundMode.enable();
     this.bgSubscription = this.backgroundMode.on('activate').subscribe(() => {
-      this.bgNetworkSubscription = this.networkService.onNetworkChange().subscribe((data: any) => {
-        if (data === 1) {
-          this.saveUnsyncVisitForms();
-        }
+      console.log('active');
+      this.bgNetworkSubscription = this.network.onConnect().subscribe(() => {
+        console.log('net connected');
+        this.saveUnsyncVisitForms();
       });
     });
     this.backgroundMode.on('deactivate').subscribe(() => {
-      this.bgSubscription.unsubscribe();
-      this.bgNetworkSubscription.unsubscribe();
-      this.backgroundMode.disable();
+      setTimeout(() => {
+        console.log('deactive');
+        this.bgSubscription.unsubscribe();
+        this.bgNetworkSubscription.unsubscribe();
+        this.backgroundMode.disable();
+      }, 3000);
     });
   }
 
