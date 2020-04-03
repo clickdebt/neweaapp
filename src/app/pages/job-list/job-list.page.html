@@ -1,7 +1,7 @@
 <ion-toolbar color="light">
   <ion-grid class="p-y-0">
     <ion-row class="searchbar-wrpper">
-      <ion-col size-md="8" size-xs="6" class="d-flex">
+      <ion-col size-md="8" size-xs="6">
         <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
           (keyup.enter)="onInput($event)" (ionCancel)="onInput($event)" placeholder="Search ID, ref, postcode, name">
         </ion-searchbar>

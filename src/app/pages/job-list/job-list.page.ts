@@ -55,11 +55,7 @@ export class JobListPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.networkService.onNetworkChange().subscribe((data) => {
-      if (data === 1) {
-        this.currentNetworkStatus = data;
-      }
-    });
+    this.currentNetworkStatus = this.networkService.getCurrentNetworkStatus();
     this.showFilter = false;
     this.showSort = false;
     // this.getFilters();
