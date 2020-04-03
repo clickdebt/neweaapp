@@ -38,10 +38,11 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.logo = localStorage.getItem('logo');
     this.syncOfflineVisitForm();
-    this.platform.pause.subscribe(() => {
-      console.log('pause');
-      this.startBackgroundEvent();
-    });
+    this.startBackgroundEvent();
+    // this.platform.pause.subscribe(() => {
+    //   console.log('pause');
+    //   this.startBackgroundEvent();
+    // });
   }
 
   ionViewWillEnter() {
@@ -139,10 +140,10 @@ export class HomePage implements OnInit {
     this.backgroundMode.on('deactivate').subscribe(() => {
       setTimeout(() => {
         console.log('deactive');
-        this.bgSubscription.unsubscribe();
+        // this.bgSubscription.unsubscribe();
         this.bgNetworkSubscription.unsubscribe();
-        this.backgroundMode.disable();
-      }, 3000);
+        // this.backgroundMode.disable();
+      }, 2000);
     });
   }
 
