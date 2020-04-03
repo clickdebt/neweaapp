@@ -233,9 +233,10 @@ export class JobListPage implements OnInit {
       }
     });
     this.cases = this.cases.concat(caseData);
-    if (this.selectedAll) {
-      this.selectAllCase();
-    }
+    // no need to select cases that will load after select all
+    // if (this.selectedAll) {
+    //   this.selectAllCase();
+    // }
     this.storageService.set('cases', this.cases);
   }
 
@@ -280,14 +281,15 @@ export class JobListPage implements OnInit {
       if (this.selectedAll) {
         this.selectedCaseIds.push(currentCase.id);
       }
-      if (currentCase.linked_cases.length) {
-        currentCase.linked_cases.forEach((currentLinkedCases) => {
-          currentLinkedCases.checked = this.selectedAll;
-          if (this.selectedAll) {
-            this.selectedCaseIds.push(currentLinkedCases.id);
-          }
-        });
-      }
+      // no need to select linked cases
+      // if (currentCase.linked_cases.length) {
+      //   currentCase.linked_cases.forEach((currentLinkedCases) => {
+      //     currentLinkedCases.checked = this.selectedAll;
+      //     if (this.selectedAll) {
+      //       this.selectedCaseIds.push(currentLinkedCases.id);
+      //     }
+      //   });
+      // }
     });
   }
 }

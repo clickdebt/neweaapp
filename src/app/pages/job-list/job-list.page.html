@@ -15,10 +15,12 @@
         </ion-button>
       </ion-col>
     </ion-row>
-    <ion-row class="ion-margin-vertical justify-content-center">
-      <ion-checkbox mode="md" [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
-      </ion-checkbox>
-      <ion-label class="ion-margin-horizontal"> Select All</ion-label>
+    <ion-row *ngIf="isMobile">
+      <ion-item lines="none">
+        <ion-checkbox [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
+        </ion-checkbox>
+        <ion-label class="ion-margin-horizontal"> Select All</ion-label>
+      </ion-item>
     </ion-row>
   </ion-grid>
 </ion-toolbar>
@@ -169,7 +171,10 @@
       <thead>
         <tr>
           <th width="3%"></th>
-          <th width="3%"></th>
+          <th width="3%">
+            <ion-checkbox mode="md" [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
+            </ion-checkbox>
+          </th>
           <th>Case ID</th>
           <th>Ref</th>
           <th>Name</th>
