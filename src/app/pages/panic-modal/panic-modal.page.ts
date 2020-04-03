@@ -10,24 +10,24 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
   styleUrls: ['./panic-modal.page.scss'],
 })
 export class PanicModalPage implements OnInit {
-  progress = 0
+  progress = 0;
   interval;
-  isMuted: boolean = false;
-  volumeClass = "volume-high-sharp"
-  isPause: boolean = false;
-  isStart: boolean = false;
-  radius: number = 130;
+  isMuted = false;
+  volumeClass = 'volume-high-sharp'
+  isPause = false;
+  isStart = false;
+  radius = 130;
   storedCaseId;
   lat;
-  lng
-  constructor(private modalCtrl: ModalController,
+  lng;
+  constructor(
+    private modalCtrl: ModalController,
     private nativeAudio: NativeAudio,
     private platform: Platform,
     private commonService: CommonService,
     private sosService: SosService,
-    private geolocation: Geolocation) {
-
-    this.getCurrentLocation()
+    private geolocation: Geolocation
+  ) {
   }
 
   async ngOnInit() {
@@ -45,14 +45,17 @@ export class PanicModalPage implements OnInit {
     await this.nativeAudio.preloadSimple('siren', 'assets/audio/SOS-alarm.wav');
   }
 
-  ionViewDidEnter() {
+  async ionViewDidEnter() {
+    console.log('here');
 
+    await this.getCurrentLocation();
   }
 
   async dismiss() {
     this.pausePanicCounter();
-    if (this.progress == 10)
+    if (this.progress == 10) {
       await this.nativeAudio.stop('siren');
+    }
     this.modalCtrl.dismiss({
       saved: false
     });
@@ -61,34 +64,37 @@ export class PanicModalPage implements OnInit {
   async startPanicCounter() {
     this.isPause = false;
     this.isStart = true;
-    if (!this.isMuted && this.progress == 0)
+    if (!this.isMuted && this.progress == 0) {
       await this.nativeAudio.play('score_0');
+    }
 
     const getProgress = async () => {
       if (this.progress <= 9) {
-        this.progress++
+        this.progress++;
       }
-      if (!this.isMuted && this.progress < 10)
+      if (!this.isMuted && this.progress < 10) {
         await this.nativeAudio.play('score_' + this.progress)
+      }
       if (this.progress == 10) {
-        this.sendSosRequest()
-        this.isPause = true
+        this.sendSosRequest();
+        this.isPause = true;
         clearInterval(this.interval);
       }
-    }
+    };
 
-    this.interval = setInterval(getProgress, 1000)
+    this.interval = setInterval(getProgress, 1000);
   }
 
   pausePanicCounter() {
-    this.isStart = false
-    this.isPause = true
+    this.isStart = false;
+    this.isPause = true;
     clearInterval(this.interval);
   }
 
   async playSiren() {
-    if (!this.isMuted)
+    if (!this.isMuted) {
       await this.nativeAudio.play('siren');
+    }
   }
 
   async sendSosRequest() {
@@ -105,30 +111,30 @@ export class PanicModalPage implements OnInit {
   }
 
   async changeSoundSetting() {
-    this.isMuted = !this.isMuted
+    this.isMuted = !this.isMuted;
     if (this.isMuted) {
       if (this.progress == 10) {
         await this.nativeAudio.stop('siren');
       }
-      this.volumeClass = "volume-mute-sharp";
+      this.volumeClass = 'volume-mute-sharp';
     } else {
       if (this.progress == 10) {
         await this.playSiren();
       }
-      this.volumeClass = "volume-high-sharp";
+      this.volumeClass = 'volume-high-sharp';
     }
   }
 
   getOverlayStyle() {
-    let isSemi = false;
-    let transform = (isSemi ? '' : 'translateY(-50%) ') + 'translateX(-50%)';
+    const isSemi = false;
+    const transform = (isSemi ? '' : 'translateY(-50%) ') + 'translateX(-50%)';
 
     return {
-      'top': isSemi ? 'auto' : '50%',
-      'bottom': isSemi ? '5%' : 'auto',
-      'color': '#000 !important',
-      'left': '50%',
-      'transform': transform,
+      top: isSemi ? 'auto' : '50%',
+      bottom: isSemi ? '5%' : 'auto',
+      color: '#000 !important',
+      left: '50%',
+      transform: transform,
       '-moz-transform': transform,
       '-webkit-transform': transform,
       'font-size': this.radius / 3.5 + 'px'
@@ -136,8 +142,11 @@ export class PanicModalPage implements OnInit {
   }
 
   async getCurrentLocation() {
+    console.log('getCurrentLocation');
     const { coords } = await this.geolocation.getCurrentPosition();
+    console.log('coords', coords);
     this.lng = coords.longitude;
     this.lat = coords.latitude;
+    console.log(this.lng, this.lat);
   }
 }
