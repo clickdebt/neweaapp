@@ -15,6 +15,11 @@
         </ion-button>
       </ion-col>
     </ion-row>
+    <ion-row class="ion-margin-vertical justify-content-center">
+      <ion-checkbox mode="md" [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
+      </ion-checkbox>
+      <ion-label class="ion-margin-horizontal"> Select All</ion-label>
+    </ion-row>
   </ion-grid>
 </ion-toolbar>
 
@@ -235,8 +240,8 @@
                     <td>
                     </td>
                     <td>
-                      <ion-checkbox mode="md" color="secondary" (ionChange)="selectCase($event,link_case.id)"
-                        slot="start"></ion-checkbox>
+                      <ion-checkbox mode="md" color="secondary" [(ngModel)]="link_case.checked"
+                        (ionChange)="selectCase($event,link_case.id)" slot="start"></ion-checkbox>
                     </td>
                     <td>{{link_case.id}}</td>
                     <td>{{link_case.ref}}</td>
@@ -286,8 +291,8 @@
             (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-down-outline">
           </ion-icon>
           <div *ngIf="case.linked_cases == '' " class="w-15"></div>
-          <ion-checkbox class="m-r-10" mode="md" color="secondary" (ionChange)="selectCase($event,case.id)"
-            slot="start"></ion-checkbox>
+          <ion-checkbox class="m-r-10" mode="md" color="secondary" [(ngModel)]="case.checked"
+            (ionChange)="selectCase($event,case.id)" slot="start"></ion-checkbox>
           <h3>{{case.debtor.debtor_name}}
             <span class="d-block"> (#{{case.id}}) </span>
           </h3>
@@ -330,8 +335,8 @@
           <ion-card class="joblist-card ion-no-margin ion-margin-top" *ngFor="let link_case of case.linked_cases">
             <ion-card-content>
               <div class="d-flex align-items-center">
-                <ion-checkbox class="m-r-10" mode="md" color="secondary" (ionChange)="selectCase($event,link_case.id)"
-                  slot="start"></ion-checkbox>
+                <ion-checkbox class="m-r-10" mode="md" color="secondary" [(ngModel)]="link_case.checked"
+                  (ionChange)="selectCase($event,link_case.id)" slot="start"></ion-checkbox>
                 <h3>{{link_case.debtor.debtor_name}}
                   <span class="d-block"> (#{{link_case.id}}) </span>
                 </h3>

@@ -39,6 +39,7 @@ export class JobListPage implements OnInit {
   isMobile = false;
   selectedCaseIds: any[] = [];
   currentNetworkStatus;
+  selectedAll = false;
   constructor(
     private caseService: CaseService,
     private router: Router,
@@ -232,6 +233,9 @@ export class JobListPage implements OnInit {
       }
     });
     this.cases = this.cases.concat(caseData);
+    if (this.selectedAll) {
+      this.selectAllCase();
+    }
     this.storageService.set('cases', this.cases);
   }
 
@@ -268,5 +272,22 @@ export class JobListPage implements OnInit {
   goToCaseDetails(currentCaseData) {
     localStorage.setItem('detais_case_data', JSON.stringify(currentCaseData));
     this.router.navigate(['/home/case-details/' + currentCaseData.id]);
+  }
+  selectAllCase() {
+    this.selectedCaseIds = [];
+    this.cases.forEach((currentCase) => {
+      currentCase.checked = this.selectedAll;
+      if (this.selectedAll) {
+        this.selectedCaseIds.push(currentCase.id);
+      }
+      if (currentCase.linked_cases.length) {
+        currentCase.linked_cases.forEach((currentLinkedCases) => {
+          currentLinkedCases.checked = this.selectedAll;
+          if (this.selectedAll) {
+            this.selectedCaseIds.push(currentLinkedCases.id);
+          }
+        });
+      }
+    });
   }
 }
