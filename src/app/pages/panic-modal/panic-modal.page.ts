@@ -139,5 +139,6 @@ export class PanicModalPage implements OnInit {
     const { coords } = await this.geolocation.getCurrentPosition();
     this.lng = coords.longitude;
     this.lat = coords.latitude;
+    console.log(this.lng, this.lat);
   }
 }
