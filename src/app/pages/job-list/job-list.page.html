@@ -182,13 +182,16 @@
           <th>Linked Cases Amount Total</th>
           <th>Postcode</th>
           <th>Visits</th>
+          <th>Status</th>
+          <th>Hold</th>
+          <th>VRM</th>
           <th>Details</th>
           <th>Visit</th>
         </tr>
       </thead>
       <tbody>
         <ng-container *ngFor="let case of cases">
-          <tr class="no-border">
+          <tr class="no-border" [ngClass]="{'bg-hold':case.hold_until > currentDate}">
             <td>
               <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]"
                 (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-forward-outline">
@@ -210,6 +213,9 @@
             <td>{{case.linkedCasesTotalBalance}}</td>
             <td>{{case.debtor.addresses[0].address_postcode}}</td>
             <td>{{case.visitcount_total}}</td>
+            <td>{{case.current_status.status_name}}</td>
+            <td>{{case.hold_until > currentDate}}</td>
+            <td>{{case.custom5}}</td>
             <td class="action ">
               <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
                 (click)="goToCaseDetails(case)">
@@ -286,7 +292,7 @@
 
   <!-- mobile card starts-->
   <div *ngIf="isMobile">
-    <ion-card class="joblist-card" *ngFor="let case of cases">
+    <ion-card class="joblist-card" *ngFor="let case of cases" [ngClass]="{'bg-hold':case.hold_until > currentDate}">
       <ion-card-content>
         <div class="d-flex align-items-center">
           <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]"
@@ -322,6 +328,10 @@
               Amount :
               <span> {{case.d_outstanding}} </span>
             </ion-col>
+            <ion-col size="12" *ngIf="case.linked_cases != ''">
+              Linked Cases Amount Total :
+              <span> {{case.linkedCasesTotalBalance}} </span>
+            </ion-col>
             <ion-col size="6">
               Postcode :
               <span> {{case.debtor.addresses[0].address_postcode}} </span>
@@ -330,9 +340,17 @@
               visit :
               <span> {{case.visitcount_total}} </span>
             </ion-col>
-            <ion-col size="12" *ngIf="case.linked_cases != ''">
-              Linked Cases Amount Total :
-              <span> {{case.linkedCasesTotalBalance}} </span>
+            <ion-col size="6" *ngIf="case.current_status.status_name">
+              Status :
+              <span> {{case.current_status.status_name}} </span>
+            </ion-col>
+            <ion-col size="6">
+              Hold :
+              <span> {{case.hold_until > currentDate}} </span>
+            </ion-col>
+            <ion-col size="6" *ngIf="case.custom5">
+              VRM :
+              <span> {{case.custom5}} </span>
             </ion-col>
           </ion-row>
         </ion-grid>

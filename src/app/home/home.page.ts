@@ -74,11 +74,16 @@ export class HomePage implements OnInit {
           const diffMs = Math.floor((new Date().getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
           if (diffMs >= 5) {
             this.caseService.getCases({ last_update_date: downloadStatus.time }, 1).subscribe(async (response: any) => {
-              await this.databaseService.setCases(response.data);
-              await this.databaseService.setDownloadStatus({
-                status: true,
-                time: moment().format('YYYY-MM-DD hh:mm:ss')
-              });
+              if (response) {
+                await this.databaseService.setCases(response.data);
+                this.caseService.getFilterMasterData().subscribe(async (data: any) => {
+                  await this.databaseService.setFilterMasterData(data.data);
+                });
+                await this.databaseService.setDownloadStatus({
+                  status: true,
+                  time: moment().format('YYYY-MM-DD hh:mm:ss')
+                });
+              }
             });
           }
         }
@@ -143,7 +148,7 @@ export class HomePage implements OnInit {
         // this.bgSubscription.unsubscribe();
         this.bgNetworkSubscription.unsubscribe();
         // this.backgroundMode.disable();
-      }, 2000);
+      }, 300);
     });
   }
 

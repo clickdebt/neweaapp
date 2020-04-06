@@ -40,6 +40,7 @@ export class JobListPage implements OnInit {
   selectedCaseIds: any[] = [];
   currentNetworkStatus;
   selectedAll = false;
+  currentDate;
   constructor(
     private caseService: CaseService,
     private router: Router,
@@ -62,6 +63,7 @@ export class JobListPage implements OnInit {
     if (!(this.cases.length > 0)) {
       this.getCases('');
     }
+    this.currentDate = new Date();
   }
 
   radioGroupChange(event) {
