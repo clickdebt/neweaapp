@@ -122,6 +122,14 @@
             <span>{{caseDetails.caseSummary.current_status?.status_name}}</span>
           </ion-col>
         </ion-row>
+        <ion-row>
+          <ion-col>
+            <span>Last visit date:</span>
+          </ion-col>
+          <ion-col class="text-color-light">
+            <span>{{caseDetails.caseSummary.last_visit_date}}</span>
+          </ion-col>
+        </ion-row>
       </ion-grid>
     </div>
     <!-- case Summary ends-->
@@ -271,6 +279,36 @@
                     {{caseDetails.financialDetails.totals?.current_outstanding | number:'0.2-2'}}
                   </span>
                 </ion-item>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          <ion-col size-md="3" *ngIf="currentCaseData.linked_cases">
+            <ion-card>
+              <ion-item class="card-title-bg">
+                <ion-card-title>Linked cases</ion-card-title>
+              </ion-item>
+
+              <ion-card-content>
+                <div class="d-flex ion-justify-content-between">
+                  <ion-item>
+                    <span>Case Id</span>
+                  </ion-item>
+                  <ion-item>
+                    <span>Outstanding</span>
+                  </ion-item>
+                </div>
+                <div class="d-flex ion-justify-content-between" *ngFor="let linked_case of currentCaseData.linked_cases">
+                  <ion-item>
+                    <span class="text-color-light">
+                      {{linked_case.id}}
+                    </span>
+                  </ion-item>
+                  <ion-item>
+                    <span class="text-color-light">
+                      {{linked_case.d_outstanding | number:'0.2-2'}}
+                    </span>
+                  </ion-item>
+                </div>
               </ion-card-content>
             </ion-card>
           </ion-col>
