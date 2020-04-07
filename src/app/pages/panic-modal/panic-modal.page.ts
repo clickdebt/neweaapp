@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { CommonService } from 'src/app/services';
+import { CommonService, StorageService } from 'src/app/services';
 import { SosService } from 'src/app/services/sos.service';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 @Component({
@@ -20,13 +20,15 @@ export class PanicModalPage implements OnInit {
   storedCaseId;
   lat;
   lng;
+  caseId;
   constructor(
     private modalCtrl: ModalController,
     private nativeAudio: NativeAudio,
     private platform: Platform,
     private commonService: CommonService,
     private sosService: SosService,
-    private geolocation: Geolocation
+    private geolocation: Geolocation,
+    private storageService: StorageService
   ) {
   }
 
@@ -99,7 +101,11 @@ export class PanicModalPage implements OnInit {
 
   async sendSosRequest() {
     await this.playSiren();
-    this.sosService.sendSOS(0, this.lat, this.lng).subscribe((responseObj) => {
+    this.caseId = await this.storageService.get('caseId');
+    if (!this.caseId) {
+      this.caseId = 0;
+    }
+    this.sosService.sendSOS(this.caseId, this.lat, this.lng).subscribe((responseObj) => {
       this.setSOSTemplate(responseObj);
     });
   }

@@ -244,6 +244,9 @@
                     <th>Date</th>
                     <th>Postcode</th>
                     <th>Visit Count</th>
+                    <th>Status</th>
+                    <th>Hold</th>
+                    <th>VRM</th>
                     <th>Details</th>
                     <th>Visit</th>
                   </tr>
@@ -261,6 +264,9 @@
                     <td>{{link_case.date}}</td>
                     <td>{{link_case.debtor.addresses[0].address_postcode}}</td>
                     <td>{{link_case.visitcount_total}}</td>
+                    <td>{{link_case.visitcount_total}}</td>
+                    <td>{{link_case.current_status.status_name}}</td>
+                    <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
                     <td class="action ">
                       <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
                         (click)="goToCaseDetails(link_case)">
@@ -346,7 +352,7 @@
             </ion-col>
             <ion-col size="6">
               Hold :
-              <span> {{case.hold_until > currentDate}} </span>
+              <span> {{case.hold_until > currentDate ? 'Yes' : 'No'}} </span>
             </ion-col>
             <ion-col size="6" *ngIf="case.custom5">
               VRM :
@@ -394,6 +400,18 @@
                   <ion-col size="12">
                     Date :
                     <span> {{link_case.date}} </span>
+                  </ion-col>
+                  <ion-col size="6" *ngIf="link_case.current_status.status_name">
+                    Status :
+                    <span> {{link_case.current_status.status_name}} </span>
+                  </ion-col>
+                  <ion-col size="6">
+                    Hold :
+                    <span> {{link_case.hold_until > currentDate ? 'Yes' : 'No'}} </span>
+                  </ion-col>
+                  <ion-col size="6" *ngIf="link_case.custom5">
+                    VRM :
+                    <span> {{link_case.custom5}} </span>
                   </ion-col>
                 </ion-row>
               </ion-grid>
