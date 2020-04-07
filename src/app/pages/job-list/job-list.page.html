@@ -266,7 +266,7 @@
                     <td>{{link_case.visitcount_total}}</td>
                     <td>{{link_case.visitcount_total}}</td>
                     <td>{{link_case.current_status.status_name}}</td>
-                    <td>{{link_case.hold_until > currentDate}}</td>
+                    <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
                     <td class="action ">
                       <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
                         (click)="goToCaseDetails(link_case)">
@@ -352,7 +352,7 @@
             </ion-col>
             <ion-col size="6">
               Hold :
-              <span> {{case.hold_until > currentDate}} </span>
+              <span> {{case.hold_until > currentDate ? 'Yes' : 'No'}} </span>
             </ion-col>
             <ion-col size="6" *ngIf="case.custom5">
               VRM :
@@ -407,7 +407,7 @@
                   </ion-col>
                   <ion-col size="6">
                     Hold :
-                    <span> {{link_case.hold_until > currentDate}} </span>
+                    <span> {{link_case.hold_until > currentDate ? 'Yes' : 'No'}} </span>
                   </ion-col>
                   <ion-col size="6" *ngIf="link_case.custom5">
                     VRM :
