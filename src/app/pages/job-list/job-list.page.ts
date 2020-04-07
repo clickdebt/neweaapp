@@ -3,6 +3,7 @@ import { CaseService, DatabaseService } from '../../services';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storage.service';
 import { Platform } from '@ionic/angular';
+import * as moment from 'moment';
 import { NetworkService } from 'src/app/services/network.service';
 @Component({
   selector: 'app-job-list',
@@ -63,7 +64,7 @@ export class JobListPage implements OnInit {
     if (!(this.cases.length > 0)) {
       this.getCases('');
     }
-    this.currentDate = new Date();
+    this.currentDate = moment().format('YYYY-MM-DD hh:mm:ss');
   }
 
   radioGroupChange(event) {
