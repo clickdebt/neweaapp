@@ -214,7 +214,7 @@
             <td>{{case.debtor.addresses[0].address_postcode}}</td>
             <td>{{case.visitcount_total}}</td>
             <td>{{case.current_status.status_name}}</td>
-            <td>{{case.hold_until > currentDate}}</td>
+            <td>{{case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
             <td>{{case.custom5}}</td>
             <td class="action ">
               <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"

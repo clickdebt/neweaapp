@@ -87,7 +87,7 @@
             <span>Client Reference:</span>
           </ion-col>
           <ion-col class="text-color-light">
-            <span>{{caseDetails.cl_ref}}</span>
+            <span>{{caseDetails.caseSummary.cl_ref}}</span>
           </ion-col>
         </ion-row>
         <ion-row>
@@ -95,7 +95,7 @@
             <span>Client Name:</span>
           </ion-col>
           <ion-col class="text-color-light">
-            <span>{{caseDetails.client.client_title}}</span>
+            <span>{{caseDetails.client.title}}</span>
           </ion-col>
         </ion-row>
         <ion-row>
@@ -127,7 +127,7 @@
             <span>Last visit date:</span>
           </ion-col>
           <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.last_visit_date}}</span>
+            <span>{{caseDetails.caseSummary.last_visit_date ? caseDetails.caseSummary.last_visit_date: '-'}}</span>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -149,38 +149,38 @@
           <ion-col size-md="3">
             <ion-card>
               <ion-item class="card-title-bg">
-                <ion-card-title>Debtor Debt</ion-card-title>
+                <ion-card-title>Debtor Balance</ion-card-title>
               </ion-item>
 
               <ion-card-content>
                 <ion-item>
                   <ion-label>Outstanding:</ion-label>
                   <span class="text-color-light">
-                    {{caseDetails.financialDetails.debt?.outstanding | number:'0.2-2'}}
+                    {{caseDetails.financialDetails.client?.outstanding | number:'0.2-2'}}
                   </span>
                 </ion-item>
                 <ion-item>
                   <ion-label>Paid:</ion-label>
                   <span class="text-color-light">
-                    {{caseDetails.financialDetails.debt?.paid | number:'0.2-2'}}
+                    {{caseDetails.financialDetails.client?.paid | number:'0.2-2'}}
                   </span>
                 </ion-item>
                 <ion-item>
                   <ion-label>Cleared:</ion-label>
                   <span class="text-color-light">
-                    {{caseDetails.financialDetails.debt?.cleared | number:'0.2-2'}}
+                    {{caseDetails.financialDetails.client?.cleared | number:'0.2-2'}}
                   </span>
                 </ion-item>
                 <ion-item>
                   <ion-label>Current outstanding:</ion-label>
                   <span class="text-color-light">
-                    {{caseDetails.financialDetails.debt?.current_outstanding | number:'0.2-2'}}
+                    {{caseDetails.financialDetails.client?.current_outstanding | number:'0.2-2'}}
                   </span>
                 </ion-item>
               </ion-card-content>
             </ion-card>
           </ion-col>
-          <ion-col size-md="3">
+          <!-- <ion-col size-md="3">
             <ion-card>
               <ion-item class="card-title-bg">
                 <ion-card-title>Debtor Cost</ion-card-title>
@@ -213,7 +213,7 @@
                 </ion-item>
               </ion-card-content>
             </ion-card>
-          </ion-col>
+          </ion-col> -->
           <ion-col size-md="3">
             <ion-card>
               <ion-item class="card-title-bg">
