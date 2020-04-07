@@ -217,6 +217,7 @@ export class JobListPage implements OnInit {
 
   goToVisitForm(visitCase) {
     localStorage.setItem('visit_case_data', JSON.stringify(visitCase));
+    this.storageService.set('caseId', visitCase.id);
     this.router.navigate(['/home/visit-form/' + visitCase.id]);
   }
   loadData(infiniteScrollEvent) {
@@ -274,6 +275,7 @@ export class JobListPage implements OnInit {
   }
   goToCaseDetails(currentCaseData) {
     localStorage.setItem('detais_case_data', JSON.stringify(currentCaseData));
+    this.storageService.set('caseId', currentCaseData.id);
     this.router.navigate(['/home/case-details/' + currentCaseData.id]);
   }
   selectAllCase() {
