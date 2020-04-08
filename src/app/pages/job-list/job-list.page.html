@@ -264,9 +264,9 @@
                     <td>{{link_case.date}}</td>
                     <td>{{link_case.debtor.addresses[0].address_postcode}}</td>
                     <td>{{link_case.visitcount_total}}</td>
-                    <td>{{link_case.visitcount_total}}</td>
                     <td>{{link_case.current_status.status_name}}</td>
                     <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
+                    <td>{{link_case.custom5}}</td>
                     <td class="action ">
                       <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
                         (click)="goToCaseDetails(link_case)">

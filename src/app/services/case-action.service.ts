@@ -53,7 +53,7 @@ export class CaseActionService {
     return this.http.post(apiURL, data);
   }
   createArrangement(data, caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/preview/4199${caseId}?source=API`;
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/edit/${caseId}?source=API`;
     return this.http.post(apiURL, data);
   }
 }
