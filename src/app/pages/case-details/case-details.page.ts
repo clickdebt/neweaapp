@@ -351,19 +351,10 @@ export class CaseDetailsPage implements OnInit {
       component: ArrangementModalPage,
       componentProps: {
         caseId: this.caseId,
-        d_outstanding: this.currentCaseData.d_outstanding
+        d_outstanding: this.currentCaseData.d_outstanding,
+        isDetailsPage: true
       }
     });
-    AddArrangementModal.onDidDismiss()
-      .then((response) => {
-        if (response.data && response.data.saved) {
-          console.log(response.data.arrangementObj);
-          this.caseActionService.createArrangement(response.data.arrangementObj, this.caseId)
-            .subscribe((data) => {
-              console.log(data);
-            });
-        }
-      });
     await AddArrangementModal.present();
   }
   goBack() {
