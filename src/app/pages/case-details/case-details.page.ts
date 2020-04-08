@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StorageService, CommonService } from 'src/app/services';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
-import { ModalController, AlertController } from '@ionic/angular';
+import { ModalController, AlertController, NavController } from '@ionic/angular';
 import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
 import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
@@ -56,7 +56,8 @@ export class CaseDetailsPage implements OnInit {
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
     private caseActionService: CaseActionService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private navCtrl: NavController
   ) { }
 
   ngOnInit() {
@@ -350,19 +351,13 @@ export class CaseDetailsPage implements OnInit {
       component: ArrangementModalPage,
       componentProps: {
         caseId: this.caseId,
-        d_outstanding: this.currentCaseData.d_outstanding
+        d_outstanding: this.currentCaseData.d_outstanding,
+        isDetailsPage: true
       }
     });
-    AddArrangementModal.onDidDismiss()
-      .then((response) => {
-        if (response.data && response.data.saved) {
-          console.log(response.data.arrangementObj);
-          this.caseActionService.createArrangement(response.data.arrangementObj, this.caseId)
-            .subscribe((data) => {
-              console.log(data);
-            });
-        }
-      });
     await AddArrangementModal.present();
+  }
+  goBack() {
+    this.navCtrl.pop();
   }
 }

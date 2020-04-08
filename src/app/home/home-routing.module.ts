@@ -45,6 +45,10 @@ const routes: Routes = [
       {
         path: 'map-view',
         loadChildren: () => import('../pages/map-view/map-view.module').then(m => m.MapViewPageModule)
+      },
+      {
+        path: 'vrm-search',
+        loadChildren: () => import('../pages/vrm-search/vrm-search.module').then(m => m.VrmSearchPageModule)
       }
     ]
   }
