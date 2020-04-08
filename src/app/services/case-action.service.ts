@@ -37,7 +37,23 @@ export class CaseActionService {
     return this.http.post(apiURL, data);
   }
   deAllocationCase(data, caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent//${caseId}?source=API`;
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${caseId}?source=API`;
+    return this.http.post(apiURL, data);
+  }
+  getActiveArrangements(caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/info/${caseId}/single?source=API`;
+    return this.http.get(apiURL);
+  }
+  getInactiveArrangements(caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/inactive/${caseId}/single/default/?source=API`;
+    return this.http.get(apiURL);
+  }
+  updateArrangement(data, caseId, arrangementId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/default_popup/view/case_arrangement/${caseId}/single/default/update/${arrangementId}?source=API`;
+    return this.http.post(apiURL, data);
+  }
+  createArrangement(data, caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/preview/4199${caseId}?source=API`;
     return this.http.post(apiURL, data);
   }
 }

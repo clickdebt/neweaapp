@@ -7,6 +7,8 @@ import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
 import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
 import { CaseActionService } from 'src/app/services/case-action.service';
+import { PaymentModalPage } from '../payment-modal/payment-modal.page';
+import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
 
 @Component({
   selector: 'app-case-details',
@@ -66,7 +68,8 @@ export class CaseDetailsPage implements OnInit {
   }
 
   loadInitData() {
-    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status', 'On Hold', 'Add Fee', 'Deallocate case'];
+    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status', 'On Hold',
+      'Add Fee', 'Deallocate case', 'Add Payment', 'Add Arrangement'];
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
       this.getCaseMarkers();
@@ -94,6 +97,10 @@ export class CaseDetailsPage implements OnInit {
       this.onHold();
     } else if (this.SelectedAction === 'Add Fee') {
       this.addFee();
+    } else if (this.SelectedAction === 'Add Payment') {
+      this.addPayment();
+    } else if (this.SelectedAction === 'Add Arrangement') {
+      this.addArrangement();
     }
     this.SelectedAction = '';
   }
@@ -322,5 +329,40 @@ export class CaseDetailsPage implements OnInit {
       ]
     });
     await alert.present();
+  }
+  async addPayment() {
+    const AddPaymentModal = await this.modalCtrl.create({
+      component: PaymentModalPage,
+      componentProps: {
+        caseId: this.caseId
+      }
+    });
+    AddPaymentModal.onDidDismiss()
+      .then((response) => {
+        if (response.data.paymentObj) {
+          console.log(response.data.paymentObj);
+        }
+      });
+    await AddPaymentModal.present();
+  }
+  async addArrangement() {
+    const AddArrangementModal = await this.modalCtrl.create({
+      component: ArrangementModalPage,
+      componentProps: {
+        caseId: this.caseId,
+        d_outstanding: this.currentCaseData.d_outstanding
+      }
+    });
+    AddArrangementModal.onDidDismiss()
+      .then((response) => {
+        if (response.data) {
+          console.log(response.data.arrangementObj);
+          this.caseActionService.createArrangement(response.data.arrangementObj, this.caseId)
+            .subscribe((data) => {
+              console.log(data);
+            });
+        }
+      });
+    await AddArrangementModal.present();
   }
 }
