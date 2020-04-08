@@ -172,8 +172,11 @@ export class VisitFormPage implements OnInit {
         }
 
         const { data } = await paymodalPage.onWillDismiss();
-        if (data && data.saved) {
-          this.paymentInfo = data.paymentObj;
+        if (data) {
+          localStorage.removeItem('isFormPage');
+          if (data.saved) {
+            this.paymentInfo = data.paymentObj;
+          }
         }
 
       }
@@ -193,8 +196,11 @@ export class VisitFormPage implements OnInit {
         }
 
         const { data } = await arrmodalPage.onWillDismiss();
-        if (data && data.saved) {
-          this.arrangementInfo = data.arrangementObj;
+        if (data) {
+          localStorage.removeItem('isFormPage');
+          if (data.saved) {
+            this.arrangementInfo = data.arrangementObj;
+          }
         }
       }
     }
