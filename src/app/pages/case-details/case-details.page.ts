@@ -69,7 +69,7 @@ export class CaseDetailsPage implements OnInit {
 
   loadInitData() {
     this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status', 'On Hold',
-      'Add Fee', 'Deallocate case', 'Add Payment', 'Add Arrangement'];
+      'Add Fee', 'Deallocate case', 'Add Payment', 'Arrangement'];
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
       this.getCaseMarkers();
@@ -99,7 +99,7 @@ export class CaseDetailsPage implements OnInit {
       this.addFee();
     } else if (this.SelectedAction === 'Add Payment') {
       this.addPayment();
-    } else if (this.SelectedAction === 'Add Arrangement') {
+    } else if (this.SelectedAction === 'Arrangement') {
       this.addArrangement();
     }
     this.SelectedAction = '';
@@ -355,7 +355,7 @@ export class CaseDetailsPage implements OnInit {
     });
     AddArrangementModal.onDidDismiss()
       .then((response) => {
-        if (response.data) {
+        if (response.data && response.data.saved) {
           console.log(response.data.arrangementObj);
           this.caseActionService.createArrangement(response.data.arrangementObj, this.caseId)
             .subscribe((data) => {
