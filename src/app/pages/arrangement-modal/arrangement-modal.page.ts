@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, NavParams } from '@ionic/angular';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-
+import { CaseActionService } from 'src/app/services/case-action.service';
+import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
+import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-arrangement-modal.page';
+import { NetworkService } from 'src/app/services/network.service';
 @Component({
   selector: 'app-arrangement-modal',
   templateUrl: './arrangement-modal.page.html',
@@ -14,12 +17,28 @@ export class ArrangementModalPage implements OnInit {
   arrangementForm: FormGroup;
   frequency = [{ id: '2', label: 'One time final payment' }, { id: '3', label: 'Weekly By day of the week' }, { id: '4', label: 'Monthly by date' }, { id: '5', label: 'Monthly by day' }, { id: '6', label: 'Fortnightly' }, { id: '7', label: '4 weekly' }];
   payment_methods = [{ id: 1, label: 'Cash' }, { id: 2, label: 'Cheque' }, { id: 4, label: 'Credit card' }, { id: 5, label: 'Debit Card' }, { id: 8, label: 'BACS' }];
-  arrangementObj = {};
+  arrangementObj: any = { show: false };
+  activeArrangements: any = {
+    currentArrangements: {
+      show: true
+    },
+    scheduleArrangements: {
+      show: false
+    }
+  };
+  inActiveArrangements: any = {
+    show: false
+  };
+  frequencies;
+  updatedIndex = -1;
+  networkStatus;
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
     private router: Router,
-    navParams: NavParams
+    navParams: NavParams,
+    private caseActionService: CaseActionService,
+    private networkService: NetworkService
   ) {
     this.caseId = navParams.get('caseId');
     this.outstanding = navParams.get('d_outstanding');
@@ -27,6 +46,16 @@ export class ArrangementModalPage implements OnInit {
 
   ngOnInit() {
     this.initForm();
+
+  }
+  async ionViewWillEnter() {
+    this.networkStatus = await this.networkService.getCurrentNetworkStatus();
+    if (this.networkStatus) {
+      this.getActiveArrangements();
+      this.getInactiveArrangements();
+    } else {
+      this.arrangementObj.show = true;
+    }
   }
 
   dismiss() {
@@ -71,5 +100,37 @@ export class ArrangementModalPage implements OnInit {
       this.arrangementObj = {};
     }
   }
+  toggleShow(object) {
+    object.show = !object.show;
+  }
+  isShown(object) {
+    return object.show;
+  }
+  getActiveArrangements() {
+    this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
+      this.activeArrangements.currentArrangements.data = Object.values(response.current_arrangement);
+      this.activeArrangements.scheduleArrangements.data = Object.values(response.arrangement_schedule);
+    });
+  }
+  getInactiveArrangements() {
+    this.caseActionService.getInactiveArrangements(this.caseId).subscribe((response: any) => {
+      this.inActiveArrangements.data = response.data.data;
+      this.frequencies = response.data.frequencies;
+    });
+  }
+  async update(arrangement, index) {
+    const updateArrangement = await this.modalCtrl.create({
+      component: UpdateArrangementModalPage,
+      componentProps: {
+        caseId: this.caseId,
+        scheduleArrangement: arrangement
+      }
+    });
+    updateArrangement.onDidDismiss()
+      .then((response) => {
+        this.activeArrangements.scheduleArrangements.data[index] = response.data;
+      });
+    await updateArrangement.present();
 
+  }
 }
