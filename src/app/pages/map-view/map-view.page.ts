@@ -28,6 +28,10 @@ export class MapViewPage implements OnInit {
   polygonMarkers = [];
   currLang = -0.8051583;
   currLat = 51.8218729;
+  centerLng = -0.8051583;
+  centerLat = 51.8218729;
+  index = 0;
+  casesLength;
   infowindow: any;
   page = 1;
   limit = 20;
@@ -53,9 +57,9 @@ export class MapViewPage implements OnInit {
   async ionViewDidEnter() {
     this.page = 1;
     this.markers = [];
+    this.index = 0;
     this.getCurrentLocation();
     this.getCases();
-    this.initMap();
   }
   ionViewWillLeave() {
     this.storageService.remove('selected_cases_for_map');
@@ -65,7 +69,7 @@ export class MapViewPage implements OnInit {
     const caseIds = await this.storageService.get('selected_cases_for_map');
     let params: any;
     if (caseIds) {
-      params = { cases: caseIds, nonblocking: 1 }
+      params = { cases: caseIds, nonblocking: 1 };
     } else {
       params = { page: this.page++, limit: this.limit, nonblocking: 1 };
     }
@@ -81,25 +85,34 @@ export class MapViewPage implements OnInit {
   }
   getAddresses(cases) {
     if (cases) {
-      cases.forEach((da) => {
+      cases.forEach((da, caseIndex) => {
         da.address_str = `${da.debtor.addresses[0].address_ln1}, ` +
           `${da.debtor.addresses[0].address_ln2}, ` +
           `${da.debtor.addresses[0].address_ln3}, ` +
           `${da.debtor.addresses[0].address_postcode}`;
         da.location = {};
-        this.getGeocodesLatLongs(da);
+        this.getGeocodesLatLongs(da, caseIndex);
       });
 
     }
 
   }
 
-  getGeocodesLatLongs(obj) {
+  getGeocodesLatLongs(obj, caseIndex) {
     this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
       if (res.status === 'OK' && res.results && res.results[0]) {
         obj.location = res.results[0]['geometry']['location'];
+        if (this.index === 0) {
+          this.centerLat = obj.location.lat;
+          this.centerLng = obj.location.lng;
+          this.initMap();
+          this.index++;
+        }
         this.setCaseMarkers(obj);
       } else {
+        if (this.index === 0 && caseIndex === this.cases.length - 1) {
+          this.initMap(); this.index++;
+        }
         console.log(obj, res);
       }
     }, err => {
@@ -140,7 +153,6 @@ export class MapViewPage implements OnInit {
         icon: markerIcon
       });
       this.markers.push(marker);
-
       marker.addListener('click', () => {
         if (this.infowindow) { this.infowindow.close(); }
         this.infowindow = infowindow;
@@ -171,7 +183,7 @@ export class MapViewPage implements OnInit {
     this.directionsDisplay = new google.maps.DirectionsRenderer(mDirectionsRendererOptions);
     this.map = new google.maps.Map(this.mapElement.nativeElement, {
       zoom: 12,
-      center: new google.maps.LatLng(51.8218729, -0.8051583),
+      center: new google.maps.LatLng(this.centerLat, this.centerLng),
       streetViewControl: false,
       mapTypeControl: false
     });

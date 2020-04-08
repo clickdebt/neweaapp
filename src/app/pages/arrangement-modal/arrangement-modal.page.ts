@@ -90,7 +90,7 @@ export class ArrangementModalPage implements OnInit {
         ref_amount: this.arrangementForm.value.ref_amount,
         method: this.arrangementForm.value.method,
         source: this.arrangementForm.value.source,
-        start: moment(this.arrangementForm.value.start).format('DD-MM-YYYY'),
+        start: moment(this.arrangementForm.value.start).format('YYYY-MM-DD'),
         different_first_payment: this.arrangementForm.value.differentFirstPayment,
         first_amount: this.arrangementForm.value.firstPaymentAmount,
         first_date: this.arrangementForm.value.firstPaymentDate ? moment(this.arrangementForm.value.firstPaymentDate).format('DD-MM-YYYY') : "",
