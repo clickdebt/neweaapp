@@ -21,10 +21,8 @@
       </ion-icon>
     </ion-item>
     <ion-grid class="ion-no-border ion-margin" [hidden]="!isShown(activeArrangements?.currentArrangements)">
-      <ion-row class="ion-text-center"
-        *ngFor="let currentArrangement of activeArrangements.currentArrangements.data,let i=index"
-        [ngClass]="{'bg-row-dark':i%2==0}">
-        <div class="text-color-light" [innerHTML]="currentArrangement | convertArrangementToString:frequencies"></div>
+      <ion-row class="ion-text-center">
+        <div class="text-color-light" [innerHTML]="currentArrangementString"></div>
       </ion-row>
     </ion-grid>
   </div>

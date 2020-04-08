@@ -7,7 +7,6 @@ import { IonicModule } from '@ionic/angular';
 import { ArrangementModalPageRoutingModule } from './arrangement-modal-routing.module';
 
 import { ArrangementModalPage } from './arrangement-modal.page';
-import { ConvertArrangementToStringPipe } from 'src/app/pipes/convert-arrangement-to-string.pipe';
 import { UpdateArrangementModalPageModule } from '../update-arrangement-modal/update-arrangement-modal.module';
 
 @NgModule({
@@ -19,7 +18,7 @@ import { UpdateArrangementModalPageModule } from '../update-arrangement-modal/up
     ArrangementModalPageRoutingModule,
     UpdateArrangementModalPageModule
   ],
-  declarations: [ArrangementModalPage, ConvertArrangementToStringPipe],
+  declarations: [ArrangementModalPage],
   exports: [ArrangementModalPage],
   entryComponents: [ArrangementModalPage],
 })

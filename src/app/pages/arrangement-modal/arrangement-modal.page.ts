@@ -6,6 +6,7 @@ import { CaseActionService } from 'src/app/services/case-action.service';
 import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-arrangement-modal.page';
 import { NetworkService } from 'src/app/services/network.service';
+import * as moment from 'moment';
 @Component({
   selector: 'app-arrangement-modal',
   templateUrl: './arrangement-modal.page.html',
@@ -18,6 +19,9 @@ export class ArrangementModalPage implements OnInit {
   frequency = [{ id: '2', label: 'One time final payment' }, { id: '3', label: 'Weekly By day of the week' }, { id: '4', label: 'Monthly by date' }, { id: '5', label: 'Monthly by day' }, { id: '6', label: 'Fortnightly' }, { id: '7', label: '4 weekly' }];
   payment_methods = [{ id: 1, label: 'Cash' }, { id: 2, label: 'Cheque' }, { id: 4, label: 'Credit card' }, { id: 5, label: 'Debit Card' }, { id: 8, label: 'BACS' }];
   arrangementObj: any = { show: false };
+  currentArrangementString = '';
+  currArrangement;
+  arrangementMode = 'make';
   activeArrangements: any = {
     currentArrangements: {
       show: true
@@ -69,7 +73,7 @@ export class ArrangementModalPage implements OnInit {
     this.arrangementForm = this.formBuilder.group({
       frequency: ['2', [Validators.required]],
       amount: ['', [Validators.required]],
-      ref_amount: ['', [Validators.required]],
+      ref_amount: [this.outstanding, [Validators.required]],
       method: ['1', [Validators.required]],
       start: ['', [Validators.required]],
       note: ['', []],
@@ -86,11 +90,12 @@ export class ArrangementModalPage implements OnInit {
         ref_amount: this.arrangementForm.value.ref_amount,
         method: this.arrangementForm.value.method,
         source: this.arrangementForm.value.source,
-        start: this.arrangementForm.value.start,
+        start: moment(this.arrangementForm.value.start).format('DD-MM-YYYY'),
         different_first_payment: this.arrangementForm.value.differentFirstPayment,
         first_amount: this.arrangementForm.value.firstPaymentAmount,
-        first_date: this.arrangementForm.value.firstPaymentDate,
-        note: this.arrangementForm.value.note
+        first_date: this.arrangementForm.value.firstPaymentDate ? moment(this.arrangementForm.value.firstPaymentDate).format('DD-MM-YYYY') : "",
+        note: this.arrangementForm.value.note,
+        mode: this.arrangementMode
       };
       this.modalCtrl.dismiss({
         saved: true,
@@ -108,14 +113,35 @@ export class ArrangementModalPage implements OnInit {
   }
   getActiveArrangements() {
     this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
-      this.activeArrangements.currentArrangements.data = Object.values(response.current_arrangement);
-      this.activeArrangements.scheduleArrangements.data = Object.values(response.arrangement_schedule);
+      this.currArrangement = Object.values(response.current_arrangement);
+      this.currArrangement = this.currArrangement.find(data => data.active == 1);
+      this.makeCurrentArrangementString();
+      if (this.currArrangement) {
+        this.arrangementMode = 'archive_make';
+        this.activeArrangements.scheduleArrangements.data = Object.values(response.arrangement_schedule).reverse();
+      }
     });
+  }
+  makeCurrentArrangementString() {
+    if (this.currArrangement) {
+      this.currentArrangementString += `The defendant agreed to pay `;
+      if (parseInt(this.currArrangement.first_amount, 10) > 0 && this.currArrangement.first_date) {
+        this.currentArrangementString += `initial payment of <strong>&pound;${this.currArrangement.first_amount}
+        </strong> due on <strong>${moment(this.currArrangement.first_date).format('DD-MM-YYYY')}</strong> followed by `;
+      }
+      this.currentArrangementString += `<strong>&pound;${this.currArrangement.amount}</strong> with a <strong>
+      ${this.frequencies[this.currArrangement.freq]}</strong> on <strong>
+      ${moment(this.currArrangement.start).format('DD-MM-YYYY')}</strong>.</p > `;
+    } else {
+      this.currentArrangementString += `The case ${this.caseId} has no arrangement set.`;
+    }
   }
   getInactiveArrangements() {
     this.caseActionService.getInactiveArrangements(this.caseId).subscribe((response: any) => {
       this.inActiveArrangements.data = response.data.data;
       this.frequencies = response.data.frequencies;
+      console.log(this.frequencies);
+      
     });
   }
   async update(arrangement, index) {
