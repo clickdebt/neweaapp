@@ -1,0 +1,126 @@
+<ion-toolbar color="light">
+  <ion-grid class="p-y-0">
+    <ion-row>
+      <ion-col size="9">
+        <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" placeholder="Search here..">
+        </ion-searchbar>
+      </ion-col>
+      <ion-col size="3">
+        <ion-button (click)="search()" color="secondary" shape="round" expand="block">Search</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-toolbar>
+<ion-content>
+  <!-- sort toolbar -->
+
+  <!-- sort toolbar -->
+
+  <!-- table -->
+  <div class=" table-responsive" *ngIf="!isMobile">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Ref</th>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Postcode</th>
+          <th>Visits</th>
+          <th>Status</th>
+          <th>Hold</th>
+          <th>VRM</th>
+          <th>Details</th>
+          <th class="w-12">Self Allocate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let case of cases">
+          <tr class="no-border" [ngClass]="{'bg-hold':case.hold_until > currentDate}">
+            <td>{{case.id}}</td>
+            <td>{{case.ref}}</td>
+            <td>{{case.debtor.debtor_name}}</td>
+            <td>{{case.d_outstanding}}</td>
+            <td>{{case.debtor.addresses[0]?.address_postcode}}</td>
+            <td>{{case.visitcount_total}}</td>
+            <td>{{case.current_status.status_name}}</td>
+            <td>{{case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
+            <td>{{case.custom5}}</td>
+            <td class="action ">
+              <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
+                Details
+              </ion-button>
+            </td>
+            <td class="action ">
+              <ion-button type="submit" size="small" color="tertiary" (click)="selfAllocate(case)">
+                Self Allocate
+              </ion-button>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <!-- table -->
+
+  <!-- mobile card starts-->
+  <div *ngIf="isMobile">
+    <ion-card class="joblist-card" *ngFor="let case of cases" [ngClass]="{'bg-hold':case.hold_until > currentDate}">
+      <ion-card-content>
+        <div class="d-flex align-items-center">
+          <h3>{{case.debtor.debtor_name}}
+            <span class="d-block"> (#{{case.id}}) </span>
+          </h3>
+          <span class="d-flex">
+            <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
+              <ion-icon name="information-circle-outline"></ion-icon>
+            </ion-button>
+          </span>
+          <span class="d-flex">
+            <ion-button size="small" color="tertiary" (click)="selfAllocate(case)">
+              <ion-icon name="person-add-outline"></ion-icon>
+            </ion-button>
+          </span>
+        </div>
+        <ion-grid class="m-t-10">
+          <ion-row>
+            <ion-col size="5">
+              Ref :
+              <span> {{case.ref}} </span>
+            </ion-col>
+            <ion-col size="6">
+              Amount :
+              <span> {{case.d_outstanding}} </span>
+            </ion-col>
+            <ion-col size="6">
+              Postcode :
+              <span> {{case.debtor.addresses[0]?.address_postcode}} </span>
+            </ion-col>
+            <ion-col size="6">
+              visit :
+              <span> {{case.visitcount_total}} </span>
+            </ion-col>
+            <ion-col size="6" *ngIf="case.current_status.status_name">
+              Status :
+              <span> {{case.current_status.status_name}} </span>
+            </ion-col>
+            <ion-col size="6">
+              Hold :
+              <span> {{case.hold_until > currentDate ? 'Yes' : 'No'}} </span>
+            </ion-col>
+            <ion-col size="6" *ngIf="case.custom5">
+              VRM :
+              <span> {{case.custom5}} </span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <div class="d-flex ion-margin-vertical ion-justify-content-center" *ngIf="!cases.length">
+    <span *ngIf="!searchBarValue" class="text-color-light">Enter VRM Search For cases</span>
+    <span *ngIf="searchBarValue && isSearch" class=" text-color-light">No cases Found</span>
+  </div>
+  <!-- mobile card ends-->
+
+</ion-content>
