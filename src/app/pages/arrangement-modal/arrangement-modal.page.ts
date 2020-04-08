@@ -7,6 +7,7 @@ import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-arrangement-modal.page';
 import { NetworkService } from 'src/app/services/network.service';
 import * as moment from 'moment';
+import { CommonService } from 'src/app/services';
 @Component({
   selector: 'app-arrangement-modal',
   templateUrl: './arrangement-modal.page.html',
@@ -36,16 +37,21 @@ export class ArrangementModalPage implements OnInit {
   frequencies;
   updatedIndex = -1;
   networkStatus;
+  isDetailsPage;
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
     private router: Router,
     navParams: NavParams,
     private caseActionService: CaseActionService,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private commonService: CommonService
   ) {
     this.caseId = navParams.get('caseId');
     this.outstanding = navParams.get('d_outstanding');
+    this.isDetailsPage = navParams.get('isDetailsPage');
+    console.log(navParams);
+
   }
 
   ngOnInit() {
@@ -97,10 +103,20 @@ export class ArrangementModalPage implements OnInit {
         note: this.arrangementForm.value.note,
         mode: this.arrangementMode
       };
-      this.modalCtrl.dismiss({
-        saved: true,
-        arrangementObj: this.arrangementObj
-      });
+      if (this.isDetailsPage === true) {
+        console.log('hii');
+        this.caseActionService.createArrangement(this.arrangementObj, this.caseId)
+          .subscribe((response: any) => {
+            this.currArrangement = {};
+            this.commonService.showToast(response.data.message, 'success');
+            this.getActiveArrangements();
+          });
+      } else {
+        this.modalCtrl.dismiss({
+          saved: true,
+          arrangementObj: this.arrangementObj
+        });
+      }
     } else {
       this.arrangementObj = {};
     }
@@ -140,8 +156,6 @@ export class ArrangementModalPage implements OnInit {
     this.caseActionService.getInactiveArrangements(this.caseId).subscribe((response: any) => {
       this.inActiveArrangements.data = response.data.data;
       this.frequencies = response.data.frequencies;
-      console.log(this.frequencies);
-      
     });
   }
   async update(arrangement, index) {
