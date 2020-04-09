@@ -335,15 +335,11 @@ export class CaseDetailsPage implements OnInit {
     const AddPaymentModal = await this.modalCtrl.create({
       component: PaymentModalPage,
       componentProps: {
-        caseId: this.caseId
+        caseId: this.caseId,
+        isDetailsPage: true
       }
     });
-    AddPaymentModal.onDidDismiss()
-      .then((response) => {
-        if (response.data.paymentObj) {
-          console.log(response.data.paymentObj);
-        }
-      });
+
     await AddPaymentModal.present();
   }
   async addArrangement() {

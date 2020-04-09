@@ -56,4 +56,8 @@ export class CaseActionService {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/edit/${caseId}?source=API`;
     return this.http.post(apiURL, data);
   }
+  createPayment(data, caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/payment/case_actions_panels/case_action_create_payment/${caseId}?source=API`;
+    return this.http.post(apiURL, data);
+  }
 }

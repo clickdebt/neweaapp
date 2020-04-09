@@ -297,7 +297,8 @@
                     <span>Outstanding</span>
                   </ion-item>
                 </div>
-                <div class="d-flex ion-justify-content-between" *ngFor="let linked_case of currentCaseData.linked_cases">
+                <div class="d-flex ion-justify-content-between"
+                  *ngFor="let linked_case of currentCaseData.linked_cases">
                   <ion-item>
                     <span class="text-color-light">
                       {{linked_case.id}}
@@ -328,25 +329,26 @@
         </ion-icon>
       </ion-item>
       <ion-grid class="ion-no-border ion-margin-bottom ion-margin-horizontal" [hidden]="!isShown(caseDetails.payments)">
+        <ion-row *ngIf="!caseDetails.payments?.paymentData?.length">
+          <ion-col class="text-color-light ion-text-center">
+            <span>No Payments Found </span>
+          </ion-col>
+        </ion-row>
         <ion-row class="history-bg ion-margin-top pt-1 pl-1" *ngFor="let payment of caseDetails.payments.paymentData">
           <ion-col size-md="8" size="12">
-            <ion-label>BatchId:</ion-label>
-            <span class="text-color-light ion-margin-start">{{payment.id}}</span>
-          </ion-col>
-          <ion-col size-md="4" size="12">
-            <ion-label>Date & Time</ion-label>
+            <ion-label>Date & Time:</ion-label>
             <span class="text-color-light ion-margin-start">{{payment.date}}</span>
           </ion-col>
-          <ion-col size-md="8" size="12">
-            <ion-label>Amount</ion-label>
+          <ion-col size-md="4" size="12">
+            <ion-label>Amount:</ion-label>
             <span class="text-color-light ion-margin-start">{{payment.amount}}</span>
           </ion-col>
           <ion-col size-md="8" size="12">
-            <ion-label>Payment Type</ion-label>
+            <ion-label>Payment Type:</ion-label>
             <span class="text-color-light ion-margin-start">{{payment.payment_type?.name}}</span>
           </ion-col>
           <ion-col size-md="4" size="12">
-            <ion-label>Payment Source</ion-label>
+            <ion-label>Payment Source:</ion-label>
             <span class="text-color-light ion-margin-start">{{payment.payment_source?.name}}</span>
           </ion-col>
         </ion-row>
