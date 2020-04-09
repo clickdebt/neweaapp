@@ -46,6 +46,8 @@ export class UpdateArrangementModalPage implements OnInit {
 
       this.caseActionService.updateArrangement(this.updateArrangementForm.value, this.caseId,
         this.scheduleArrangement.id).subscribe((response) => {
+          console.log(response);
+
           this.modalCtrl.dismiss({
             saved: true,
             scheduleArrangement: this.scheduleArrangement
