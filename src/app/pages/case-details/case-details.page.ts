@@ -119,6 +119,38 @@ export class CaseDetailsPage implements OnInit {
       this.caseDetails.caseMarkers.fields = response.data.fields;
     });
   }
+  async onCaseMarkerClick(caseMarker) {
+    console.log(caseMarker);
+    if (caseMarker.shortcode === 'hold') {
+      this.onHold();
+    } else {
+      const alert = await this.alertCtrl.create({
+        header: 'Update a CaseMarker',
+        message: `Are you sure you want to change <strong>${caseMarker.label}</strong> marker?`,
+        buttons: [
+          {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+            }
+          },
+          {
+            text: 'Yes',
+            handler: () => {
+              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId)
+                .subscribe((response) => {
+                  this.getCaseMarkers();
+                });
+            }
+          }
+        ]
+      });
+      await alert.present();
+    }
+
+
+
+  }
 
   colorCondition(index) {
     if (parseInt(index, 10) === 0) {
@@ -271,13 +303,18 @@ export class CaseDetailsPage implements OnInit {
   }
 
   async onHold() {
-    const OnHoldModal = await this.modalCtrl.create({
+    const onHoldModal = await this.modalCtrl.create({
       component: OnHoldModalPage,
       componentProps: {
         caseId: this.caseId
       }
     });
-    await OnHoldModal.present();
+    onHoldModal.onDidDismiss().then((response) => {
+      if (response.data && response.data.saved) {
+        this.getCaseMarkers();
+      }
+    });
+    await onHoldModal.present();
   }
   async addFee() {
     const AddFeeModal = await this.modalCtrl.create({

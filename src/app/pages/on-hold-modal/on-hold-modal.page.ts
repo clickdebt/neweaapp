@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { CommonService } from 'src/app/services';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-on-hold-modal',
@@ -10,25 +11,35 @@ import { CommonService } from 'src/app/services';
 })
 export class OnHoldModalPage implements OnInit {
   @Input() caseId;
-  formData: any = {
-    // date: new Date().toISOString()
-  };
+  onHoldForm: FormGroup;
+
   constructor(
     private modalCtrl: ModalController,
     private caseActionService: CaseActionService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit() {
+    this.initForm();
   }
-  onDaysChange(event) {
-    this.formData.date = new Date(new Date().getTime() + (event.detail.value * 24 * 60 * 60 * 1000)).toISOString();
+
+  initForm() {
+    this.onHoldForm = this.formBuilder.group({
+      hold_client_request: [false, [Validators.required]],
+      no_of_days: ['', [Validators.required]],
+      note: ['', []],
+    });
   }
+
   save() {
-    this.formData.status_id = 3;
-    console.log(this.formData);
-    this.caseActionService.saveOnHoldStatus(this.formData, this.caseId).subscribe((response: any) => {
+    console.log(this.onHoldForm.value);
+    this.caseActionService.saveOnHoldStatus(this.onHoldForm.value, this.caseId).subscribe((response: any) => {
+      console.log(response);
       this.commonService.showToast(response.data.message, 'success');
+      this.modalCtrl.dismiss({
+        saved: true
+      });
     });
   }
   cancel() {

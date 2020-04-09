@@ -20,7 +20,7 @@
         </ion-icon>
       </ion-item>
       <ion-list class="ion-no-border ion-margin-start" [hidden]="!isShown(caseDetails.caseMarkers)">
-        <ion-button size="default" [color]="colorCondition(caseMarker.value)"
+        <ion-button (click)="onCaseMarkerClick(caseMarker)" size="default" [color]="colorCondition(caseMarker.value)"
           *ngFor="let caseMarker of caseDetails.caseMarkers.fields">
           {{caseMarker.label}}
         </ion-button>

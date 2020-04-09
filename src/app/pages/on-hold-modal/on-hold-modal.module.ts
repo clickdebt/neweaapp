@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
@@ -13,8 +13,9 @@ import { OnHoldModalPage } from './on-hold-modal.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    OnHoldModalPageRoutingModule
+    OnHoldModalPageRoutingModule,
+    ReactiveFormsModule
   ],
   declarations: [OnHoldModalPage]
 })
-export class OnHoldModalPageModule {}
+export class OnHoldModalPageModule { }

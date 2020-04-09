@@ -33,7 +33,7 @@ export class CaseActionService {
     return this.http.get(apiURL);
   }
   saveOnHoldStatus(data, caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_status/${caseId}?source=API`;
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/put_on_hold/${caseId}?source=API`;
     return this.http.post(apiURL, data);
   }
   deAllocationCase(data, caseId) {
