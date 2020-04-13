@@ -63,6 +63,12 @@ export class JobListPage implements OnInit {
     // this.getFilters();
     if (!(this.cases.length > 0)) {
       this.getCases('');
+    } else if (await this.storageService.get('is_case_updated')) {
+      this.page = 1;
+      this.cases = [];
+      this.getCases('');
+      this.updateCasesData();
+      await this.storageService.set('is_case_updated', false);
     }
     this.currentDate = moment().format('YYYY-MM-DD hh:mm:ss');
   }
@@ -295,6 +301,24 @@ export class JobListPage implements OnInit {
       //     }
       //   });
       // }
+    });
+  }
+  async updateCasesData() {
+    const downloadStatus = await this.databaseService.getDownloadStatus();
+
+    this.caseService.getCases({ last_update_date: downloadStatus.time }, 1).subscribe(async (response: any) => {
+      if (response) {
+        console.log(response);
+
+        await this.databaseService.setCases(response.data);
+        this.caseService.getFilterMasterData().subscribe(async (data: any) => {
+          await this.databaseService.setFilterMasterData(data.data);
+        });
+        await this.databaseService.setDownloadStatus({
+          status: true,
+          time: moment().format('YYYY-MM-DD hh:mm:ss')
+        });
+      }
     });
   }
 }

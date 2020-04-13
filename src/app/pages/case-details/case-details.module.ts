@@ -11,6 +11,7 @@ import { HighlightPipe } from '../../pipes/highlight.pipe';
 import { AddNoteModalPageModule } from '../add-note-modal/add-note-modal.module';
 import { OnHoldModalPageModule } from '../on-hold-modal/on-hold-modal.module';
 import { AddFeeModalPageModule } from '../add-fee-modal/add-fee-modal.module';
+import { UploadDocumentModalPageModule } from '../upload-document-modal/upload-document-modal.module';
 
 @NgModule({
   imports: [
@@ -20,7 +21,8 @@ import { AddFeeModalPageModule } from '../add-fee-modal/add-fee-modal.module';
     CaseDetailsPageRoutingModule,
     AddNoteModalPageModule,
     OnHoldModalPageModule,
-    AddFeeModalPageModule
+    AddFeeModalPageModule,
+    UploadDocumentModalPageModule
   ],
   declarations: [CaseDetailsPage, HighlightPipe]
 })

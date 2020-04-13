@@ -15,10 +15,15 @@
       <ion-label>On Hold Status</ion-label>
     </ion-item>
   </ion-row>
-  <form class="ion-margin" [formGroup]="onHoldForm" name="onHoldForm">
+  <div class="ion-margin text-color-light" *ngIf="this.caseMarker.value == '1'">
+    <div>Case is on Hold</div>
+    <div>Hold_until - {{case.hold_until}}</div>
+    <div>Client Request</div>
+  </div>
+  <form class="ion-margin" [formGroup]="holdForm" name="holdForm">
     <ion-list lines="full" class="ion-no-margin ion-no-padding">
-      <ion-list lines="none">
-        <ion-radio-group [formControl]="onHoldForm.controls['hold_client_request']">
+      <ion-list *ngIf="this.caseMarker.value == '0'" lines="none">
+        <ion-radio-group [formControl]="holdForm.controls['hold_client_request']">
           <ion-list-header>
             <ion-label class="font-size-18">Is hold a client request</ion-label>
           </ion-list-header>
@@ -36,7 +41,7 @@
           </ion-grid>
         </ion-radio-group>
       </ion-list>
-      <ion-item>
+      <ion-item *ngIf="this.caseMarker.value == '0'">
         <ion-label position="floating">No of Days <ion-text color="danger">*</ion-text>
         </ion-label>
         <ion-input type="number" formControlName="no_of_days"></ion-input>
@@ -49,7 +54,11 @@
     <div class="ion-padding">
       <ion-row>
         <ion-col>
-          <ion-button expand="block" type="submit" [disabled]="this.onHoldForm.invalid" (click)="save()">Save
+          <ion-button *ngIf="this.caseMarker.value == '0'" expand="block" type="submit"
+            [disabled]="this.holdForm.invalid" (click)="save()">Save
+          </ion-button>
+          <ion-button *ngIf="this.caseMarker.value == '1'" expand="block" type="submit"
+            [disabled]="this.holdForm.invalid" (click)="removeHold()">Remove Hold
           </ion-button>
         </ion-col>
         <ion-col>
