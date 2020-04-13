@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Upload Document</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="uploadForm" name="uploadForm">
+    <ion-item lines="none" class="ion-margin-top">
+      <ion-button expand="block" color="secondary" type="button" (click)="pickFile()">Choose file</ion-button>
+    </ion-item>
+  </form>
+</ion-content>

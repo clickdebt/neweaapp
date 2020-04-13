@@ -11,8 +11,9 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 })
 export class OnHoldModalPage implements OnInit {
   @Input() caseId;
-  onHoldForm: FormGroup;
-
+  @Input() caseMarker;
+  @Input() case;
+  holdForm: FormGroup;
   constructor(
     private modalCtrl: ModalController,
     private caseActionService: CaseActionService,
@@ -21,24 +22,43 @@ export class OnHoldModalPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    console.log(this.case);
+
     this.initForm();
   }
 
   initForm() {
-    this.onHoldForm = this.formBuilder.group({
-      hold_client_request: [false, [Validators.required]],
-      no_of_days: ['', [Validators.required]],
-      note: ['', []],
-    });
+    if (this.caseMarker.value === '1') {
+      this.holdForm = this.formBuilder.group({
+        note: ['', []],
+      });
+    } else {
+      this.holdForm = this.formBuilder.group({
+        hold_client_request: [false, [Validators.required]],
+        no_of_days: ['', [Validators.required]],
+        note: ['', []],
+      });
+    }
   }
 
   save() {
-    console.log(this.onHoldForm.value);
-    this.caseActionService.saveOnHoldStatus(this.onHoldForm.value, this.caseId).subscribe((response: any) => {
+    console.log(this.holdForm.value);
+    this.caseActionService.saveOnHoldStatus(this.holdForm.value, this.caseId).subscribe((response: any) => {
       console.log(response);
       this.commonService.showToast(response.data.message, 'success');
       this.modalCtrl.dismiss({
-        saved: true
+        saved: true,
+        data: this.holdForm.value
+      });
+    });
+  }
+  removeHold() {
+    console.log(this.holdForm.value);
+    this.caseActionService.removeHoldStatus(this.holdForm.value, this.caseId).subscribe((response: any) => {
+      this.commonService.showToast('Hold removed successfully', 'success');
+      this.modalCtrl.dismiss({
+        saved: true,
+        data: this.holdForm.value
       });
     });
   }

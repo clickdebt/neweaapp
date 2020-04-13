@@ -10,6 +10,8 @@ import { CommonService } from 'src/app/services';
 })
 export class AddNoteModalPage implements OnInit {
   @Input() caseId;
+  @Input() currentCase: any;
+  linkCases;
   note: string;
   constructor(
     private modalCtrl: ModalController,
@@ -18,6 +20,14 @@ export class AddNoteModalPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    if (this.currentCase.linked_cases.length > 0) {
+      // Select all linked cases
+      // this.linkCases = this.currentCase.linked_cases.map(({ id }) => id);
+      this.linkCases = [this.currentCase.linked_cases[0].id];
+    }
+  }
+  onLinkCaseSelectChange(event) {
+    console.log(event, this.linkCases);
   }
 
   async dismiss() {

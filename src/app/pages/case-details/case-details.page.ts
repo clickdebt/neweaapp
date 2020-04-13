@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { StorageService, CommonService } from 'src/app/services';
+import { StorageService, CommonService, CaseService } from 'src/app/services';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { ModalController, AlertController, NavController } from '@ionic/angular';
 import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
@@ -9,6 +9,7 @@ import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
+import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
 
 @Component({
   selector: 'app-case-details',
@@ -57,7 +58,8 @@ export class CaseDetailsPage implements OnInit {
     private alertCtrl: AlertController,
     private caseActionService: CaseActionService,
     private commonService: CommonService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private caseService: CaseService
   ) { }
 
   ngOnInit() {
@@ -69,8 +71,8 @@ export class CaseDetailsPage implements OnInit {
   }
 
   loadInitData() {
-    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status', 'On Hold',
-      'Add Fee', 'Deallocate case', 'Add Payment', 'Arrangement'];
+    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status',
+      'Add Fee', 'Deallocate case', 'Add Payment', 'Arrangement', 'Upload Document'];
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
       this.getCaseMarkers();
@@ -94,14 +96,14 @@ export class CaseDetailsPage implements OnInit {
       this.addHSStatus();
     } else if (this.SelectedAction === 'Deallocate case') {
       this.deallocateCase();
-    } else if (this.SelectedAction === 'On Hold') {
-      this.onHold();
     } else if (this.SelectedAction === 'Add Fee') {
       this.addFee();
     } else if (this.SelectedAction === 'Add Payment') {
       this.addPayment();
     } else if (this.SelectedAction === 'Arrangement') {
       this.addArrangement();
+    } else if (this.SelectedAction === 'Upload Document') {
+      this.uploadDocument();
     }
     this.SelectedAction = '';
   }
@@ -122,7 +124,7 @@ export class CaseDetailsPage implements OnInit {
   async onCaseMarkerClick(caseMarker) {
     console.log(caseMarker);
     if (caseMarker.shortcode === 'hold') {
-      this.onHold();
+      this.onHold(caseMarker);
     } else {
       const alert = await this.alertCtrl.create({
         header: 'Update a CaseMarker',
@@ -246,7 +248,8 @@ export class CaseDetailsPage implements OnInit {
     const AddNoteModal = await this.modalCtrl.create({
       component: AddNoteModalPage,
       componentProps: {
-        caseId: this.caseId
+        caseId: this.caseId,
+        currentCase: this.currentCaseData
       }
     });
     await AddNoteModal.present();
@@ -302,16 +305,20 @@ export class CaseDetailsPage implements OnInit {
     await alert.present();
   }
 
-  async onHold() {
+  async onHold(caseMarker) {
     const onHoldModal = await this.modalCtrl.create({
       component: OnHoldModalPage,
       componentProps: {
-        caseId: this.caseId
+        caseId: this.caseId,
+        // tslint:disable-next-line: object-literal-shorthand
+        caseMarker: caseMarker,
+        case: this.currentCaseData
       }
     });
-    onHoldModal.onDidDismiss().then((response) => {
+    onHoldModal.onDidDismiss().then(async (response) => {
       if (response.data && response.data.saved) {
         this.getCaseMarkers();
+        this.storageService.set('is_case_updated', true);
       }
     });
     await onHoldModal.present();
@@ -320,7 +327,8 @@ export class CaseDetailsPage implements OnInit {
     const AddFeeModal = await this.modalCtrl.create({
       component: AddFeeModalPage,
       componentProps: {
-        caseId: this.caseId
+        caseId: this.caseId,
+        currentCase: this.currentCaseData
       }
     });
     await AddFeeModal.present();
@@ -390,7 +398,16 @@ export class CaseDetailsPage implements OnInit {
     });
     await AddArrangementModal.present();
   }
+  async uploadDocument() {
+    const uploadDocument = await this.modalCtrl.create({
+      component: UploadDocumentModalPage,
+      componentProps: {
+        caseId: this.caseId,
+      }
+    });
+    await uploadDocument.present();
+  }
   goBack() {
-    this.navCtrl.pop();
+    this.navCtrl.back();
   }
 }
