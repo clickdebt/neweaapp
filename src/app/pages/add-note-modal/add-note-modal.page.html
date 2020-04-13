@@ -16,6 +16,19 @@
         <ion-label>Add Note</ion-label>
       </ion-item>
     </ion-row>
+    <ion-row class="ion-margin">
+      <ion-col *ngIf="currentCase.linked_cases.length>0" size-md="6" class="ion-margin-top d-flex">
+        <ion-label class="ion-align-self-center">Select Linked case</ion-label>
+        <ion-item class="w-50" lines="none">
+          <ion-select multiple="true" [(ngModel)]="selectedLinkCaseIds" (ionChange)="onLinkCaseSelectChange($event)" okText="Okay"
+            cancelText="Dismiss" placeholder="Select linked case">
+            <ion-select-option [value]="linkCase.id" *ngFor="let linkCase of currentCase.linked_cases,let i=index">
+              {{linkCase.id}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
     <ion-row class="ion-margin-top">
       <ion-item class="w-100" lines="none">
         <ion-textarea [(ngModel)]="note" rows="10" placeholder="Note" required></ion-textarea>

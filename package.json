@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
     "@ionic-native/background-mode": "^5.23.0",
+    "@ionic-native/chooser": "^5.23.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/geolocation": "^5.22.0",
     "@ionic-native/google-maps": "^5.5.0",
@@ -40,6 +41,7 @@
     "cordova-browser": "6.0.0",
     "cordova-plugin-actionsheet": "^2.3.3",
     "cordova-plugin-background-mode": "^0.7.3",
+    "cordova-plugin-chooser": "^1.2.7",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.2",
     "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
@@ -103,7 +105,8 @@
       },
       "cordova-plugin-network-information": {},
       "cordova-plugin-nativeaudio": {},
-      "cordova-plugin-background-mode": {}
+      "cordova-plugin-background-mode": {},
+      "cordova-plugin-chooser": {}
     },
     "platforms": [
       "browser",

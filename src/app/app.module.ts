@@ -25,6 +25,7 @@ import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { Network } from '@ionic-native/network/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { Chooser } from '@ionic-native/chooser/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -62,7 +63,8 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
     LaunchNavigator,
     Network,
     NativeAudio,
-    BackgroundMode
+    BackgroundMode,
+    Chooser
   ],
   bootstrap: [AppComponent]
 })

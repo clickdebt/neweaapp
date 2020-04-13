@@ -10,44 +10,61 @@
 
 
 <ion-content>
-  <form>
-    <ion-grid>
-      <ion-row class="modal-header ion-margin-horizontal ion-justify-content-center">
-        <ion-item lines="none" class="font-size-21">
-          <ion-label>Status</ion-label>
-        </ion-item>
+  <ion-row class="modal-header ion-margin-horizontal ion-justify-content-center">
+    <ion-item lines="none" class="font-size-21">
+      <ion-label>On Hold Status</ion-label>
+    </ion-item>
+  </ion-row>
+  <div class="ion-margin text-color-light" *ngIf="this.caseMarker.value == '1'">
+    <div>Case is on Hold</div>
+    <div>Hold_until - {{case.hold_until}}</div>
+    <div>Client Request</div>
+  </div>
+  <form class="ion-margin" [formGroup]="holdForm" name="holdForm">
+    <ion-list lines="full" class="ion-no-margin ion-no-padding">
+      <ion-list *ngIf="this.caseMarker.value == '0'" lines="none">
+        <ion-radio-group [formControl]="holdForm.controls['hold_client_request']">
+          <ion-list-header>
+            <ion-label class="font-size-18">Is hold a client request</ion-label>
+          </ion-list-header>
+          <ion-grid class="d-flex">
+            <ion-row>
+              <ion-item lines="none">
+                <ion-label>Yes</ion-label>
+                <ion-radio slot="start" [value]="true"></ion-radio>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-label>No</ion-label>
+                <ion-radio slot="start" [value]="false"></ion-radio>
+              </ion-item>
+            </ion-row>
+          </ion-grid>
+        </ion-radio-group>
+      </ion-list>
+      <ion-item *ngIf="this.caseMarker.value == '0'">
+        <ion-label position="floating">No of Days <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input type="number" formControlName="no_of_days"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Note</ion-label>
+        <ion-textarea rows="3" formControlName="note"></ion-textarea>
+      </ion-item>
+    </ion-list>
+    <div class="ion-padding">
+      <ion-row>
+        <ion-col>
+          <ion-button *ngIf="this.caseMarker.value == '0'" expand="block" type="submit"
+            [disabled]="this.holdForm.invalid" (click)="save()">Save
+          </ion-button>
+          <ion-button *ngIf="this.caseMarker.value == '1'" expand="block" type="submit"
+            [disabled]="this.holdForm.invalid" (click)="removeHold()">Remove Hold
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button expand="block" type="button" (click)="dismiss()">Close</ion-button>
+        </ion-col>
       </ion-row>
-      <!-- <ion-row class="ion-margin">
-        <ion-item class="w-100" lines="none">
-          <ion-label position="fixed" class="ion-margin-end">No of Days:</ion-label>
-          <ion-input [(ngModel)]="formData.days" [ngModelOptions]="{standalone: true}"
-            (ionChange)="onDaysChange($event)" placeholder="No of Days" type="number">
-          </ion-input>
-        </ion-item>
-      </ion-row>
-      <ion-row class="ion-margin">
-        <ion-item class="w-100" lines="none">
-          <ion-label position="fixed" class="ion-margin-end">Hold Until:</ion-label>
-          <ion-datetime class="w-100" disabled="true" displayFormat="DD/MM/YYYY" [(ngModel)]="formData.date"
-            [ngModelOptions]="{standalone: true}">
-          </ion-datetime>
-        </ion-item>
-      </ion-row> -->
-      <ion-row class="ion-margin">
-        <ion-item class="w-100" lines="none">
-          <ion-label position="fixed" class="ion-margin-end">Note:</ion-label>
-          <ion-textarea [(ngModel)]="formData.note" rows="2" [ngModelOptions]="{standalone: true}" placeholder="Note">
-          </ion-textarea>
-        </ion-item>
-      </ion-row>
-      <ion-row class="ion-margin-top ion-justify-content-center">
-        <ion-button type="submit" [disabled]="formData.note?.length<1" color="secondary" (click)="save()">
-          Save
-        </ion-button>
-        <ion-button color="secondary" (click)="cancel()">
-          Cancel
-        </ion-button>
-      </ion-row>
-    </ion-grid>
+    </div>
   </form>
 </ion-content>
