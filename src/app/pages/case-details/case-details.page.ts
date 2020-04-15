@@ -71,8 +71,7 @@ export class CaseDetailsPage implements OnInit {
   }
 
   loadInitData() {
-    this.actions = ['Add Note', 'Add Vulnerability Status', 'Add H&S Status',
-      'Add Fee', 'Deallocate case', 'Add Payment', 'Arrangement', 'Upload Document'];
+    this.actions = ['Add Note', 'Add Fee', 'Deallocate case', 'Add Payment', 'Arrangement', 'Upload Document'];
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
       this.getCaseMarkers();

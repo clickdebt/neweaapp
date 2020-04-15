@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { Chooser } from '@ionic-native/chooser/ngx';
-import { FormGroup } from '@angular/forms';
-
+import { ModalController, NavParams } from '@ionic/angular';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { CaseActionService } from 'src/app/services/case-action.service';
+import { CommonService } from 'src/app/services';
 @Component({
   selector: 'app-upload-document-modal',
   templateUrl: './upload-document-modal.page.html',
@@ -10,13 +10,26 @@ import { FormGroup } from '@angular/forms';
 })
 export class UploadDocumentModalPage implements OnInit {
   uploadForm: FormGroup;
-
+  caseId = '';
+  file;
   constructor(
     private modalCtrl: ModalController,
-    private chooser: Chooser
-  ) { }
+    private formBuilder: FormBuilder,
+    private caseActionService: CaseActionService,
+    private navParams: NavParams,
+    private commonUtils: CommonService
+  ) {
+    this.caseId = navParams.get('caseId');
+  }
 
   ngOnInit() {
+    this.initForm();
+  }
+
+  initForm() {
+    this.uploadForm = this.formBuilder.group({
+      file: ['', [Validators.required]]
+    });
   }
   dismiss() {
     // using the injected ModalController this page
@@ -25,12 +38,16 @@ export class UploadDocumentModalPage implements OnInit {
       saved: false
     });
   }
-
-  pickFile() {
-    this.chooser.getFile()
-      .then((file) => {
-        console.log(file);
-      })
-      .catch((error: any) => console.error(error));
+  onFileInputChange(event) {
+    this.file = event.target.files[0];
+  }
+  uploadDocument() {
+    if (this.uploadForm.valid && this.file) {
+      this.caseActionService.uploadDocument(this.file, this.caseId).subscribe((res: any) => {
+        if (res.message) {
+          this.commonUtils.showToast(res.message);
+        }
+      });
+    }
   }
 }
