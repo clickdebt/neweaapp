@@ -112,7 +112,7 @@
         <ion-item>
           <ion-label position="floating">Method</ion-label>
           <ion-select placeholder="Select Payment Method" formControlName="method">
-            <ion-select-option *ngFor="let method of payment_methods" value="{{method.id}}">{{method.label}}
+            <ion-select-option *ngFor="let method of paymentMethods" value="{{method.id}}">{{method.label}}
             </ion-select-option>
           </ion-select>
         </ion-item>

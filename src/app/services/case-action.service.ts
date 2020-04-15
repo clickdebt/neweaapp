@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class CaseActionService {
-
+  // tslint:disable: max-line-length
   constructor(public http: HttpClient) { }
 
   getFeeOptions(caseId) {
@@ -63,5 +63,14 @@ export class CaseActionService {
   createPayment(data, caseId) {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/payment/case_actions_panels/case_action_create_payment/${caseId}?source=API`;
     return this.http.post(apiURL, data);
+  }
+
+  uploadDocument(file, caseId) {
+    let formData = new FormData();
+    formData.append('file', file);
+    console.log(caseId, file);
+    console.log(formData);
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${caseId}?source=API`;
+    return this.http.post(apiURL, formData);
   }
 }

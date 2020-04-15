@@ -3,7 +3,6 @@ import { ModalController, NavParams } from '@ionic/angular';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CaseActionService } from 'src/app/services/case-action.service';
-import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-arrangement-modal.page';
 import { NetworkService } from 'src/app/services/network.service';
 import * as moment from 'moment';
@@ -17,8 +16,9 @@ export class ArrangementModalPage implements OnInit {
   caseId = '';
   outstanding;
   arrangementForm: FormGroup;
+  // tslint:disable: max-line-length
   frequency = [{ id: '2', label: 'One time final payment' }, { id: '3', label: 'Weekly By day of the week' }, { id: '4', label: 'Monthly by date' }, { id: '5', label: 'Monthly by day' }, { id: '6', label: 'Fortnightly' }, { id: '7', label: '4 weekly' }];
-  payment_methods = [{ id: 1, label: 'Cash' }, { id: 2, label: 'Cheque' }, { id: 4, label: 'Credit card' }, { id: 5, label: 'Debit Card' }, { id: 8, label: 'BACS' }];
+  paymentMethods = [{ id: 1, label: 'Cash' }, { id: 2, label: 'Cheque' }, { id: 4, label: 'Credit card' }, { id: 5, label: 'Debit Card' }, { id: 8, label: 'BACS' }];
   arrangementObj: any = { show: false };
   currentArrangementString = '';
   currArrangement;
@@ -42,7 +42,7 @@ export class ArrangementModalPage implements OnInit {
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
     private router: Router,
-    navParams: NavParams,
+    private navParams: NavParams,
     private caseActionService: CaseActionService,
     private networkService: NetworkService,
     private commonService: CommonService

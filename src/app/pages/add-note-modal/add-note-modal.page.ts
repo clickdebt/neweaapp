@@ -12,6 +12,7 @@ export class AddNoteModalPage implements OnInit {
   @Input() caseId;
   @Input() currentCase: any;
   linkCases;
+  selectedLinkCaseIds;
   note: string;
   constructor(
     private modalCtrl: ModalController,
@@ -20,14 +21,17 @@ export class AddNoteModalPage implements OnInit {
   ) { }
 
   ngOnInit() {
+  }
+
+
+  ionViewWillEnter() {
     if (this.currentCase.linked_cases.length > 0) {
       // Select all linked cases
-      // this.linkCases = this.currentCase.linked_cases.map(({ id }) => id);
-      this.linkCases = [this.currentCase.linked_cases[0].id];
+      this.linkCases = this.currentCase.linked_cases.map(({ id }) => id);
     }
   }
   onLinkCaseSelectChange(event) {
-    console.log(event, this.linkCases);
+    console.log(this.linkCases, this.selectedLinkCaseIds);
   }
 
   async dismiss() {
@@ -43,7 +47,8 @@ export class AddNoteModalPage implements OnInit {
       const data = {
         note: this.note,
         display_client: 1,
-        display_officer: 1
+        display_officer: 1,
+        case_ids: this.selectedLinkCaseIds
       };
       this.caseActionService.saveNoteData(data, this.caseId).subscribe((response: any) => {
         this.commonService.showToast(response.message, 'success');
