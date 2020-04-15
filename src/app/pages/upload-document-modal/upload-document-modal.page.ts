@@ -46,6 +46,9 @@ export class UploadDocumentModalPage implements OnInit {
       this.caseActionService.uploadDocument(this.file, this.caseId).subscribe((res: any) => {
         if (res.message) {
           this.commonUtils.showToast(res.message);
+          this.modalCtrl.dismiss({
+            saved: true
+          });
         }
       });
     }
