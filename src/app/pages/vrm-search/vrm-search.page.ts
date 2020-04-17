@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CaseService } from '../../services/case.service';
 import * as moment from 'moment';
 import { Platform } from '@ionic/angular';
-import { StorageService } from 'src/app/services';
+import { StorageService, CommonService } from 'src/app/services';
 import { Router } from '@angular/router';
+import { CaseActionService } from 'src/app/services/case-action.service';
 
 @Component({
   selector: 'app-vrm-search',
@@ -21,7 +22,9 @@ export class VrmSearchPage implements OnInit {
     private caseService: CaseService,
     private platform: Platform,
     private router: Router,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private caseActionService: CaseActionService,
+    private commonService: CommonService
   ) { }
 
   ngOnInit() {
@@ -42,7 +45,9 @@ export class VrmSearchPage implements OnInit {
     }
   }
   selfAllocate(currentCase) {
-    console.log(currentCase);
+    this.caseActionService.selfCaseAllocate(currentCase.id).subscribe((response: any) => {
+      this.commonService.showToast('Case Successfully allocated to you.');
+    });
   }
   goToCaseDetails(currentCaseData) {
     localStorage.setItem('detais_case_data', JSON.stringify(currentCaseData));

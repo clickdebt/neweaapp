@@ -41,6 +41,9 @@ export class CaseDetailsPage implements OnInit {
     },
     payments: {
       show: false
+    },
+    documents: {
+      show: false
     }
   };
   historyData: any[] = [];
@@ -49,6 +52,7 @@ export class CaseDetailsPage implements OnInit {
   historyFilterData: any[] = [];
   actions: string[];
   SelectedAction = '';
+  caseDocuments = [];
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -71,7 +75,12 @@ export class CaseDetailsPage implements OnInit {
   }
 
   loadInitData() {
-    this.actions = ['Add Note', 'Add Fee', 'Deallocate case', 'Add Payment', 'Arrangement', 'Upload Document'];
+    const isNewlyn = localStorage.getItem('server_url').indexOf('newlyn');
+    if (isNewlyn !== -1) {
+      this.actions = ['Add Note', 'Add Fee', 'Visit Case', 'Deallocate case', 'Arrangement', 'Upload Document'];
+    } else {
+      this.actions = ['Add Note', 'Add Fee', 'Visit Case', 'Deallocate case', 'Add Payment', 'Arrangement', 'Upload Document'];
+    }
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
       this.getCaseMarkers();
@@ -81,6 +90,7 @@ export class CaseDetailsPage implements OnInit {
       this.getCaseDetails();
       this.getHistory();
       this.getPayments();
+      this.getCaseDocuments();
     } else {
       this.router.navigate(['/home/job-list']);
     }
@@ -89,10 +99,6 @@ export class CaseDetailsPage implements OnInit {
   onSelectChange(event) {
     if (this.SelectedAction === 'Add Note') {
       this.addNote();
-    } else if (this.SelectedAction === 'Add Vulnerability Status') {
-      this.addValnerabilityStatus();
-    } else if (this.SelectedAction === 'Add H&S Status') {
-      this.addHSStatus();
     } else if (this.SelectedAction === 'Deallocate case') {
       this.deallocateCase();
     } else if (this.SelectedAction === 'Add Fee') {
@@ -103,6 +109,8 @@ export class CaseDetailsPage implements OnInit {
       this.addArrangement();
     } else if (this.SelectedAction === 'Upload Document') {
       this.uploadDocument();
+    } else if (this.SelectedAction === 'Visit Case') {
+      this.router.navigate([`/home/visit-form/${this.caseId}`]);
     }
     this.SelectedAction = '';
   }
@@ -128,6 +136,14 @@ export class CaseDetailsPage implements OnInit {
       const alert = await this.alertCtrl.create({
         header: 'Update a CaseMarker',
         message: `Are you sure you want to change <strong>${caseMarker.label}</strong> marker?`,
+        inputs: [
+          {
+            name: 'linked_cases',
+            type: 'checkbox',
+            value: 'linked_cases',
+            label: 'Add for linked cases?'
+          }
+        ],
         buttons: [
           {
             text: 'No',
@@ -137,8 +153,12 @@ export class CaseDetailsPage implements OnInit {
           },
           {
             text: 'Yes',
-            handler: () => {
-              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId)
+            handler: data => {
+              let addMarkerForLinkedCases = false;
+              if (data.length > 0 && data[0] === 'linked_cases') {
+                addMarkerForLinkedCases = true;
+              }
+              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, addMarkerForLinkedCases)
                 .subscribe((response) => {
                   this.getCaseMarkers();
                 });
@@ -240,6 +260,13 @@ export class CaseDetailsPage implements OnInit {
         return 0;
       });
       console.log(this.caseDetails);
+    });
+  }
+  getCaseDocuments() {
+    this.caseActionService.getCaseDocuments(this.caseId).subscribe((response: any) => {
+      if (response) {
+        this.caseDocuments = Object.values(response.documents);
+      }
     });
   }
 

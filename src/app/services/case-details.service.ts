@@ -38,8 +38,8 @@ export class CaseDetailsService {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/payment/case_actions_panels/case_action_payments_table/${caseId}/successful?source=API`;
     return this.http.get(apiURL);
   }
-  updateCaseMarker(col, caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${caseId}/${col}?source=API`;
+  updateCaseMarker(col, caseId, addMarkerForLinkedCases) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${caseId}/${col}/${addMarkerForLinkedCases}?source=API`;
     return this.http.get(apiURL);
   }
 }
