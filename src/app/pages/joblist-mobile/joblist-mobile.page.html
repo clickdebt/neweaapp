@@ -1,0 +1,154 @@
+<ion-content>
+
+  <!-- sort toolbar -->
+
+  <ion-toolbar color="light">
+    <ion-grid class="p-y-0">
+      <ion-row class="searchbar-wrpper">
+        <ion-col size-md="4" size-xs="12">
+          <p class="toolbar-title">
+            Job List
+          </p>
+        </ion-col>
+        <ion-col size-md="3" size-xs="5">
+          <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
+            <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
+            <ion-select-option class="text-wrap">Name</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <p class="toolbar-label">
+          Sort by
+        </p>
+        <ion-col size-md="3" size-xs="5">
+          <ion-select interface="popover" class="cst-select" okText="Okay" cancelText="Dismiss" placeholder="Select Frequency">
+            <ion-select-option class="text-wrap">Postcode Prefix</ion-select-option>
+            <ion-select-option class="text-wrap">Name</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <div class="dashboard-btn-wrapper">
+          <ion-button size="small" color="primary">
+            <ion-icon name="location-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+
+  <!-- sort toolbar -->
+
+
+  <ion-card class="joblist-card">
+    <ion-card-content>
+      <div class="d-flex align-items-center">
+        <ion-icon class="m-r-10" name="chevron-down-outline"></ion-icon>
+        <ion-checkbox class="m-r-10" checked="true" mode="md" color="secondary" slot="start"></ion-checkbox>
+        <h3>Brandon Larson
+          <span class="d-block"> (#14536) </span>
+        </h3>
+        <span class="d-flex">
+          <ion-button size="small" color="secondary">
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button size="small" color="tertiary">
+            <ion-icon name="reader-outline"></ion-icon>
+          </ion-button>
+        </span>
+      </div>
+      <ion-grid class="m-t-10">
+        <ion-row>
+          <ion-col size="6">
+            Ref :
+            <span> PCN1234 </span>
+          </ion-col>
+          <ion-col size="6">
+            Amount :
+            <span> 100.23 </span>
+          </ion-col>
+          <ion-col size="6">
+            Postcode :
+            <span> GL527JU </span>
+          </ion-col>
+          <ion-col size="6">
+            visit :
+            <span> 3 </span>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <div class="linked-case">
+        <h4>Linked cases</h4>
+        <table class="table">
+          <tr class="no-border">
+            <th style="width:20%">Case ID</th>
+            <th style="width:25%">Ref</th>
+            <th style="width:20%">Amount</th>
+            <th style="width:35%" class="ion-text-center" colspan=2>Action</th>
+            <!-- <th style="width:17%">Report</th> -->
+          </tr>
+          <tr class="no-border">
+            <td>51234</td>
+            <td>PCN1234</td>
+            <td>654865</td>
+            <td class="action ">
+              <ion-button size="small" color="secondary">
+                <ion-icon name="information-circle-outline"></ion-icon>
+              </ion-button>
+            </td>
+            <td class="action">
+              <ion-button size="small" color="tertiary">
+                <ion-icon name="reader-outline"></ion-icon>
+              </ion-button>
+            </td>
+          </tr>
+
+        </table>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="joblist-card">
+    <ion-card-content>
+      <div class="d-flex align-items-center">
+        <ion-icon class="m-r-10" name="chevron-forward-outline"></ion-icon>
+        <ion-checkbox class="m-r-10" checked="false" mode="md" color="secondary" slot="start"></ion-checkbox>
+        <h3>Brandon Larson
+          <span class="d-block"> (#14536) </span>
+        </h3>
+        <span class="d-flex">
+          <ion-button size="small" color="secondary">
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button size="small" color="tertiary">
+            <ion-icon name="reader-outline"></ion-icon>
+          </ion-button>
+        </span>
+      </div>
+      <ion-grid class="m-t-10">
+        <ion-row>
+          <ion-col size="6">
+            Ref :
+            <span> PCN1234 </span>
+          </ion-col>
+          <ion-col size="6">
+            Amount :
+            <span> 100.23 </span>
+          </ion-col>
+          <ion-col size="6">
+            Postcode :
+            <span> GL527JU </span>
+          </ion-col>
+          <ion-col size="6">
+            visit :
+            <span> 3 </span>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-button color="secondary" expand="full">Show 2 cases on Map</ion-button>
+  </ion-toolbar>
+</ion-footer>

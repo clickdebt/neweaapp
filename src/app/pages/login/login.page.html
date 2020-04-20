@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Field Agent</ion-title>
+    <ion-buttons slot="end" [routerLink]="['/server-settings']">
+      <ion-icon size="large" name="settings-outline"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    
+  <ion-card class="ion-padding" color="success-light" *ngIf="setting">
+    <ion-card-subtitle>Nick Name: {{setting.nickname}}</ion-card-subtitle>
+    <ion-card-subtitle>URL: {{setting.url}}</ion-card-subtitle>
+  </ion-card>
+
+  <form [formGroup]="loginForm" name="loginForm">
+    <ion-list lines="full" class="ion-no-margin ion-no-padding">
+      <ion-item>
+        <ion-label position="floating">Username <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input type="text" formControlName="username"></ion-input>
+
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Password <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input type="password" formControlName="password"></ion-input>
+      </ion-item>
+    </ion-list>
+    <div class="ion-padding">
+      <ion-button expand="block" type="submit" [disabled]="this.loginForm.invalid" class="ion-no-margin"
+        (click)="login()">Login</ion-button>
+    </div>
+  </form>
+</ion-content>

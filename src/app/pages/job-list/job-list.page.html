@@ -1,0 +1,437 @@
+<ion-toolbar color="light">
+  <ion-grid class="p-y-0">
+    <ion-row class="searchbar-wrpper">
+      <ion-col size-md="8" size-xs="6">
+        <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
+          (keyup.enter)="onInput($event)" (ionCancel)="onInput($event)" placeholder="Search ID, ref, postcode, name">
+        </ion-searchbar>
+      </ion-col>
+      <ion-col size-md="4" size-xs="6" class="ion-text-end">
+        <ion-button color="secondary" size="small" (click)="showFilterDiv()">
+          Filters
+        </ion-button>
+        <ion-button color="secondary" size="small" (click)="showSortDiv()">
+          Sort
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="isMobile">
+      <ion-item lines="none">
+        <ion-checkbox [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
+        </ion-checkbox>
+        <ion-label class="ion-margin-horizontal"> Select All</ion-label>
+      </ion-item>
+    </ion-row>
+  </ion-grid>
+</ion-toolbar>
+
+<div class="filters" [ngClass]="{'active': showFilter}">
+  <div class="filter-body">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Quick Filter</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of quick" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.title}}</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <div class="divider"></div>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.schemes">
+          <h6>Schemes</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.schemes" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.stages">
+          <h6>Stage</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.stages" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.name}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.statuses">
+          <h6>Status</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.statuses" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.status_name}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.clients">
+          <h6>Client</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.clients" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.outstandingAmount">
+          <h6>Outstanding Amount</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.outstandingAmount" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.visitCounts">
+          <h6>Visit Count</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.visitCounts" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <div class="filter-footer">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="6">
+          <ion-button color="dark" size="default" fill="clear" (click)="clearFilter()">CLEAR</ion-button>
+        </ion-col>
+        <ion-col size-xs="6" class="ion-text-end">
+          <ion-button color="secondary" size="default" fill="solid" (click)="filterCases()">Apply Filter</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</div>
+<div class="filters sort" [ngClass]="{'active': showSort}">
+  <div class="filter-body">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="12">
+          <h6>Sort</h6>
+          <ion-list class="filter-item-list">
+            <ion-radio-group value="sort" (ionChange)="radioGroupChange($event)">
+              <ion-item *ngFor="let entry of sortOptions" class="filter-item-list-item" lines="none"
+                [ngClass]="{'active': entry.value == sortVal}">
+                <ion-label>{{entry.title}}</ion-label>
+                <ion-radio slot="start" value="{{entry.value}}"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <div class="filter-footer">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-xs="6">
+          <ion-button color="dark" size="default" fill="clear" (click)="clearSort()">CLEAR</ion-button>
+        </ion-col>
+        <ion-col size-xs="6" class="ion-text-end">
+          <ion-button color="secondary" size="default" fill="solid" (click)="filterCases()">Apply SORT</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</div>
+<ion-content>
+  <!-- sort toolbar -->
+
+  <!-- sort toolbar -->
+
+  <!-- table -->
+  <div class="table-responsive" *ngIf="!isMobile">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th width="3%"></th>
+          <th width="3%">
+            <ion-checkbox mode="md" [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
+            </ion-checkbox>
+          </th>
+          <th>Case ID</th>
+          <th>Ref</th>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Linked Cases Amount Total</th>
+          <th>Postcode</th>
+          <th>Visits</th>
+          <th>Status</th>
+          <th>Hold</th>
+          <th>VRM</th>
+          <th>Details</th>
+          <th>Visit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let case of cases">
+          <tr class="no-border" [ngClass]="{'bg-hold': (case.hold_until > currentDate || case.current_status.status_type == 3)}">
+            <td>
+              <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]"
+                (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-forward-outline">
+              </ion-icon>
+              <ion-icon *ngIf="case.linked_cases != '' && caseLinks[case.id]"
+                (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-down-outline">
+              </ion-icon>
+              <!-- <ion-button size="small" fill="clear" >
+              </ion-button> -->
+            </td>
+            <td>
+              <ion-checkbox mode="md" [(ngModel)]="case.checked" (ionChange)="selectCase($event,case.id)"
+                color="secondary" slot="start"></ion-checkbox>
+            </td>
+            <td>{{case.id}}</td>
+            <td>{{case.ref}}</td>
+            <td>{{case.debtor.debtor_name}}</td>
+            <td>{{case.d_outstanding}}</td>
+            <td>{{case.linkedCasesTotalBalance}}</td>
+            <td>{{case.debtor.addresses[0].address_postcode}}</td>
+            <td>{{case.visitcount_total}}</td>
+            <td>{{case.current_status.status_name}}</td>
+            <td>{{case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
+            <td>{{case.custom5}}</td>
+            <td class="action ">
+              <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                (click)="goToCaseDetails(case)">
+                Details
+              </ion-button>
+            </td>
+            <td class="action">
+              <ion-button size="small" color="tertiary" (click)="goToVisitForm(case)"
+                *ngIf="case.stage.stage_type.stage_type == 'Visit'">
+                Visit
+              </ion-button>
+            </td>
+          </tr>
+          <tr class="linked-case" *ngIf="case.linked_cases != '' && caseLinks[case.id]">
+            <td class="p-x-0 p-y-0" colspan=14>
+              <div>
+                <h4>Linked cases</h4>
+                <table class="table">
+                  <tr class="no-border">
+                    <th width="3%"></th>
+                    <th width="3%"></th>
+                    <th>Case ID</th>
+                    <th>Ref</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Postcode</th>
+                    <th>Visit Count</th>
+                    <th>Status</th>
+                    <th>Hold</th>
+                    <th>VRM</th>
+                    <th>Details</th>
+                    <th>Visit</th>
+                  </tr>
+                  <tr class="no-border" *ngFor="let link_case of case.linked_cases">
+                    <td>
+                    </td>
+                    <td>
+                      <ion-checkbox mode="md" color="secondary" [(ngModel)]="link_case.checked"
+                        (ionChange)="selectCase($event,link_case.id)" slot="start"></ion-checkbox>
+                    </td>
+                    <td>{{link_case.id}}</td>
+                    <td>{{link_case.ref}}</td>
+                    <td>{{link_case.debtor.debtor_name}}</td>
+                    <td>{{link_case.d_outstanding}}</td>
+                    <td>{{link_case.date}}</td>
+                    <td>{{link_case.debtor.addresses[0].address_postcode}}</td>
+                    <td>{{link_case.visitcount_total}}</td>
+                    <td>{{link_case.current_status.status_name}}</td>
+                    <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
+                    <td>{{link_case.custom5}}</td>
+                    <td class="action ">
+                      <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                        (click)="goToCaseDetails(link_case)">
+                        Details
+                      </ion-button>
+                    </td>
+                    <td class="action">
+                      <ion-button size="small" color="tertiary" (click)="goToVisitForm(link_case)">
+                        Visit
+                      </ion-button>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+      <tfoot>
+
+      </tfoot>
+    </table>
+    <ion-infinite-scroll threshold=" 100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+  <!-- table -->
+
+  <!-- mobile card starts-->
+  <div *ngIf="isMobile">
+    <ion-card class="joblist-card" *ngFor="let case of cases" [ngClass]="{'bg-hold':case.hold_until > currentDate}">
+      <ion-card-content>
+        <div class="d-flex align-items-center">
+          <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]"
+            (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-forward-outline">
+          </ion-icon>
+          <ion-icon *ngIf="case.linked_cases != '' && caseLinks[case.id]"
+            (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-down-outline">
+          </ion-icon>
+          <div *ngIf="case.linked_cases == '' " class="w-15"></div>
+          <ion-checkbox class="m-r-10" mode="md" color="secondary" [(ngModel)]="case.checked"
+            (ionChange)="selectCase($event,case.id)" slot="start"></ion-checkbox>
+          <h3>{{case.debtor.debtor_name}}
+            <span class="d-block"> (#{{case.id}}) </span>
+          </h3>
+          <span class="d-flex">
+            <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+              (click)="goToCaseDetails(case)">
+              <ion-icon name="information-circle-outline"></ion-icon>
+            </ion-button>
+            <ion-button size="small" color="tertiary" *ngIf="case.stage.stage_type.stage_type == 'Visit'"
+              (click)="goToVisitForm(case)">
+              <ion-icon name="reader-outline"></ion-icon>
+            </ion-button>
+          </span>
+        </div>
+        <ion-grid class="m-t-10">
+          <ion-row>
+            <ion-col size="5">
+              Ref :
+              <span> {{case.ref}} </span>
+            </ion-col>
+            <ion-col size="6">
+              Amount :
+              <span> {{case.d_outstanding}} </span>
+            </ion-col>
+            <ion-col size="12" *ngIf="case.linked_cases != ''">
+              Linked Cases Amount Total :
+              <span> {{case.linkedCasesTotalBalance}} </span>
+            </ion-col>
+            <ion-col size="6">
+              Postcode :
+              <span> {{case.debtor.addresses[0].address_postcode}} </span>
+            </ion-col>
+            <ion-col size="6">
+              visit :
+              <span> {{case.visitcount_total}} </span>
+            </ion-col>
+            <ion-col size="6" *ngIf="case.current_status.status_name">
+              Status :
+              <span> {{case.current_status.status_name}} </span>
+            </ion-col>
+            <ion-col size="6">
+              Hold :
+              <span> {{case.hold_until > currentDate ? 'Yes' : 'No'}} </span>
+            </ion-col>
+            <ion-col size="6" *ngIf="case.custom5">
+              VRM :
+              <span> {{case.custom5}} </span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <div *ngIf="case.linked_cases != '' && caseLinks[case.id]">
+          <ion-card class="joblist-card ion-no-margin ion-margin-top" *ngFor="let link_case of case.linked_cases">
+            <ion-card-content>
+              <div class="d-flex align-items-center">
+                <ion-checkbox class="m-r-10" mode="md" color="secondary" [(ngModel)]="link_case.checked"
+                  (ionChange)="selectCase($event,link_case.id)" slot="start"></ion-checkbox>
+                <h3>{{link_case.debtor.debtor_name}}
+                  <span class="d-block"> (#{{link_case.id}}) </span>
+                </h3>
+                <span class="d-flex">
+                  <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                    (click)="goToCaseDetails(link_case)">
+                    <ion-icon name="information-circle-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button size="small" color="tertiary" (click)="goToVisitForm(link_case)">
+                    <ion-icon name="reader-outline"></ion-icon>
+                  </ion-button>
+                </span>
+              </div>
+              <ion-grid class="m-t-10">
+                <ion-row>
+                  <ion-col size="6">
+                    Ref :
+                    <span>{{link_case.ref}} </span>
+                  </ion-col>
+                  <ion-col size="6">
+                    Amount :
+                    <span> {{link_case.d_outstanding}} </span>
+                  </ion-col>
+                  <ion-col size="6">
+                    Postcode :
+                    <span> {{link_case.debtor.addresses[0].address_postcode}} </span>
+                  </ion-col>
+                  <ion-col size="6">
+                    visit :
+                    <span> {{link_case.visitcount_total}} </span>
+                  </ion-col>
+                  <ion-col size="12">
+                    Date :
+                    <span> {{link_case.date}} </span>
+                  </ion-col>
+                  <ion-col size="6" *ngIf="link_case.current_status.status_name">
+                    Status :
+                    <span> {{link_case.current_status.status_name}} </span>
+                  </ion-col>
+                  <ion-col size="6">
+                    Hold :
+                    <span> {{link_case.hold_until > currentDate ? 'Yes' : 'No'}} </span>
+                  </ion-col>
+                  <ion-col size="6" *ngIf="link_case.custom5">
+                    VRM :
+                    <span> {{link_case.custom5}} </span>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-infinite-scroll threshold="100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+  <!-- mobile card ends-->
+
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-button *ngIf="selectedCaseIds.length>0" (click)="showCasesOnMap()" color="secondary" expand="full">Show
+      {{selectedCaseIds.length}} cases
+      on Map</ion-button>
+  </ion-toolbar>
+</ion-footer>

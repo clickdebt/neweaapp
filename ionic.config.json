@@ -1,0 +1,7 @@
+{
+  "name": "fieldagent",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

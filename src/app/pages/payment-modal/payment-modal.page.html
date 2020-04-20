@@ -1,0 +1,130 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Payment</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+
+  <div class="ion-margin-top" [hidden]="!networkStatus">
+    <ion-item class="bg-main" (click)="toggleShow(payments)" ng-class="{active: isShown(payments)}">
+      <ion-label>
+        <h2>Payments</h2>
+      </ion-label>
+      <ion-icon slot="end" [name]="isShown(payments) ? 'chevron-up-sharp':'chevron-down-sharp'">
+      </ion-icon>
+    </ion-item>
+    <ion-grid class="ion-margin" id="scheduleArrangements" class="ion-no-border" [hidden]="!isShown(payments)">
+      <ion-row>
+        <ion-col size="3">
+          <span>Date & Time</span>
+        </ion-col>
+        <ion-col size="3">
+          <span>Amount</span>
+        </ion-col>
+        <ion-col size="3">
+          <span>Payment Type</span>
+        </ion-col>
+        <ion-col size="3">
+          <span>Payment Source</span>
+        </ion-col>
+      </ion-row>
+      <ion-row *ngIf="!payments.paymentData?.length">
+        <ion-col class="text-color-light ion-text-center">
+          <span>No Payments Found </span>
+        </ion-col>
+      </ion-row>
+      <ion-row id="payments" *ngFor="let payment of payments.paymentData,let i=index"
+        [ngClass]="{'bg-row-dark':i%2==0}">
+        <ion-col size="3" class="text-color-light">
+          <span>{{payment.date}}</span>
+        </ion-col>
+        <ion-col size="3" class="text-color-light">
+          <span>{{payment.amount}}</span>
+        </ion-col>
+        <ion-col size="3" class="text-color-light">
+          <span>{{payment.payment_type?.name}}</span>
+        </ion-col>
+        <ion-col size="3" class="text-color-light">
+          <span>{{payment.payment_source?.name}}</span>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <div class="ion-margin-top">
+    <ion-item class="bg-main" (click)="toggleShow(paymentObj)" ng-class="{active: isShown(paymentObj)}">
+      <ion-label>
+        <h2>Create Payment</h2>
+      </ion-label>
+      <ion-icon slot="end" [name]="isShown(paymentObj) ? 'chevron-up-sharp':'chevron-down-sharp'">
+      </ion-icon>
+    </ion-item>
+    <form [formGroup]="paymentsForm" name="paymentsForm" [hidden]="!isShown(paymentObj)">
+      <ion-list lines="full" class="ion-no-margin ion-no-padding">
+        <ion-item>
+          <ion-label position="floating">Date <ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-datetime displayFormat="DD-MM-YYYY" formControlName="date" disabled></ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Amount <ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-input type="text" formControlName="amount"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Ref <ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-input type="text" formControlName="reference"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Method</ion-label>
+          <ion-select placeholder="Select Payment Method" formControlName="method">
+            <ion-select-option *ngFor="let method of payment_methods" value="{{method.id}}">{{method.label}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Source</ion-label>
+          <ion-select placeholder="Select Payment Source" formControlName="method">
+            <ion-select-option *ngFor="let method of sources" value="{{method.id}}">{{method.label}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Split</ion-label>
+          <ion-select placeholder="Select Split type" formControlName="financial_split_override_id">
+            <ion-select-option *ngFor="let method of splites" value="{{method.id}}">{{method.label}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Note</ion-label>
+          <ion-textarea formControlName="note" placeholder="note"></ion-textarea>
+        </ion-item>
+
+      </ion-list>
+      <div class="ion-padding">
+        <ion-row>
+          <ion-col>
+            <ion-button expand="block" type="submit" [disabled]="this.paymentsForm.invalid" (click)="save()">Save
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-button expand="block" type="button" (click)="dismiss()">Close</ion-button>
+          </ion-col>
+        </ion-row>
+      </div>
+    </form>
+  </div>
+
+</ion-content>

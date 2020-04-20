@@ -1,0 +1,342 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import '~@ionic/angular/css/display.css';
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+
+
+$spaceamounts: (0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100); // Adjust this to include the pixel amounts you need.
+$sides: (top, bottom, left, right); // Leave this variable alone
+
+@each $space in $spaceamounts {
+  @each $side in $sides {
+    .m-#{str-slice($side, 0, 1)}-#{$space} {
+      margin-#{$side}: #{$space}px !important;
+    }
+  
+    .p-#{str-slice($side, 0, 1)}-#{$space} {
+      padding-#{$side}: #{$space}px !important;
+    }
+  }
+}
+
+.p-y-0{
+  padding-top: 0!important;
+  padding-bottom: 0!important;
+} 
+
+.p-x-0{
+  padding-left: 0!important;
+  padding-right: 0!important;
+}
+
+html{
+    font-family: 'Raleway';
+  }
+  
+.d-block{
+  display: block;
+}
+
+  .header-md:after{
+      display: none;
+  }
+
+  .searchbar-wrpper{
+    display: flex;
+    align-items: center;
+    position: relative;
+  
+    ion-select,ion-input{
+      text-align: left;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 10px;
+      --padding-start:10px;
+     
+    }
+    .toolbar-label{
+      font-size: 14px;
+      padding-right: 5px;
+      color: grey;
+      font-weight: normal;
+      padding-left: 5px;
+    }
+    ion-item{
+      --background:transparent;
+    }
+  }
+
+  .dashboard-btn-wrapper{
+    position: absolute;
+    right: 5px;
+    top: 15px;
+  }
+
+  .toolbar-title{
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+// table css
+
+  .table {
+    table-layout: fixed;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    background-color: #ffff;
+    border-collapse: collapse;
+    table-layout: fixed;
+    thead{
+      background-color: #f9f9f9;
+      th{
+        vertical-align: bottom;
+        border-bottom: 1px solid #dee2e6;
+        color: #8d898d;
+        font-size: 12px;
+        font-weight: normal;
+      }
+    }
+    td{
+      color: #898588;
+      font-size: 14px;
+    }
+    .action{
+      padding: 5px 0;
+      ion-button{
+        width: 85%;
+      }
+    }
+ion-icon{
+  font-size: 17px;
+}
+
+}
+
+.table tr{
+  border-bottom: 1px solid #dee2e6;
+}
+
+.d-flex{
+  display: flex!important;
+}
+
+.align-items-center{
+  align-items: center!important;
+}
+
+
+.no-border{
+  border: 0!important;
+}
+
+.table td, .table th {
+  padding: .75rem;
+  vertical-align: top;
+ 
+  text-align: left;
+}
+
+.linked-case{
+  tr:nth-of-type(even) {
+    background-color: #fff!important;
+  }
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+  background-color: #f9f9f9;
+}
+
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+
+// table css
+
+
+ion-footer{
+  ion-button{
+    width: 300px;
+    margin: 15px auto;
+    --border-radius:10px;
+  }
+}
+
+
+//Form IO
+.formio-wrapper{
+
+  formio-alerts{
+    display: none !important;
+  }
+
+  .has-feedback{
+    background: transparent !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .wizard-page{
+    padding: 0px 17px;
+    .col-form-label{
+      font-size: 0.9rem;
+    }
+  
+    .form-control {
+      border-radius: 0px;
+      box-shadow: none;
+      &:focus{
+        border-color: var(--ion-color-secondary);
+        box-shadow: none;
+        outline: 0;
+      }
+    }
+  }
+
+  .list-inline{
+    display: flex;
+    // justify-content: space-between;
+    border-top: 1px solid rgba(0, 0, 0, 0.22);
+    padding: 0px 17px;
+    padding-top: 17px;
+    justify-content: center;
+    flex-wrap: wrap;
+    .list-inline-item{
+      margin-bottom: 5px;
+    }
+  }
+
+  nav{
+    .pagination{
+      display: flex;
+      overflow-y: hidden;
+      overflow-x: auto;
+      border-radius: 0;
+      .page-item{
+        flex: 1;
+        background: #b1b1b1;
+        border: 0;
+        border-top: 1px solid var(--ion-color-light);
+        border-left: 1px solid var(--ion-color-light);
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+        cursor: not-allowed;
+        &:first-child{
+          border-left: 0;
+          .page-link{
+            border-left: 0;
+          }  
+        }
+
+        &:last-child{
+          .page-link{
+            border-right: 0;
+          }  
+        }
+        .page-link{
+          width: 100%;
+          border-radius: 0;
+          font-size: 1rem;
+          padding: 10px 16px;
+          color: var(--ion-color-light);
+          background: #b1b1b1;
+          text-align: center;
+          border: 0;
+          border-left: 1px solid var(--ion-color-light);
+          padding: 16px 0px;
+        }
+        &.active, &.fill{
+          color: var(--ion-color-light);
+          background: var(--ion-color-secondary);
+          pointer-events: initial;
+          cursor: pointer;
+          .page-link{
+            color: var(--ion-color-light);
+            background: var(--ion-color-secondary);
+          }
+        }
+      }
+    }
+  }
+
+  .btn{
+    border-radius: 0;
+    min-width: 150px;
+    text-transform: uppercase;
+    outline: 0 !important;
+    box-shadow: none !important;
+    &.btn-primary{
+      background: var(--ion-color-secondary);
+      border-color: var(--ion-color-secondary);
+      &.focus, &:focus, &.active, &:active, &.hover, &:hover{
+        background: transparent;
+        color: var(--ion-color-secondary);
+        border-color: var(--ion-color-secondary);
+      }
+    }
+    &.btn-secondary{
+      background: var(--ion-color-dark);
+      border-color: var(--ion-color-dark);
+    }
+  }
+
+  .formio-component-radio{
+    .form-group{
+      .form-check{
+        display: inline-block;
+        margin-left: 15px;
+        &:first-of-type{
+          margin-left: 0;
+        }
+        .form-check-label{
+          input{
+            top: 1px;
+            vertical-align: middle;
+          } 
+          span{
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+  }
+}
+
+.modal-wrapper{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: initial !important;
+  width: initial !important;
+}

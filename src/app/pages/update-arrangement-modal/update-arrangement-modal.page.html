@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title> Update Arrangement</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form class="ion-margin" [formGroup]="updateArrangementForm" name="updateArrangementForm">
+    <ion-list lines="full" class="ion-no-margin ion-no-padding">
+      <ion-item>
+        <ion-label position="floating">Date <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-datetime displayFormat="DD-MM-YYYY" formControlName="date"></ion-datetime>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Amount <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input formControlName="amount"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-col>
+          <ion-button expand="block" color="secondary" type="submit" [disabled]="this.updateArrangementForm.invalid"
+            (click)="update()">
+            Update
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button expand="block" color="secondary" type="button" (click)="dismiss()">Close</ion-button>
+        </ion-col>
+      </ion-item>
+    </ion-list>
+  </form>
+</ion-content>

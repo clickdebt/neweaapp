@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Upload Document</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="uploadForm" name="uploadForm">
+    <ion-list lines="full" class="ion-no-margin ion-no-padding">
+      <ion-item>
+        <!-- <ion-label position="floating">Document <ion-text color="danger">*</ion-text> -->
+        <!-- </ion-label> -->
+        <ion-input type="file" name="file" formControlName="file" (change)="onFileInputChange($event)"></ion-input>
+      </ion-item>
+      <div class="ion-padding">
+        <ion-button expand="block" type="submit" [disabled]="this.uploadForm.invalid" class="ion-no-margin"
+          (click)="uploadDocument()">Upload Document</ion-button>
+      </div>
+    </ion-list>
+  </form>
+</ion-content>

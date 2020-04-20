@@ -1,0 +1,8 @@
+<ion-content class="ion-padding">
+  <div #map id="map"></div>
+</ion-content>
+
+<ion-footer>
+  <ion-button color="secondary" *ngIf="polygonMarkers.length" (click)="calculateAndDisplayRoutes()">Show routes</ion-button>
+  <ion-button color="secondary" *ngIf="destination" (click)="navigateLocation()">Navigate in Maps</ion-button>
+</ion-footer>

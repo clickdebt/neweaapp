@@ -1,0 +1,205 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Arrangement</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+
+  <div class="ion-margin-top " [hidden]="!networkStatus">
+    <ion-item class="bg-main" (click)="toggleShow(activeArrangements?.currentArrangements)"
+      ng-class="{active: isShown(activeArrangements?.currentArrangements)}">
+      <ion-label>
+        <h2>Current Arrangement</h2>
+      </ion-label>
+      <ion-icon slot="end"
+        [name]="isShown(activeArrangements?.currentArrangements) ? 'chevron-up-sharp':'chevron-down-sharp'">
+      </ion-icon>
+    </ion-item>
+    <ion-grid class="ion-no-border ion-margin" [hidden]="!isShown(activeArrangements?.currentArrangements)">
+      <ion-row class="ion-text-center">
+        <div class="text-color-light" [innerHTML]="currentArrangementString"></div>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <div class=" ion-margin-top" [hidden]="!networkStatus">
+    <ion-item class="bg-main" (click)="toggleShow(activeArrangements?.scheduleArrangements)"
+      ng-class="{active: isShown(activeArrangements?.scheduleArrangements)}">
+      <ion-label>
+        <h2>Arrangement Schedule</h2>
+      </ion-label>
+      <ion-icon slot="end"
+        [name]="isShown(activeArrangements?.scheduleArrangements) ? 'chevron-up-sharp':'chevron-down-sharp'">
+      </ion-icon>
+    </ion-item>
+    <ion-grid id="scheduleArrangements" class="ion-no-border"
+      [hidden]="!isShown(activeArrangements?.scheduleArrangements)">
+      <ion-row>
+        <ion-col size="3">
+          <span>Date Received</span>
+        </ion-col>
+        <ion-col size="2" class="text-nowrap">
+          <span>Amount</span>
+        </ion-col>
+        <ion-col size="2" class="text-nowrap">
+          <span>Balance</span>
+        </ion-col>
+        <ion-col size="4">
+          <span>Status</span>
+        </ion-col>
+        <ion-col size="1">
+          <ion-icon name="settings-outline"></ion-icon>
+        </ion-col>
+      </ion-row>
+      <ion-row *ngFor="let scheduleArrangement of activeArrangements.scheduleArrangements.data,let i=index"
+        [ngClass]="{'bg-row-dark':i%2==0}">
+        <ion-col size="3" class="text-color-light">
+          <span>{{scheduleArrangement.date}}</span>
+        </ion-col>
+        <ion-col size="2" class="text-color-light">
+          <span>{{scheduleArrangement.amount}}</span>
+        </ion-col>
+        <ion-col size="2" class="text-color-light">
+          <span>{{scheduleArrangement.arr_balance}}</span>
+        </ion-col>
+        <ion-col size="4" class="text-color-light">
+          <span>{{scheduleArrangement.payment_action.name}}</span>
+        </ion-col>
+        <ion-col size="1">
+          <ion-icon (click)="update(scheduleArrangement, i)" name="create-outline"></ion-icon>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <div class="ion-margin-top">
+    <ion-item class="bg-main" (click)="toggleShow(arrangementObj)" ng-class="{active: isShown(arrangementObj)}">
+      <ion-label>
+        <h2>Create Arrangement <span *ngIf="outstanding"> - O/S {{outstanding}}</span></h2>
+      </ion-label>
+      <ion-icon slot="end" [name]="isShown(arrangementObj) ? 'chevron-up-sharp':'chevron-down-sharp'">
+      </ion-icon>
+    </ion-item>
+    <form [formGroup]="arrangementForm" name="arrangementForm" [hidden]="!isShown(arrangementObj)">
+      <ion-list lines="full" class="ion-no-margin ion-no-padding">
+        <ion-item>
+          <ion-label position="floating">Frequency<ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-select placeholder="Select Frequency" formControlName="frequency">
+            <ion-select-option *ngFor="let method of frequency" value="{{method.id}}">{{method.label}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Total Amount <ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-input type="text" formControlName="ref_amount"></ion-input>
+        </ion-item>
+        <!-- Different first payment details -->
+        <ion-item>
+          <ion-checkbox slot="start" formControlName="differentFirstPayment"
+            (ionChange)="differentFirstPaymentChanged($event)"></ion-checkbox>
+          <ion-label>Different First Payment</ion-label>
+        </ion-item>
+        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
+          <ion-label position="floating">First Payment Date<ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-datetime displayFormat="DD-MM-YYYY" formControlName="firstPaymentDate"></ion-datetime>
+        </ion-item>
+        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
+          <ion-label position="floating">First Amount<ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-input type="text" formControlName="firstPaymentAmount"></ion-input>
+        </ion-item>
+        <ion-item>
+          <!-- Different first payment details complete-->
+
+          <ion-label position="floating">Arrangement Amount <ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-input type="text" formControlName="amount"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Start Date <ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-datetime displayFormat="DD-MM-YYYY" formControlName="start"></ion-datetime>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Method<ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-select placeholder="Select Payment Method" formControlName="method">
+            <ion-select-option *ngFor="let method of paymentMethods" value="{{method.id}}">{{method.label}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Note</ion-label>
+          <ion-textarea formControlName="note" placeholder="note"></ion-textarea>
+        </ion-item>
+
+      </ion-list>
+      <div class="ion-padding">
+        <ion-row>
+          <ion-col>
+            <ion-button expand="block" type="submit" [disabled]="this.arrangementForm.invalid" (click)="save()">
+              Save
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-button expand="block" type="button" (click)="dismiss()">Close</ion-button>
+          </ion-col>
+        </ion-row>
+      </div>
+    </form>
+  </div>
+
+  <div class="ion-margin-top" [hidden]="!networkStatus">
+    <ion-item class="bg-main" (click)="toggleShow(inActiveArrangements)"
+      ng-class="{active: isShown(inActiveArrangements)}">
+      <ion-label>
+        <h2>Inactive arrangements</h2>
+      </ion-label>
+      <ion-icon slot="end" [name]="isShown(inActiveArrangements) ? 'chevron-up-sharp':'chevron-down-sharp'">
+      </ion-icon>
+    </ion-item>
+    <ion-grid id="inActiveArrangements" class="ion-no-border" [hidden]="!isShown(inActiveArrangements)">
+      <ion-row>
+        <ion-col size="4">
+          <span>Date</span>
+        </ion-col>
+        <ion-col size="4">
+          <span>Frequency</span>
+        </ion-col>
+        <ion-col size="4">
+          <span>Amount</span>
+        </ion-col>
+        <!-- <ion-col size="3">
+          <span>Note</span>
+        </ion-col> -->
+        <!-- <ion-col size="1">
+          <ion-icon name="settings-outline"></ion-icon>
+        </ion-col> -->
+      </ion-row>
+      <ion-row *ngFor="let inActiveArrangement of inActiveArrangements.data,let i=index"
+        [ngClass]="{'bg-row-dark':i%2==0}">
+        <ion-col size="4" class="text-color-light">
+          <span>{{inActiveArrangement.start}}</span>
+        </ion-col>
+        <ion-col size="4" class="text-color-light">
+          <span>{{frequencies[inActiveArrangement.freq]}}</span>
+        </ion-col>
+        <ion-col size="4" class="text-color-light">
+          <span>{{inActiveArrangement.amount}}</span>
+        </ion-col>
+        <!-- <ion-col size="1">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-col> -->
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

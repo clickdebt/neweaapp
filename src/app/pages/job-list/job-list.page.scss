@@ -1,0 +1,178 @@
+ion-content {
+  --background: #f9f9f9;
+}
+
+.dashboard-btn-wrapper ion-button {
+  height: 40px;
+  width: 50px;
+}
+
+.linked-case {
+  border: 1px solid #d8d8d8;
+  box-shadow: inset 0px 1px 4px 2px #cecece;
+  padding: 0;
+
+  h4 {
+    margin: 10px auto;
+    text-align: center;
+    font-size: 14px;
+    color: #cc0092;
+  }
+
+  table {
+    width: 99%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }
+
+  th {
+    vertical-align: bottom;
+    border-bottom: 1px solid #dee2e6;
+    color: #8d898d;
+    font-size: 12px;
+    font-weight: normal;
+  }
+
+  td {
+    border-bottom: 0;
+  }
+}
+
+.filters {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 57px;
+  background: #ffffff;
+  max-height: 70vh;
+  height: 100%;
+  z-index: 10;
+  -webkit-transform: none;
+  -moz-transform: none;
+  transform: none;
+  box-shadow: -1px 0px 10px rgba(0, 0, 0, 0.5);
+  overflow: auto;
+  padding-bottom: 77px;
+
+  &.sort {
+    // height: auto;
+    padding-bottom: 0;
+  }
+
+  &.active {
+    display: block;
+  }
+
+  h6 {
+    margin: 10px 0;
+  }
+
+  .divider {
+    margin: 10px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
+  }
+
+  .filter-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
+    height: 77px;
+  }
+
+  .filter-body {
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+.filter-item-list {
+  .filter-item-list-item {
+    margin-right: 3px;
+    --min-height: 10px;
+    display: inline-block;
+    border: 2px solid var(--ion-color-dark);
+    color: var(--ion-color-dark);
+    font-size: 13px;
+    text-transform: uppercase;
+    border-radius: 40px;
+    height: auto;
+
+    &.active {
+      --background: var(--ion-color-dark);
+
+      ion-label {
+        color: var(--ion-color-dark-contrast);
+      }
+    }
+
+    ion-label {
+      font-weight: 500;
+      margin: 5px 0;
+    }
+
+    ion-checkbox {
+      opacity: 0;
+      margin: 0;
+      height: 0;
+      width: 0;
+    }
+
+    ion-radio {
+      opacity: 0;
+      margin: 0;
+      height: 0;
+      width: 0;
+    }
+  }
+}
+
+.item-native {
+  color: blue;
+  height: auto;
+  min-height: initial !important;
+}
+
+ion-toolbar {
+  border: none;
+}
+
+.joblist-card {
+  h3 {
+    display: inline-block;
+    color: #000;
+    font-weight: 600;
+    width: 80%;
+  }
+  ion-col {
+    span {
+      color: #000;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .table td,
+  .table th {
+    padding: 7px;
+    font-size: 12px;
+  }
+  .table .action ion-button {
+    width: 100%;
+    font-size: 10px;
+  }
+  .table .action {
+    padding: 3px;
+  }
+  .joblist-card h3 {
+    width: 70%;
+  }
+}
+.w-15 {
+  width: 15px;
+}
+.bg-hold {
+  background-color: #ffcfcf !important;
+}
