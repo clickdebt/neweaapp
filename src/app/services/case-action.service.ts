@@ -65,12 +65,20 @@ export class CaseActionService {
     return this.http.post(apiURL, data);
   }
 
+  getCaseDocuments(caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_ajax_layout/legacy/panels/case_documents_mini/${caseId}?source=API`;
+    return this.http.get(apiURL);
+  }
+
   uploadDocument(file, caseId) {
     let formData = new FormData();
     formData.append('file', file);
-    console.log(caseId, file);
-    console.log(formData);
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${caseId}?source=API`;
     return this.http.post(apiURL, formData);
+  }
+
+  selfCaseAllocate(caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${caseId}?source=API`;
+    return this.http.get(apiURL);
   }
 }

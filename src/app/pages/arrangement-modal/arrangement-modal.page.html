@@ -88,21 +88,40 @@
     <form [formGroup]="arrangementForm" name="arrangementForm" [hidden]="!isShown(arrangementObj)">
       <ion-list lines="full" class="ion-no-margin ion-no-padding">
         <ion-item>
-          <ion-label position="floating">Frequency</ion-label>
+          <ion-label position="floating">Frequency<ion-text color="danger">*</ion-text>
+          </ion-label>
           <ion-select placeholder="Select Frequency" formControlName="frequency">
             <ion-select-option *ngFor="let method of frequency" value="{{method.id}}">{{method.label}}
             </ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Arrangement Amount <ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-input type="text" formControlName="amount"></ion-input>
-        </ion-item>
-        <ion-item>
           <ion-label position="floating">Total Amount <ion-text color="danger">*</ion-text>
           </ion-label>
           <ion-input type="text" formControlName="ref_amount"></ion-input>
+        </ion-item>
+        <!-- Different first payment details -->
+        <ion-item>
+          <ion-checkbox slot="start" formControlName="differentFirstPayment"
+            (ionChange)="differentFirstPaymentChanged($event)"></ion-checkbox>
+          <ion-label>Different First Payment</ion-label>
+        </ion-item>
+        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
+          <ion-label position="floating">First Payment Date<ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-datetime displayFormat="DD-MM-YYYY" formControlName="firstPaymentDate"></ion-datetime>
+        </ion-item>
+        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
+          <ion-label position="floating">First Amount<ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-input type="text" formControlName="firstPaymentAmount"></ion-input>
+        </ion-item>
+        <ion-item>
+          <!-- Different first payment details complete-->
+
+          <ion-label position="floating">Arrangement Amount <ion-text color="danger">*</ion-text>
+          </ion-label>
+          <ion-input type="text" formControlName="amount"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="floating">Start Date <ion-text color="danger">*</ion-text>
@@ -110,25 +129,14 @@
           <ion-datetime displayFormat="DD-MM-YYYY" formControlName="start"></ion-datetime>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Method</ion-label>
+          <ion-label position="floating">Method<ion-text color="danger">*</ion-text>
+          </ion-label>
           <ion-select placeholder="Select Payment Method" formControlName="method">
             <ion-select-option *ngFor="let method of paymentMethods" value="{{method.id}}">{{method.label}}
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <!-- Different first payment details -->
-        <ion-item>
-          <ion-checkbox slot="start" formControlName="differentFirstPayment"></ion-checkbox>
-          <ion-label>Different First Payment</ion-label>
-        </ion-item>
-        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
-          <ion-label position="floating">First Payment Date</ion-label>
-          <ion-datetime displayFormat="DD-MM-YYYY" formControlName="firstPaymentDate"></ion-datetime>
-        </ion-item>
-        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
-          <ion-label position="floating">First Amount</ion-label>
-          <ion-input type="text" formControlName="firstPaymentAmount"></ion-input>
-        </ion-item>
+
         <ion-item>
           <ion-label position="floating">Note</ion-label>
           <ion-textarea formControlName="note" placeholder="note"></ion-textarea>

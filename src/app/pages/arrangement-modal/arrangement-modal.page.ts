@@ -62,7 +62,6 @@ export class ArrangementModalPage implements OnInit {
     this.networkStatus = await this.networkService.getCurrentNetworkStatus();
     if (this.networkStatus) {
       this.getActiveArrangements();
-      this.getInactiveArrangements();
     } else {
       this.arrangementObj.show = true;
     }
@@ -77,10 +76,10 @@ export class ArrangementModalPage implements OnInit {
   }
   initForm() {
     this.arrangementForm = this.formBuilder.group({
-      frequency: ['2', [Validators.required]],
+      frequency: ['', [Validators.required]],
       amount: ['', [Validators.required]],
       ref_amount: [this.outstanding, [Validators.required]],
-      method: ['1', [Validators.required]],
+      method: ['', [Validators.required]],
       start: ['', [Validators.required]],
       note: ['', []],
       differentFirstPayment: [false, []],
@@ -99,7 +98,7 @@ export class ArrangementModalPage implements OnInit {
         start: moment(this.arrangementForm.value.start).format('YYYY-MM-DD'),
         different_first_payment: this.arrangementForm.value.differentFirstPayment,
         first_amount: this.arrangementForm.value.firstPaymentAmount,
-        first_date: this.arrangementForm.value.firstPaymentDate ? moment(this.arrangementForm.value.firstPaymentDate).format('DD-MM-YYYY') : "",
+        first_date: this.arrangementForm.value.firstPaymentDate ? moment(this.arrangementForm.value.firstPaymentDate).format('YYYY-MM-DD') : '',
         note: this.arrangementForm.value.note,
         mode: this.arrangementMode
       };
@@ -121,6 +120,16 @@ export class ArrangementModalPage implements OnInit {
       this.arrangementObj = {};
     }
   }
+  differentFirstPaymentChanged(event) {
+    if (event.detail.checked) {
+      this.arrangementForm.controls["firstPaymentAmount"].setValidators([Validators.required]);
+      this.arrangementForm.controls["firstPaymentDate"].setValidators([Validators.required]);
+    } else {
+      this.arrangementForm.controls["firstPaymentAmount"].setValidators([]);
+      this.arrangementForm.controls["firstPaymentDate"].setValidators([]);
+    }
+  }
+
   toggleShow(object) {
     object.show = !object.show;
   }
@@ -131,7 +140,7 @@ export class ArrangementModalPage implements OnInit {
     this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
       this.currArrangement = Object.values(response.current_arrangement);
       this.currArrangement = this.currArrangement.find(data => data.active == 1);
-      this.makeCurrentArrangementString();
+      this.getInactiveArrangements();
       if (this.currArrangement) {
         this.arrangementMode = 'archive_make';
         this.activeArrangements.scheduleArrangements.data = Object.values(response.arrangement_schedule).reverse();
@@ -139,6 +148,7 @@ export class ArrangementModalPage implements OnInit {
     });
   }
   makeCurrentArrangementString() {
+    this.currentArrangementString = '';
     if (this.currArrangement) {
       this.currentArrangementString += `The defendant agreed to pay `;
       if (parseInt(this.currArrangement.first_amount, 10) > 0 && this.currArrangement.first_date) {
@@ -156,6 +166,15 @@ export class ArrangementModalPage implements OnInit {
     this.caseActionService.getInactiveArrangements(this.caseId).subscribe((response: any) => {
       this.inActiveArrangements.data = response.data.data;
       this.frequencies = response.data.frequencies;
+      let freqNew = [];
+      if (this.frequencies) {
+        Object.entries(this.frequencies).forEach((val) => {
+          const obj = { id: val[0], label: val[1] };
+          freqNew.push(obj);
+        });
+        this.frequency = freqNew;
+      }
+      this.makeCurrentArrangementString();
     });
   }
   async update(arrangement, index) {
