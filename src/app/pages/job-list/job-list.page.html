@@ -191,7 +191,7 @@
       </thead>
       <tbody>
         <ng-container *ngFor="let case of cases">
-          <tr class="no-border" [ngClass]="{'bg-hold': (case.hold_until > currentDate || case.current_status.status_type == 4)}">
+          <tr class="no-border" [ngClass]="{'bg-hold': (case.hold_until > currentDate || case.current_status.status_type == 3)}">
             <td>
               <ion-icon *ngIf="case.linked_cases != '' && !caseLinks[case.id]"
                 (click)="caseLinks[case.id] = !caseLinks[case.id]" slot="icon-only" name="caret-forward-outline">
