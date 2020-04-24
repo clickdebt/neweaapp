@@ -11,11 +11,7 @@ import { NetworkService } from 'src/app/services/network.service';
   styleUrls: ['./job-list.page.scss'],
 })
 export class JobListPage implements OnInit {
-<<<<<<< HEAD
-  limit = 20;
-=======
   limit = 50;
->>>>>>> 6c86ad277bd4f2734db4fa16d683711113d2c9e7
   page = 1;
   cases = [];
   showFilter = false;
