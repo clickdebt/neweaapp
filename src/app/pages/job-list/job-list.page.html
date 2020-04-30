@@ -3,10 +3,13 @@
     <ion-row class="searchbar-wrpper">
       <ion-col size-md="8" size-xs="6">
         <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
-          (keyup.enter)="onInput($event)" (ionCancel)="onInput($event)" placeholder="Search ID, ref, postcode, name">
+          (keyup.enter)="onInput()" (ionCancel)="onInput($event)" placeholder="Search ID, ref, postcode, name">
         </ion-searchbar>
       </ion-col>
       <ion-col size-md="4" size-xs="6" class="ion-text-end">
+        <ion-button color="secondary" size="small" (click)="onInput()">
+          Search
+        </ion-button>
         <ion-button color="secondary" size="small" (click)="showFilterDiv()">
           Filters
         </ion-button>

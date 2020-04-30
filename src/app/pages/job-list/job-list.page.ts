@@ -26,16 +26,22 @@ export class JobListPage implements OnInit {
   sortVal = '';
   shouldShowCancel: boolean;
   sortOptions = [
+    { title: 'Old Cases', isChecked: false, value: 'id|ASC' },
     { title: 'Latest Cases', isChecked: false, value: 'id|DESC' },
-    { title: 'Scheme', isChecked: false, value: 'scheme_id|ASC' },
+    { title: 'Name A-Z', isChecked: false, value: 'Debtor.debtor_name|ASC' },
+    { title: 'Name Z-A', isChecked: false, value: 'Debtor.debtor_name|DESC' },
+    { title: 'Scheme', isChecked: false, value: 'Scheme.name|ASC' },
     { title: 'Balance Low to High', isChecked: false, value: 'd_outstanding|ASC' },
     { title: 'Balance High to Low', isChecked: false, value: 'd_outstanding|DESC' },
+    { title: 'Next payment Date', isChecked: false, value: 'ISNULL(ActiveArrangement.last_due_date), ActiveArrangement.last_due_date|ASC' },
+    { title: 'Hold Expires', isChecked: false, value: 'hold_until|Asc' },
     { title: 'Case Ref', isChecked: false, value: 'ref|ASC' },
     { title: 'PostCode', isChecked: false, value: 'Addresses.address_postcode|ASC' },
     { title: 'Visits Low to High', isChecked: false, value: 'visitcount_total|ASC' },
     { title: 'Visits High to Low', isChecked: false, value: 'visitcount_total|DESC' },
     { title: 'Visit Allocated Oldest to Newest', isChecked: false, value: 'last_allocated_date|ASC' },
-    { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date|DESC' }
+    { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date|DESC' },
+    { title: 'Work Type', isChecked: false, value: 'SchemeManager.name|ASC' }
   ];
   isMobile = false;
   selectedCaseIds: any[] = [];
@@ -121,7 +127,7 @@ export class JobListPage implements OnInit {
     this.getCases('');
 
   }
-  onInput(event) {
+  onInput() {
     this.filters['q'] = this.searchBarValue;
     this.filterCases();
   }
@@ -244,9 +250,9 @@ export class JobListPage implements OnInit {
     });
     this.cases = this.cases.concat(caseData);
     // no need to select cases that will load after select all
-    // if (this.selectedAll) {
-    //   this.selectAllCase();
-    // }
+    if (this.selectedAll) {
+      this.selectAllCase();
+    }
     this.storageService.set('cases', this.cases);
   }
 
