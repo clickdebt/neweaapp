@@ -13,7 +13,7 @@ export class PanicModalPage implements OnInit {
   progress = 0;
   interval;
   isMuted = false;
-  volumeClass = 'volume-high-sharp'
+  volumeClass = 'volume-high-sharp';
   isPause = false;
   isStart = false;
   radius = 130;
@@ -149,10 +149,15 @@ export class PanicModalPage implements OnInit {
 
   async getCurrentLocation() {
     console.log('getCurrentLocation');
-    const { coords } = await this.geolocation.getCurrentPosition();
-    console.log('coords', coords);
-    this.lng = coords.longitude;
-    this.lat = coords.latitude;
-    console.log(this.lng, this.lat);
+    await this.geolocation.getCurrentPosition().then((res: any) => {
+      const coords = res.coords;
+      console.log('coords', coords);
+      this.lng = coords.longitude;
+      this.lat = coords.latitude;
+      console.log(this.lng, this.lat);
+    }, err => {
+      console.log(err);
+    });
+
   }
 }
