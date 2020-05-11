@@ -46,6 +46,8 @@ export class CaseDetailsPage implements OnInit {
       show: false
     }
   };
+  getCaseSchemeSpecificDetail = false;
+  getCaseSchemeSpecificData = [];
   historyData: any[] = [];
   historyDataIndex = 10;
   searchBarValue = '';
@@ -88,6 +90,7 @@ export class CaseDetailsPage implements OnInit {
       this.getClient();
       this.getfinancialDetails();
       this.getCaseDetails();
+      this.getCaseSchemeSpecificDetails();
       this.getHistory();
       this.getPayments();
       this.getCaseDocuments();
@@ -203,6 +206,15 @@ export class CaseDetailsPage implements OnInit {
   getCaseDetails() {
     this.caseDetailsService.getCaseDetails(this.caseId).subscribe((response) => {
       this.caseDetails.caseDetail = Object.assign(this.caseDetails.caseDetail, response);
+    });
+  }
+  getCaseSchemeSpecificDetails() {
+    this.caseDetailsService.getSchemeSpecificDetails(this.caseId).subscribe((response: any) => {
+      // console.log(response);
+      if (response && response.prepare_array) {
+        this.getCaseSchemeSpecificDetail = true;
+        this.getCaseSchemeSpecificData = response.prepare_array;
+      }
     });
   }
   getHistory() {

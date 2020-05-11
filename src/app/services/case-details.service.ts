@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class CaseDetailsService {
-
+  // tslint:disable: max-line-length
   constructor(
     public http: HttpClient
   ) { }
@@ -40,6 +40,10 @@ export class CaseDetailsService {
   }
   updateCaseMarker(col, caseId, addMarkerForLinkedCases) {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${caseId}/${col}/${addMarkerForLinkedCases}?source=API`;
+    return this.http.get(apiURL);
+  }
+  getSchemeSpecificDetails(caseId) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/custom/panels/important_panel/${caseId}/0/app_scheme_case_info?source=API`;
     return this.http.get(apiURL);
   }
 }

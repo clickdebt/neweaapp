@@ -28,20 +28,22 @@ export class JobListPage implements OnInit {
   sortOptions = [
     { title: 'Old Cases', isChecked: false, value: 'id|ASC' },
     { title: 'Latest Cases', isChecked: false, value: 'id|DESC' },
-    { title: 'Name A-Z', isChecked: false, value: 'Debtor.debtor_name|ASC' },
-    { title: 'Name Z-A', isChecked: false, value: 'Debtor.debtor_name|DESC' },
+    { title: 'Name A-Z', isChecked: false, value: 'ISNULL(Debtor.debtor_1_surname), Debtor.debtor_1_surname ASC, Debtor.debtor_name|ASC' },
+    { title: 'Name Z-A', isChecked: false, value: 'ISNULL(Debtor.debtor_1_surname), Debtor.debtor_1_surname DESC, Debtor.debtor_name|DESC' },
     { title: 'Scheme', isChecked: false, value: 'Scheme.name|ASC' },
     { title: 'Balance Low to High', isChecked: false, value: 'd_outstanding|ASC' },
     { title: 'Balance High to Low', isChecked: false, value: 'd_outstanding|DESC' },
     { title: 'Next payment Date', isChecked: false, value: 'ISNULL(ActiveArrangement.last_due_date), ActiveArrangement.last_due_date|ASC' },
     { title: 'Hold Expires', isChecked: false, value: 'hold_until|Asc' },
-    { title: 'Case Ref', isChecked: false, value: 'ref|ASC' },
+    { title: 'Case Ref', isChecked: false, value: 'cast(Cases.ref as unsigned)|ASC' },
     { title: 'PostCode', isChecked: false, value: 'Addresses.address_postcode|ASC' },
     { title: 'Visits Low to High', isChecked: false, value: 'visitcount_total|ASC' },
     { title: 'Visits High to Low', isChecked: false, value: 'visitcount_total|DESC' },
     { title: 'Visit Allocated Oldest to Newest', isChecked: false, value: 'last_allocated_date|ASC' },
     { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date|DESC' },
-    { title: 'Work Type', isChecked: false, value: 'SchemeManager.name|ASC' }
+    { title: 'Work Type', isChecked: false, value: 'SchemeManager.name|ASC' },
+    { title: 'Last Visit Date Asc', isChecked: false, value: 'ISNULL(Cases.last_visit_date), Cases.last_visit_date|ASC' },
+    { title: 'Last Visit Date Desc', isChecked: false, value: 'ISNULL(Cases.last_visit_date), Cases.last_visit_date|DESC' }
   ];
   isMobile = false;
   selectedCaseIds: any[] = [];
