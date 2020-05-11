@@ -149,15 +149,10 @@ export class PanicModalPage implements OnInit {
 
   async getCurrentLocation() {
     console.log('getCurrentLocation');
-    await this.geolocation.getCurrentPosition().then((res: any) => {
-      const coords = res.coords;
-      console.log('coords', coords);
-      this.lng = coords.longitude;
-      this.lat = coords.latitude;
-      console.log(this.lng, this.lat);
-    }, err => {
-      console.log(err);
-    });
-
+    const { coords } = await this.geolocation.getCurrentPosition();
+    console.log('coords', coords);
+    this.lng = coords.longitude;
+    this.lat = coords.latitude;
+    console.log(this.lng, this.lat);
   }
 }
