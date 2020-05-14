@@ -262,12 +262,12 @@
                     </td>
                     <td>{{link_case.id}}</td>
                     <td>{{link_case.ref}}</td>
-                    <td>{{link_case.debtor.debtor_name}}</td>
+                    <td>{{link_case.debtor_name}}</td>
                     <td>{{link_case.d_outstanding}}</td>
                     <td>{{link_case.date}}</td>
-                    <td>{{link_case.debtor.addresses[0].address_postcode}}</td>
+                    <td>{{link_case.address_postcode}}</td>
                     <td>{{link_case.visitcount_total}}</td>
-                    <td>{{link_case.current_status.status_name}}</td>
+                    <td>{{link_case.status_name}}</td>
                     <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
                     <td>{{link_case.custom5}}</td>
                     <td class="action ">
@@ -394,7 +394,7 @@
                   </ion-col>
                   <ion-col size="6">
                     Postcode :
-                    <span> {{link_case.debtor.addresses[0].address_postcode}} </span>
+                    <span> {{link_case.address_postcode}} </span>
                   </ion-col>
                   <ion-col size="6">
                     visit :
@@ -406,7 +406,7 @@
                   </ion-col>
                   <ion-col size="6" *ngIf="link_case.current_status.status_name">
                     Status :
-                    <span> {{link_case.current_status.status_name}} </span>
+                    <span> {{link_case.status_name}} </span>
                   </ion-col>
                   <ion-col size="6">
                     Hold :
