@@ -143,7 +143,7 @@ export class JobListPage implements OnInit {
       page: this.page
     };
     Object.keys(this.filters).forEach(fil => {
-      if (this.filters[fil].length) {
+      if ( this.filters[fil] != undefined && this.filters[fil].length) {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
       }
     });
