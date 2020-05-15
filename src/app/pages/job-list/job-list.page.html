@@ -329,7 +329,7 @@
         </div>
         <ion-grid class="m-t-10">
           <ion-row>
-            <ion-col size="5">
+            <ion-col size="6">
               Ref :
               <span> {{case.ref}} </span>
             </ion-col>
@@ -369,7 +369,7 @@
               <div class="d-flex align-items-center">
                 <ion-checkbox class="m-r-10" mode="md" color="secondary" [(ngModel)]="link_case.checked"
                   (ionChange)="selectCase($event,link_case.id)" slot="start"></ion-checkbox>
-                <h3>{{link_case.debtor.debtor_name}}
+                <h3>{{link_case.debtor_name}}
                   <span class="d-block"> (#{{link_case.id}}) </span>
                 </h3>
                 <span class="d-flex">
@@ -404,7 +404,7 @@
                     Date :
                     <span> {{link_case.date}} </span>
                   </ion-col>
-                  <ion-col size="6" *ngIf="link_case.current_status.status_name">
+                  <ion-col size="6" *ngIf="link_case.status_name">
                     Status :
                     <span> {{link_case.status_name}} </span>
                   </ion-col>
