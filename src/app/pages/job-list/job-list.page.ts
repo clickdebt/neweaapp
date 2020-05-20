@@ -35,7 +35,7 @@ export class JobListPage implements OnInit {
     { title: 'Balance Low to High', isChecked: false, value: 'd_outstanding|ASC' },
     { title: 'Balance High to Low', isChecked: false, value: 'd_outstanding|DESC' },
     { title: 'Next payment Date', isChecked: false, value: 'ISNULL(ActiveArrangement.last_due_date), ActiveArrangement.last_due_date|ASC' },
-    { title: 'Hold Expires', isChecked: false, value: 'hold_until|Asc' },
+    { title: 'Hold Expires', isChecked: false, value: 'ISNULL(Cases.hold_until), Cases.hold_until|Asc' },
     { title: 'Case Ref', isChecked: false, value: 'cast(Cases.ref as unsigned)|ASC' },
     { title: 'PostCode', isChecked: false, value: 'EnforcementAddresses.address_postcode|ASC' },
     { title: 'Visits Low to High', isChecked: false, value: 'visitcount_total|ASC' },
