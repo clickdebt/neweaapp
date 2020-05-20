@@ -35,9 +35,9 @@ export class JobListPage implements OnInit {
     { title: 'Balance Low to High', isChecked: false, value: 'd_outstanding|ASC' },
     { title: 'Balance High to Low', isChecked: false, value: 'd_outstanding|DESC' },
     { title: 'Next payment Date', isChecked: false, value: 'ISNULL(ActiveArrangement.last_due_date), ActiveArrangement.last_due_date|ASC' },
-    { title: 'Hold Expires', isChecked: false, value: 'hold_until|Asc' },
+    { title: 'Hold Expires', isChecked: false, value: 'ISNULL(Cases.hold_until), Cases.hold_until|Asc' },
     { title: 'Case Ref', isChecked: false, value: 'cast(Cases.ref as unsigned)|ASC' },
-    { title: 'PostCode', isChecked: false, value: 'Addresses.address_postcode|ASC' },
+    { title: 'PostCode', isChecked: false, value: 'EnforcementAddresses.address_postcode|ASC' },
     { title: 'Visits Low to High', isChecked: false, value: 'visitcount_total|ASC' },
     { title: 'Visits High to Low', isChecked: false, value: 'visitcount_total|DESC' },
     { title: 'Visit Allocated Oldest to Newest', isChecked: false, value: 'last_allocated_date|ASC' },
@@ -51,6 +51,7 @@ export class JobListPage implements OnInit {
   currentNetworkStatus;
   selectedAll = false;
   currentDate;
+  linkedIds = [];
   constructor(
     private caseService: CaseService,
     private router: Router,
@@ -143,7 +144,7 @@ export class JobListPage implements OnInit {
       page: this.page
     };
     Object.keys(this.filters).forEach(fil => {
-      if ( this.filters[fil] != undefined && this.filters[fil].length) {
+      if (this.filters[fil] != undefined && this.filters[fil].length) {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
       }
     });
@@ -243,22 +244,31 @@ export class JobListPage implements OnInit {
 
   }
   parseCaseData(caseData, linkedCases) {
-    caseData.forEach(elem => {
-      elem.linkedCasesTotalBalance = 0;
-      // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
-      elem.linked_cases = linkedCases.filter(linked => (
-        ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
-        && linked.id !== elem.id
-      ));
-      if (elem.linked_cases != '') {
-        const linked = elem.linked_cases.map(l => l.id);
-        caseData = caseData.filter(c => linked.indexOf(c.id));
-        elem.linked_cases = Object.values(elem.linked_cases);
-        elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
-          return accumulator + parseFloat(currentValue.d_outstanding);
-        }, 0);
+
+    caseData.forEach((elem) => {
+      if (this.linkedIds.indexOf(elem.id) == -1) {
+        console.log(elem.id);
+        elem.linkedCasesTotalBalance = 0;
+        // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
+        elem.linked_cases = linkedCases.filter(linked => (
+          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
+          && linked.id !== elem.id
+        ));
+        console.log(elem.linked_cases)
+        if (elem.linked_cases != '') {
+          console.log(elem.id, elem.linked_cases);
+          const linked = elem.linked_cases.map(l => l.id);
+          linked.forEach(l => this.linkedIds.push(l));
+          console.log(linked);
+          caseData = caseData.filter(c => linked.indexOf(c.id));
+          elem.linked_cases = Object.values(elem.linked_cases);
+          elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
+            return accumulator + parseFloat(currentValue.d_outstanding);
+          }, 0);
+        }
       }
     });
+
     this.cases = this.cases.concat(caseData);
     // no need to select cases that will load after select all
     if (this.selectedAll) {
