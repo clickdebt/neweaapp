@@ -171,6 +171,7 @@ export class MapViewPage implements OnInit {
     const { coords } = await this.geolocation.getCurrentPosition();
     this.currLang = coords.longitude;
     this.currLat = coords.latitude;
+    console.log(this.currLang, this.currLat)
     return coords;
   }
 
