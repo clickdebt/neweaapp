@@ -64,13 +64,15 @@ export class VisitFormPage implements OnInit {
     this.getLocation();
     this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'))
     if (this.visitCaseData) {
-      this.addressData = {
-        address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
-        address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
-        address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
-        address_town: this.visitCaseData.debtor.addresses[0].address_town,
-        address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
-      };
+      if (this.visitCaseData.debtor.enforcement_addresses) {
+        this.addressData = {
+          address_ln1: this.visitCaseData.debtor.enforcement_addresses[0].address_ln1,
+          address_ln2: this.visitCaseData.debtor.enforcement_addresses[0].address_ln2,
+          address_ln3: this.visitCaseData.debtor.enforcement_addresses[0].address_ln3,
+          address_town: this.visitCaseData.debtor.enforcement_addresses[0].address_town,
+          address_postcode: this.visitCaseData.debtor.enforcement_addresses[0].address_postcode,
+        };
+      }
     }
     if (this.networkService.getCurrentNetworkStatus() === 1) {
       this.visitService.getVisitForm().subscribe(res => {
