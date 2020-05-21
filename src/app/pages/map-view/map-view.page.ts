@@ -86,12 +86,19 @@ export class MapViewPage implements OnInit {
   getAddresses(cases) {
     if (cases) {
       cases.forEach((da, caseIndex) => {
-        da.address_str = `${da.debtor.addresses[0].address_ln1}, ` +
-          `${da.debtor.addresses[0].address_ln2}, ` +
-          `${da.debtor.addresses[0].address_ln3}, ` +
-          `${da.debtor.addresses[0].address_postcode}`;
+        if (da.debtor.enforcement_addresses.length) {
+          da.address_str = `${da.debtor.enforcement_addresses[0].address_ln1}, ` +
+            `${da.debtor.enforcement_addresses[0].address_ln2}, ` +
+            `${da.debtor.enforcement_addresses[0].address_ln3}, ` +
+            `${da.debtor.enforcement_addresses[0].address_postcode}`;
+        } else {
+          da.address_str = '';
+        }
+
         da.location = {};
-        this.getGeocodesLatLongs(da, caseIndex);
+        if (da.address_str) {
+          this.getGeocodesLatLongs(da, caseIndex);
+        }
       });
 
     }

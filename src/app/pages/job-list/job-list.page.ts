@@ -52,6 +52,7 @@ export class JobListPage implements OnInit {
   selectedAll = false;
   currentDate;
   linkedIds = [];
+  busy = false;
   constructor(
     private caseService: CaseService,
     private router: Router,
@@ -76,6 +77,7 @@ export class JobListPage implements OnInit {
     // } else if (await this.storageService.get('is_case_updated')) {
     this.page = 1;
     this.cases = [];
+    this.linkedIds = [];
     this.getCases('');
     if (await this.storageService.get('is_case_updated')) {
       this.updateCasesData();
@@ -100,6 +102,11 @@ export class JobListPage implements OnInit {
   }
   clearSort() {
     this.sortVal = '';
+    this.showSort = false;
+    this.page = 1;
+    this.cases = [];
+    this.linkedIds = [];
+    this.getCases('');
   }
   clearFilter() {
     Object.keys(this.filterMaster).forEach(key => {
@@ -112,6 +119,7 @@ export class JobListPage implements OnInit {
     this.showFilter = false;
     this.page = 1;
     this.cases = [];
+    this.linkedIds = [];
     this.getCases('');
   }
 
@@ -130,6 +138,7 @@ export class JobListPage implements OnInit {
     this.cases = [];
     this.showFilter = false;
     this.showSort = false;
+    this.linkedIds = [];
     this.getCases('');
 
   }
@@ -149,15 +158,19 @@ export class JobListPage implements OnInit {
       }
     });
     if (this.networkService.getCurrentNetworkStatus() == 1) {
-      this.caseService.getCases(params).subscribe((res: any) => {
-        if (infiniteScrollEvent) {
-          infiniteScrollEvent.target.complete();
-        }
-        if (res.result) {
-          this.page++;
-          this.parseCaseData(res.data, res.linked);
-        }
-      });
+      if (!this.busy) {
+        this.busy = true;
+        this.caseService.getCases(params).subscribe((res: any) => {
+          this.busy = false;
+          if (infiniteScrollEvent) {
+            infiniteScrollEvent.target.complete();
+          }
+          if (res.result) {
+            this.page++;
+            this.parseCaseData(res.data, res.linked);
+          }
+        });
+      }
     } else {
       let query = 'select * from rdebt_cases where 1 = 1';
       let p = [];
@@ -247,20 +260,25 @@ export class JobListPage implements OnInit {
 
     caseData.forEach((elem) => {
       if (this.linkedIds.indexOf(elem.id) == -1) {
-        console.log(elem.id);
         elem.linkedCasesTotalBalance = 0;
         // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
         elem.linked_cases = linkedCases.filter(linked => (
           ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
-          && linked.id !== elem.id
+          && linked.id !== elem.id && (this.linkedIds.indexOf(linked.id) == -1)
         ));
-        console.log(elem.linked_cases)
         if (elem.linked_cases != '') {
-          console.log(elem.id, elem.linked_cases);
+          (elem.linked_cases).forEach(l => {
+            // l.linked_cases = linkedCases.filter(link => (
+            //   ((link.manual_link_id === l.manual_link_id && link.manual_link_id !== null) || link.debtorid === l.debtorid)
+            //   && link.id !== l.id
+            // ));
+            // l.linked_cases = Object.values(l.linked_cases);
+            this.linkedIds.push(l.id);
+          });
           const linked = elem.linked_cases.map(l => l.id);
-          linked.forEach(l => this.linkedIds.push(l));
-          console.log(linked);
-          caseData = caseData.filter(c => linked.indexOf(c.id));
+          caseData = caseData.filter(c => {
+            return (linked.indexOf(c.id) == -1);
+          });
           elem.linked_cases = Object.values(elem.linked_cases);
           elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
             return accumulator + parseFloat(currentValue.d_outstanding);
@@ -268,7 +286,6 @@ export class JobListPage implements OnInit {
         }
       }
     });
-
     this.cases = this.cases.concat(caseData);
     // no need to select cases that will load after select all
     if (this.selectedAll) {
