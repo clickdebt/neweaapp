@@ -41,7 +41,7 @@
             <td>{{case.ref}}</td>
             <td>{{case.debtor.debtor_name}}</td>
             <td>{{case.d_outstanding}}</td>
-            <td>{{case.debtor.addresses[0]?.address_postcode}}</td>
+            <td><span *ngIf="case.debtor.enforcement_addresses.length">{{case.debtor.enforcement_addresses[0].address_postcode}}</span></td>
             <td>{{case.visitcount_total}}</td>
             <td>{{case.current_status.status_name}}</td>
             <td>{{case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
@@ -68,8 +68,7 @@
     <ion-card class="joblist-card" *ngFor="let case of cases" [ngClass]="{'bg-hold':case.hold_until > currentDate}">
       <ion-card-content>
         <div class="d-flex align-items-center">
-          <h3>{{case.debtor.debtor_name}}
-            <span class="d-block"> (#{{case.id}}) </span>
+          <h3>{{case.debtor.debtor_name}}<span>(#{{case.id}})</span>
           </h3>
           <span class="d-flex">
             <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
@@ -84,7 +83,7 @@
         </div>
         <ion-grid class="m-t-10">
           <ion-row>
-            <ion-col size="5">
+            <ion-col size="6">
               Ref :
               <span> {{case.ref}} </span>
             </ion-col>
@@ -94,7 +93,7 @@
             </ion-col>
             <ion-col size="6">
               Postcode :
-              <span> {{case.debtor.addresses[0]?.address_postcode}} </span>
+              <span> {{case.debtor.enforcement_addresses[0]?.address_postcode}} </span>
             </ion-col>
             <ion-col size="6">
               visit :

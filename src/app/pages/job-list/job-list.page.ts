@@ -262,17 +262,17 @@ export class JobListPage implements OnInit {
       if (this.linkedIds.indexOf(elem.id) == -1) {
         elem.linkedCasesTotalBalance = 0;
         // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
+        elem.linked_cases_group = linkedCases.filter(linked => (
+          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
+          && (this.linkedIds.indexOf(linked.id) == -1)
+        ));
         elem.linked_cases = linkedCases.filter(linked => (
           ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
           && linked.id !== elem.id && (this.linkedIds.indexOf(linked.id) == -1)
         ));
         if (elem.linked_cases != '') {
           (elem.linked_cases).forEach(l => {
-            // l.linked_cases = linkedCases.filter(link => (
-            //   ((link.manual_link_id === l.manual_link_id && link.manual_link_id !== null) || link.debtorid === l.debtorid)
-            //   && link.id !== l.id
-            // ));
-            // l.linked_cases = Object.values(l.linked_cases);
+            l.parent_case_id = elem.id;
             this.linkedIds.push(l.id);
           });
           const linked = elem.linked_cases.map(l => l.id);
@@ -325,9 +325,14 @@ export class JobListPage implements OnInit {
     this.router.navigate(['home/map-view']);
   }
   goToCaseDetails(currentCaseData) {
-    localStorage.setItem('detais_case_data', JSON.stringify(currentCaseData));
-    this.storageService.set('caseId', currentCaseData.id);
-    this.router.navigate(['/home/case-details/' + currentCaseData.id]);
+    const currCase = JSON.parse(JSON.stringify(currentCaseData));
+    if (currentCaseData.parent_case_id) {
+      const parent_case = this.cases.find(c => c.id = currentCaseData.parent_case_id);
+      currCase.linked_cases = parent_case.linked_cases_group.filter(link => link.id !== currCase.id);
+    }
+    localStorage.setItem('detais_case_data', JSON.stringify(currCase));
+    this.storageService.set('caseId', currCase.id);
+    this.router.navigate(['/home/case-details/' + currCase.id]);
   }
   selectAllCase() {
     this.selectedCaseIds = [];
