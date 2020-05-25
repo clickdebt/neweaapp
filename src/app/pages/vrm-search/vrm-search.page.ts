@@ -51,6 +51,7 @@ export class VrmSearchPage implements OnInit {
   }
   goToCaseDetails(currentCaseData) {
     localStorage.setItem('detais_case_data', JSON.stringify(currentCaseData));
+    localStorage.setItem('from_vrm', '1');
     this.storageService.set('caseId', currentCaseData.id);
     this.router.navigate(['/home/case-details/' + currentCaseData.id]);
   }

@@ -78,7 +78,7 @@ export class CaseActionService {
   }
 
   selfCaseAllocate(caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${caseId}?source=API`;
+    const apiURL = localStorage.getItem('server_url') + `b/system/v3/cases/self_case_allocate/${caseId}?source=API`;
     return this.http.get(apiURL);
   }
 }

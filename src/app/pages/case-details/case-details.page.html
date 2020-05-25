@@ -130,6 +130,14 @@
             <span>{{caseDetails.caseSummary.last_visit_date ? caseDetails.caseSummary.last_visit_date: '-'}}</span>
           </ion-col>
         </ion-row>
+        <ion-row *ngIf="fromVrmSearch">
+          <ion-col>
+            <span>Agent Name:</span>
+          </ion-col>
+          <ion-col class="text-color-light">
+            <span>{{caseDetails.caseSummary.officer?.name}}</span>
+          </ion-col>
+        </ion-row>
       </ion-grid>
     </div>
     <!-- case Summary ends-->
@@ -623,7 +631,7 @@
   <ion-grid>
     <ion-row class="ion-justify-content-center">
       <ion-col size-md="3">
-        <ion-item>
+        <ion-item *ngIf="!fromVrmSearch">
           <ion-select [(ngModel)]="SelectedAction" (ionFocus)="onSelectChange($event)" value="" okText="Okay"
             cancelText="Dismiss">
             <ion-select-option disabled="true" value="">Select an Action</ion-select-option>

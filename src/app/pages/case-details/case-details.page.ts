@@ -19,6 +19,7 @@ import { UploadDocumentModalPage } from '../upload-document-modal/upload-documen
 })
 export class CaseDetailsPage implements OnInit {
   caseId;
+  fromVrmSearch: any = false;
   currentCaseData: any = {};
   caseDetails: any = {
     caseMarkers: {
@@ -73,6 +74,7 @@ export class CaseDetailsPage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    this.fromVrmSearch = localStorage.getItem('from_vrm');
     this.loadInitData();
   }
 
@@ -447,5 +449,9 @@ export class CaseDetailsPage implements OnInit {
   }
   goBack() {
     this.navCtrl.back();
+  }
+
+  ionViewWillLeave() {
+    localStorage.removeItem('from_vrm');
   }
 }
