@@ -180,7 +180,10 @@ export class ArrangementModalPage implements OnInit {
       }
       this.currentArrangementString += `<strong>&pound;${this.currArrangement.amount}</strong> with a <strong>
       ${this.frequencies[this.currArrangement.freq]}</strong> on <strong>
-      ${moment(this.currArrangement.start).format('DD-MM-YYYY')}</strong>.</p > `;
+      ${moment(this.currArrangement.start).format('DD-MM-YYYY')}</strong>.</p>`;
+      if(this.isGroupArrangement) {
+        this.currentArrangementString += `<div>Selected Cases:  ${JSON.parse(this.currArrangement.caseids).join()}</div>`;
+      }
     } else {
       this.currentArrangementString += `The case ${this.caseId} has no arrangement set.`;
     }
