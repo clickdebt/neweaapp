@@ -38,9 +38,9 @@ export class CaseDetailsService {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/payment/case_actions_panels/case_action_payments_group/${caseId}/successful?source=API`;
     return this.http.get(apiURL);
   }
-  updateCaseMarker(col, caseId, addMarkerForLinkedCases) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${caseId}/${col}/${addMarkerForLinkedCases}?source=API`;
-    return this.http.get(apiURL);
+  updateCaseMarker(col, caseId, linked) {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${caseId}/${col}?source=API`;
+    return this.http.post(apiURL, {'linked': linked});
   }
   getSchemeSpecificDetails(caseId) {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/custom/panels/important_panel/${caseId}/0/app_scheme_case_info?source=API`;

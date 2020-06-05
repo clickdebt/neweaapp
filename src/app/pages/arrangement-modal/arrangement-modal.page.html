@@ -85,8 +85,17 @@
       <ion-icon slot="end" [name]="isShown(arrangementObj) ? 'chevron-up-sharp':'chevron-down-sharp'">
       </ion-icon>
     </ion-item>
+
     <form [formGroup]="arrangementForm" name="arrangementForm" [hidden]="!isShown(arrangementObj)">
       <ion-list lines="full" class="ion-no-margin ion-no-padding">
+        <ion-item *ngIf="currentCase.linked_cases.length>0">
+          <ion-label position="floating">Select Linked case</ion-label>
+          <ion-select multiple="true" formControlName="selectedLinkCaseIds" (ionChange)="onLinkCaseSelectChange($event)">
+            <ion-select-option [value]="linkCase.id" *ngFor="let linkCase of currentCase.linked_cases,let i=index">
+              {{linkCase.id}} - (O/S: {{linkCase.d_outstanding}})
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
         <ion-item>
           <ion-label position="floating">Frequency<ion-text color="danger">*</ion-text>
           </ion-label>

@@ -2,12 +2,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { VisitService, CaseService, DatabaseService } from 'src/app/services';
 import { StorageService } from 'src/app/services/storage.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController } from '@ionic/angular';
+import { ModalController, AlertController } from '@ionic/angular';
 import { CommonService } from 'src/app/services';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import * as moment from 'moment';
+declare var google;
 import { NetworkService } from 'src/app/services/network.service';
 @Component({
   selector: 'app-visit-form',
@@ -15,7 +16,10 @@ import { NetworkService } from 'src/app/services/network.service';
   styleUrls: ['./visit-form.page.scss'],
 })
 export class VisitFormPage implements OnInit {
-
+  directionsService = new google.maps.DirectionsService();
+  directionsDisplay = new google.maps.DirectionsRenderer();
+  circle = new google.maps.Circle();
+  polygon = new google.maps.Polygon();
   formData;
   formConfig;
   jsonObject: any;
@@ -33,6 +37,8 @@ export class VisitFormPage implements OnInit {
   currLang: any;
   currLat: any;
   visitOutcome;
+  distance;
+  locationOverride = false;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -43,7 +49,8 @@ export class VisitFormPage implements OnInit {
     private geolocation: Geolocation,
     private commonService: CommonService,
     private databaseService: DatabaseService,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private alertCtrl: AlertController
   ) { }
 
   ngOnInit() {
@@ -72,6 +79,8 @@ export class VisitFormPage implements OnInit {
           address_town: this.visitCaseData.debtor.enforcement_addresses[0].address_town,
           address_postcode: this.visitCaseData.debtor.enforcement_addresses[0].address_postcode,
         };
+        this.addressData.address_str = Object.values(this.addressData).join(',');
+        this.getGeocodesLatLongs(this.addressData);
       }
     }
     if (this.networkService.getCurrentNetworkStatus() === 1) {
@@ -93,6 +102,25 @@ export class VisitFormPage implements OnInit {
       }
       this.addVisitOutcomeField(this.visitOutcome, visitFrom);
     }
+  }
+  getGeocodesLatLongs(obj) {
+    this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
+      if (res.status === 'OK' && res.results && res.results[0]) {
+        obj.location = res.results[0]['geometry']['location'];
+        const source = new google.maps.LatLng(obj.location.lat, obj.location.lng);
+        const destination = new google.maps.LatLng(this.currLat, this.currLang);
+        this.distance = google.maps.geometry.spherical.computeDistanceBetween(source, destination);
+        console.log(obj.location.lat, obj.location.lng, this.currLat, this.currLang, this.distance);
+        if (this.distance > 200) {
+          this.confirmLocation();
+        }
+      } else {
+        this.commonService.showToast('Address not found');
+        console.log(obj, res);
+      }
+    }, err => {
+      console.log(err);
+    });
   }
   dataRead(obj) {
     this.formData = obj.data[0];
@@ -147,7 +175,10 @@ export class VisitFormPage implements OnInit {
     const { coords } = await this.geolocation.getCurrentPosition();
     this.currLang = coords.longitude;
     this.currLat = coords.latitude;
-
+    // const source = new google.maps.LatLng(-34, 151);
+    // const destination = new google.maps.LatLng(-35, 151);
+    // const distance = google.maps.geometry.spherical.computeDistanceBetween(source, destination);
+    // console.log(distance);
   }
   onRender(event) {
     // console.log(event);
@@ -207,6 +238,32 @@ export class VisitFormPage implements OnInit {
       }
     }
   }
+  async confirmLocation() {
+    const alert = await this.alertCtrl.create({
+      header: 'Location issue',
+      message: 'It is a business requirement that you are at property before starting a case visit.'
+        + ' <br> You appear to be atleast '
+        + this.distance
+        + 'meters away from the property.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            this.router.navigate(['/home/job-list']);
+          }
+        },
+        {
+          text: 'Confirm at Property',
+          handler: () => {
+            // this.logout();
+            this.locationOverride = true;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
   async onSubmit(event) {
     // console.log(event, event.data);
     // console.log(this.paymentInfo);
@@ -229,7 +286,9 @@ export class VisitFormPage implements OnInit {
     const visit_report_data = {
       form_data: event.data,
       payment_data: this.paymentInfo,
-      arrangement_data: this.arrangementInfo
+      arrangement_data: this.arrangementInfo,
+      locationOverride: this.locationOverride,
+      distance: this.distance
     };
 
     const form_data = {
@@ -264,5 +323,9 @@ export class VisitFormPage implements OnInit {
       });
 
     }
+  }
+
+  ionViewWillLeave() {
+    this.storageService.remove('caseId');
   }
 }

@@ -159,11 +159,11 @@ export class CaseDetailsPage implements OnInit {
           {
             text: 'Yes',
             handler: data => {
-              let addMarkerForLinkedCases = false;
+              let linked = [];
               if (data.length > 0 && data[0] === 'linked_cases') {
-                addMarkerForLinkedCases = true;
+                linked = this.currentCaseData.linked_cases.map(ca => ca.id);
               }
-              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, addMarkerForLinkedCases)
+              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
                 .subscribe((response) => {
                   this.getCaseMarkers();
                 });
@@ -433,7 +433,8 @@ export class CaseDetailsPage implements OnInit {
       componentProps: {
         caseId: this.caseId,
         d_outstanding: this.currentCaseData.d_outstanding,
-        isDetailsPage: true
+        isDetailsPage: true,
+        currentCase: this.currentCaseData
       }
     });
     await AddArrangementModal.present();
@@ -453,5 +454,6 @@ export class CaseDetailsPage implements OnInit {
 
   ionViewWillLeave() {
     localStorage.removeItem('from_vrm');
+    this.storageService.remove('caseId');
   }
 }
