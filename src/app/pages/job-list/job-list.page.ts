@@ -325,9 +325,9 @@ export class JobListPage implements OnInit {
     this.router.navigate(['home/map-view']);
   }
   goToCaseDetails(currentCaseData) {
-    const currCase = JSON.parse(JSON.stringify(currentCaseData));
-    if (currentCaseData.parent_case_id) {
-      const parent_case = this.cases.find(c => c.id = currentCaseData.parent_case_id);
+    let currCase = JSON.parse(JSON.stringify(currentCaseData));
+    if (currCase.parent_case_id) {
+      const parent_case = this.cases.find(c => c.id == currCase.parent_case_id);
       currCase.linked_cases = parent_case.linked_cases_group.filter(link => link.id !== currCase.id);
     }
     localStorage.setItem('detais_case_data', JSON.stringify(currCase));
