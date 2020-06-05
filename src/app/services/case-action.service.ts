@@ -52,12 +52,12 @@ export class CaseActionService {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/inactive/${caseId}/single/default/?source=API`;
     return this.http.get(apiURL);
   }
-  updateArrangement(data, caseId, arrangementId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/default_popup/view/case_arrangement/${caseId}/single/default/update/${arrangementId}?source=API`;
+  updateArrangement(data, caseId, arrangementId, type = 'single') {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/update/${caseId}/${type}/default/0/update/${arrangementId}?source=API`;
     return this.http.post(apiURL, data);
   }
-  createArrangement(data, caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/edit/${caseId}?source=API`;
+  createArrangement(data, caseId, type='edit') {
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/${type}/${caseId}?source=API`;
     return this.http.post(apiURL, data);
   }
   createPayment(data, caseId) {

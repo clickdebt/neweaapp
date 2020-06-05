@@ -38,6 +38,10 @@ export class ArrangementModalPage implements OnInit {
   updatedIndex = -1;
   networkStatus;
   isDetailsPage;
+  currentCase;
+  isGroupArrangement = false;
+  baseOutstanding;
+  groupArrId;
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -48,10 +52,9 @@ export class ArrangementModalPage implements OnInit {
     private commonService: CommonService
   ) {
     this.caseId = navParams.get('caseId');
-    this.outstanding = navParams.get('d_outstanding');
+    this.baseOutstanding = this.outstanding = navParams.get('d_outstanding');
     this.isDetailsPage = navParams.get('isDetailsPage');
-    console.log(navParams);
-
+    this.currentCase = navParams.get('currentCase');
   }
 
   ngOnInit() {
@@ -76,6 +79,7 @@ export class ArrangementModalPage implements OnInit {
   }
   initForm() {
     this.arrangementForm = this.formBuilder.group({
+      selectedLinkCaseIds: [[], []],
       frequency: ['', [Validators.required]],
       amount: ['', [Validators.required]],
       ref_amount: [this.outstanding, [Validators.required]],
@@ -102,9 +106,16 @@ export class ArrangementModalPage implements OnInit {
         note: this.arrangementForm.value.note,
         mode: this.arrangementMode
       };
+      let linkedCases = this.arrangementForm.value.selectedLinkCaseIds;
+      let type = 'edit';
+      if (linkedCases.length) {
+        linkedCases.push(this.caseId);
+        this.arrangementObj.cases = linkedCases;
+        this.arrangementObj.is_group = 1;
+        type = 'group_arrangement';
+      }
       if (this.isDetailsPage === true) {
-        console.log('hii');
-        this.caseActionService.createArrangement(this.arrangementObj, this.caseId)
+        this.caseActionService.createArrangement(this.arrangementObj, this.caseId, type)
           .subscribe((response: any) => {
             this.currArrangement = {};
             this.commonService.showToast(response.data.message, 'success');
@@ -139,11 +150,23 @@ export class ArrangementModalPage implements OnInit {
   getActiveArrangements() {
     this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
       this.currArrangement = Object.values(response.current_arrangement);
+
+      if (this.currentCase.linked_cases && this.currArrangement == '' && response.group_arrangement) {
+        this.groupArrId = response.group_arrangement.case_id;
+        this.currArrangement = [response.group_arrangement];
+        if (this.currArrangement) {
+          this.isGroupArrangement = true;
+        }
+      }
       this.currArrangement = this.currArrangement.find(data => data.active == 1);
       this.getInactiveArrangements();
       if (this.currArrangement) {
         this.arrangementMode = 'archive_make';
-        this.activeArrangements.scheduleArrangements.data = Object.values(response.arrangement_schedule).reverse();
+        if (this.isGroupArrangement) {
+          this.activeArrangements.scheduleArrangements.data = Object.values(response.group_schedules);
+        } else {
+          this.activeArrangements.scheduleArrangements.data = Object.values(response.arrangement_schedule).reverse();
+        }
       }
     });
   }
@@ -181,15 +204,25 @@ export class ArrangementModalPage implements OnInit {
     const updateArrangement = await this.modalCtrl.create({
       component: UpdateArrangementModalPage,
       componentProps: {
-        caseId: this.caseId,
-        scheduleArrangement: arrangement
+        caseId: this.isGroupArrangement ? this.groupArrId : this.caseId,
+        scheduleArrangement: arrangement,
+        isGroupArr: this.isGroupArrangement
       }
     });
     updateArrangement.onDidDismiss()
       .then((response) => {
-        this.activeArrangements.scheduleArrangements.data[index] = response.data;
+        this.getActiveArrangements();
       });
     await updateArrangement.present();
+
+  }
+  onLinkCaseSelectChange(event) {
+    const linked = this.currentCase.linked_cases.filter(lc => (this.arrangementForm.value.selectedLinkCaseIds).indexOf(lc.id) != -1);
+    const linkedCasesTotalBalance = parseFloat(this.baseOutstanding) + linked.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue.d_outstanding);
+    }, 0);
+    this.outstanding = linkedCasesTotalBalance;
+    this.arrangementForm.patchValue({ 'ref_amount': linkedCasesTotalBalance });
 
   }
 }

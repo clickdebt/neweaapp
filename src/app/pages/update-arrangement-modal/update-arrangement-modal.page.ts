@@ -13,6 +13,7 @@ export class UpdateArrangementModalPage implements OnInit {
   updateArrangementForm: FormGroup;
   scheduleArrangement;
   caseId;
+  arrType;
   constructor(
     private modalCtrl: ModalController,
     private navParams: NavParams,
@@ -23,6 +24,7 @@ export class UpdateArrangementModalPage implements OnInit {
     this.initForm();
     this.caseId = this.navParams.get('caseId');
     this.scheduleArrangement = this.navParams.get('scheduleArrangement');
+    this.arrType = this.navParams.get('isGroupArr') ? 'group' : 'single';
   }
   initForm() {
     this.updateArrangementForm = this.formBuilder.group({
@@ -45,7 +47,7 @@ export class UpdateArrangementModalPage implements OnInit {
       console.log(this.updateArrangementForm.value);
 
       this.caseActionService.updateArrangement(this.updateArrangementForm.value, this.caseId,
-        this.scheduleArrangement.id).subscribe((response) => {
+        this.scheduleArrangement.id, this.arrType).subscribe((response) => {
           console.log(response);
 
           this.modalCtrl.dismiss({
