@@ -76,15 +76,31 @@ export class CaseDetailsPage implements OnInit {
   async ionViewWillEnter() {
     this.fromVrmSearch = localStorage.getItem('from_vrm');
     this.loadInitData();
+    this.actionList();
   }
 
-  loadInitData() {
-    const isNewlyn = localStorage.getItem('server_url').indexOf('newlyn');
-    if (isNewlyn !== -1) {
-      this.actions = ['Add Note', 'Add Fee', 'Visit Case', 'Deallocate case', 'Arrangement', 'Upload Document'];
+  async actionList() {
+    const isNewlyn = this.commonService.isClient('newlyn');
+    if (isNewlyn) {
+      this.actions = ['Add Note', 'Add Fee', 'Visit Case'];
+      if (this.commonService.hasPermission(this.commonService.permissionSlug.AddArrangement)) {
+        this.actions.push('Arrangement');
+      }
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.DeAllocate)) {
+        this.actions.push('Deallocate case');
+      }
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.Document)) {
+        this.actions.push('Upload Document');
+      }
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
+        this.actions.push('Add payment');
+      }
     } else {
       this.actions = ['Add Note', 'Add Fee', 'Visit Case', 'Deallocate case', 'Add Payment', 'Arrangement', 'Upload Document'];
     }
+  }
+  loadInitData() {
+
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
       this.getCaseMarkers();

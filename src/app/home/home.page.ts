@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, ModalController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { DatabaseService, CaseService, VisitService, StorageService } from '../services';
+import { DatabaseService, CaseService, VisitService, StorageService, CommonService } from '../services';
 import { PanicModalPage } from '../pages/panic-modal/panic-modal.page'
 import { forkJoin } from 'rxjs';
 import { NetworkService } from '../services/network.service';
@@ -20,6 +20,7 @@ export class HomePage implements OnInit {
   username;
   cases = [];
   bgSubscription;
+  hasVRMpermission = false;
   bgNetworkSubscription;
   constructor(
     private platform: Platform,
@@ -33,6 +34,7 @@ export class HomePage implements OnInit {
     private storageService: StorageService,
     private backgroundMode: BackgroundMode,
     private network: Network,
+    private commonService: CommonService
   ) { }
 
   ngOnInit() {
@@ -48,6 +50,10 @@ export class HomePage implements OnInit {
   ionViewWillEnter() {
     this.server_url = localStorage.getItem('server_url');
     this.username = JSON.parse(localStorage.getItem('userdata')).name;
+    this.checkPermissions();
+  }
+  async checkPermissions(){
+    this.hasVRMpermission = await this.commonService.hasPermission(this.commonService.permissionSlug.VRM);
   }
   async ionViewDidEnter() {
     if ((this.platform.is('android') || this.platform.is('ios'))

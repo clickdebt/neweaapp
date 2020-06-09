@@ -283,6 +283,7 @@ export class JobListPage implements OnInit {
           elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
             return accumulator + parseFloat(currentValue.d_outstanding);
           }, 0);
+          elem.linkedCasesTotalBalance = (elem.linkedCasesTotalBalance).toFixed(2);
         }
       }
     });
