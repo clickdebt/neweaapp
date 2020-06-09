@@ -31,7 +31,7 @@
           <th>Hold</th>
           <th>VRM</th>
           <th>Details</th>
-          <th class="w-12">Self Allocate</th>
+          <th class="w-12" *ngIf="hasSApermission">Self Allocate</th>
         </tr>
       </thead>
       <tbody>
@@ -51,7 +51,7 @@
                 Details
               </ion-button>
             </td>
-            <td class="action ">
+            <td class="action" *ngIf="hasSApermission">
               <ion-button type="submit" size="small" color="tertiary" (click)="selfAllocate(case)">
                 Self Allocate
               </ion-button>

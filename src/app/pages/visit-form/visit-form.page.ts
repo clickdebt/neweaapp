@@ -39,6 +39,7 @@ export class VisitFormPage implements OnInit {
   visitOutcome;
   distance;
   locationOverride = false;
+  tomiles = 1609.34;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -243,8 +244,8 @@ export class VisitFormPage implements OnInit {
       header: 'Location issue',
       message: 'It is a business requirement that you are at property before starting a case visit.'
         + ' <br> You appear to be atleast '
-        + this.distance
-        + 'meters away from the property.',
+        + (this.distance / this.tomiles).toFixed(2)
+        + ' Miles away from the property.',
       buttons: [
         {
           text: 'Cancel',
@@ -288,7 +289,7 @@ export class VisitFormPage implements OnInit {
       payment_data: this.paymentInfo,
       arrangement_data: this.arrangementInfo,
       locationOverride: this.locationOverride,
-      distance: this.distance
+      distance: (this.distance / this.tomiles).toFixed(2)
     };
 
     const form_data = {

@@ -27,7 +27,7 @@
           <ion-label>Map View</ion-label>
         </div>
       </ion-col>
-      <ion-col>
+      <ion-col *ngIf="hasVRMpermission">
         <div class="dashboard-icon box4" [routerLink]="['/home/vrm-search']">
           <div>
             <img src="assets/image/search.svg">

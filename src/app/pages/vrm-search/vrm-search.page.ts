@@ -5,6 +5,7 @@ import { Platform } from '@ionic/angular';
 import { StorageService, CommonService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { CaseActionService } from 'src/app/services/case-action.service';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-vrm-search',
@@ -17,7 +18,7 @@ export class VrmSearchPage implements OnInit {
   currentDate;
   isSearch = false;
   isMobile = false;
-
+  hasSApermission = false;
   constructor(
     private caseService: CaseService,
     private platform: Platform,
@@ -32,6 +33,10 @@ export class VrmSearchPage implements OnInit {
   }
   async ionViewWillEnter() {
     this.currentDate = moment().format('YYYY-MM-DD hh:mm:ss');
+    this.checkPermissions();
+  }
+  async checkPermissions() {
+    this.hasSApermission = await this.commonService.hasPermission(this.commonService.permissionSlug.SelfAllocate);
   }
   search() {
     if (this.searchBarValue && this.searchBarValue !== '') {
