@@ -260,6 +260,7 @@ export class JobListPage implements OnInit {
 
     caseData.forEach((elem) => {
       if (this.linkedIds.indexOf(elem.id) == -1) {
+        console.log(elem.id);
         elem.linkedCasesTotalBalance = 0;
         // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
         elem.linked_cases_group = linkedCases.filter(linked => (
@@ -285,6 +286,8 @@ export class JobListPage implements OnInit {
           }, 0);
           elem.linkedCasesTotalBalance = (elem.linkedCasesTotalBalance).toFixed(2);
         }
+      } else {
+        caseData = caseData.filter(cd => cd.id != elem.id);
       }
     });
     this.cases = this.cases.concat(caseData);
