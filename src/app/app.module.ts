@@ -25,6 +25,7 @@ import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { Network } from '@ionic-native/network/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -46,6 +47,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
   ],
   providers: [
     StatusBar,
+    NavigationBar,
     SplashScreen,
     SettingsService,
     AuthService,

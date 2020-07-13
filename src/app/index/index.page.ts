@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 @Component({
   selector: 'app-index',
@@ -7,9 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class IndexPage implements OnInit {
 
-  constructor() { }
+  constructor(private statusBar: StatusBar) { }
 
   ngOnInit() {
+  }
+  ionViewWillEnter(){
+    this.statusBar.backgroundColorByHexString('#fff');
   }
 
 }

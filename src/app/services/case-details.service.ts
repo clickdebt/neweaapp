@@ -43,7 +43,7 @@ export class CaseDetailsService {
     return this.http.post(apiURL, {'linked': linked});
   }
   getSchemeSpecificDetails(caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/custom/panels/important_panel/${caseId}/0/app_scheme_case_info?source=API`;
+    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/custom/panels/important_panel/${caseId}/0/app_scheme_case_info/scheme_panel?source=API`;
     return this.http.get(apiURL);
   }
 }

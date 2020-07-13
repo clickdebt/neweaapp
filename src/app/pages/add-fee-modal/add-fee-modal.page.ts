@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { NavParams, ModalController } from '@ionic/angular';
-import { CommonService } from 'src/app/services';
+import { CommonService, StorageService } from 'src/app/services';
 
 @Component({
   selector: 'app-add-fee-modal',
@@ -16,6 +16,7 @@ export class AddFeeModalPage implements OnInit {
   constructor(
     private caseActionService: CaseActionService,
     private modalCtrl: ModalController,
+    private storageService: StorageService,
     private commonService: CommonService) {
   }
 
@@ -36,6 +37,7 @@ export class AddFeeModalPage implements OnInit {
         amount: this.feeOptions[this.selectedFeeOption].amount
       };
       this.caseActionService.addFee(feeData, this.caseId).subscribe((response: any) => {
+        this.storageService.set('is_case_updated', true);
         this.getFeeActions();
         this.commonService.showToast(response.data.message, 'success');
         if (response.data.data.length) {

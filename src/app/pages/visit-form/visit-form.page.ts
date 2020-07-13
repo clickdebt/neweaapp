@@ -266,6 +266,7 @@ export class VisitFormPage implements OnInit {
     await alert.present();
   }
   async onSubmit(event) {
+    this.storageService.set('is_case_updated', true);
     // console.log(event, event.data);
     // console.log(this.paymentInfo);
     // console.log(this.arrangementInfo);

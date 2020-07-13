@@ -72,18 +72,16 @@ export class JobListPage implements OnInit {
     this.showFilter = false;
     this.showSort = false;
     // this.getFilters();
-    // if (!(this.cases.length > 0)) {
-    //   this.getCases('');
-    // } else if (await this.storageService.get('is_case_updated')) {
-    this.page = 1;
-    this.cases = [];
-    this.linkedIds = [];
-    this.getCases('');
-    if (await this.storageService.get('is_case_updated')) {
+    if (!(this.cases.length > 0)) {
+      this.getCases('');
+    } else if (await this.storageService.get('is_case_updated')) {
+      this.page = 1;
+      this.cases = [];
+      this.linkedIds = [];
+      this.getCases('');
       this.updateCasesData();
       await this.storageService.set('is_case_updated', false);
     }
-    // }
     this.currentDate = moment().format('YYYY-MM-DD hh:mm:ss');
   }
 
