@@ -83,7 +83,7 @@ export class CaseDetailsPage implements OnInit {
     const isNewlyn = this.commonService.isClient('newlyn');
     if (isNewlyn) {
       this.actions = ['Add Note', 'Add Fee', 'Visit Case'];
-      if (this.commonService.hasPermission(this.commonService.permissionSlug.AddArrangement)) {
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddArrangement)) {
         this.actions.push('Arrangement');
       }
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.DeAllocate)) {

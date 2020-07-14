@@ -8,6 +8,7 @@ import { NetworkService } from '../services/network.service';
 import * as moment from 'moment';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { Network } from '@ionic-native/network/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -34,7 +35,8 @@ export class HomePage implements OnInit {
     private storageService: StorageService,
     private backgroundMode: BackgroundMode,
     private network: Network,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private statusBar: StatusBar
   ) { }
 
   ngOnInit() {
@@ -48,6 +50,8 @@ export class HomePage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.statusBar.styleLightContent();
+    this.statusBar.backgroundColorByHexString('#000');
     this.server_url = localStorage.getItem('server_url');
     this.username = JSON.parse(localStorage.getItem('userdata')).name;
     this.checkPermissions();

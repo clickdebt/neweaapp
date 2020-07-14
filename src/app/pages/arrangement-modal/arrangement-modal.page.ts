@@ -6,7 +6,7 @@ import { CaseActionService } from 'src/app/services/case-action.service';
 import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-arrangement-modal.page';
 import { NetworkService } from 'src/app/services/network.service';
 import * as moment from 'moment';
-import { CommonService } from 'src/app/services';
+import { CommonService, StorageService } from 'src/app/services';
 @Component({
   selector: 'app-arrangement-modal',
   templateUrl: './arrangement-modal.page.html',
@@ -49,7 +49,8 @@ export class ArrangementModalPage implements OnInit {
     private navParams: NavParams,
     private caseActionService: CaseActionService,
     private networkService: NetworkService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private storageService: StorageService
   ) {
     this.caseId = navParams.get('caseId');
     this.baseOutstanding = this.outstanding = navParams.get('d_outstanding');
@@ -93,6 +94,7 @@ export class ArrangementModalPage implements OnInit {
   }
   save() {
     if (this.arrangementForm.valid) {
+      this.storageService.set('is_case_updated', true);
       this.arrangementObj = {
         freq: this.arrangementForm.value.frequency,
         amount: this.arrangementForm.value.amount,

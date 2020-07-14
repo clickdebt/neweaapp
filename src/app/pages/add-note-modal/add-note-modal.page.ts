@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { CaseActionService } from 'src/app/services/case-action.service';
-import { CommonService } from 'src/app/services';
+import { CommonService, StorageService } from 'src/app/services';
 
 @Component({
   selector: 'app-add-note-modal',
@@ -17,7 +17,8 @@ export class AddNoteModalPage implements OnInit {
   constructor(
     private modalCtrl: ModalController,
     private caseActionService: CaseActionService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private storageService: StorageService
   ) { }
 
   ngOnInit() {
@@ -50,6 +51,7 @@ export class AddNoteModalPage implements OnInit {
         display_officer: 1,
         case_ids: this.selectedLinkCaseIds
       };
+      this.storageService.set('is_case_updated', true);
       this.caseActionService.saveNoteData(data, this.caseId).subscribe((response: any) => {
         this.commonService.showToast(response.message, 'success');
         this.dismiss();

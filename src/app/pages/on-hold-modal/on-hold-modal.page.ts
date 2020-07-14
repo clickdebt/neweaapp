@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { CaseActionService } from 'src/app/services/case-action.service';
-import { CommonService } from 'src/app/services';
+import { CommonService, StorageService } from 'src/app/services';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -18,7 +18,8 @@ export class OnHoldModalPage implements OnInit {
     private modalCtrl: ModalController,
     private caseActionService: CaseActionService,
     private commonService: CommonService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private storageService: StorageService
   ) { }
 
   ngOnInit() {
@@ -44,6 +45,7 @@ export class OnHoldModalPage implements OnInit {
   save() {
     console.log(this.holdForm.value);
     this.caseActionService.saveOnHoldStatus(this.holdForm.value, this.caseId).subscribe((response: any) => {
+      this.storageService.set('is_case_updated', true);
       console.log(response);
       this.commonService.showToast(response.data.message, 'success');
       this.modalCtrl.dismiss({

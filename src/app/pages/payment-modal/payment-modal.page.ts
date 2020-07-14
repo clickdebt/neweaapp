@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { NetworkService } from 'src/app/services/network.service';
 import { CaseActionService } from 'src/app/services/case-action.service';
+import { StorageService } from 'src/app/services';
 
 @Component({
   selector: 'app-payment-modal',
@@ -35,7 +36,8 @@ export class PaymentModalPage implements OnInit {
     navParams: NavParams,
     private caseDetailsService: CaseDetailsService,
     private networkService: NetworkService,
-    private caseActionService: CaseActionService
+    private caseActionService: CaseActionService,
+    private storageService: StorageService
   ) {
     this.caseId = navParams.get('caseId');
     this.isDetailsPage = navParams.get('isDetailsPage');
@@ -68,6 +70,7 @@ export class PaymentModalPage implements OnInit {
   }
   save() {
     if (this.paymentsForm.valid) {
+      this.storageService.set('is_case_updated', true);
       this.paymentObj = {
         date: this.paymentsForm.value.date,
         amount: this.paymentsForm.value.amount,

@@ -3,6 +3,7 @@ import { ModalController, NavParams } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as moment from 'moment';
 import { CaseActionService } from 'src/app/services/case-action.service';
+import { StorageService } from 'src/app/services';
 
 @Component({
   selector: 'app-update-arrangement-modal',
@@ -18,7 +19,9 @@ export class UpdateArrangementModalPage implements OnInit {
     private modalCtrl: ModalController,
     private navParams: NavParams,
     private formBuilder: FormBuilder,
-    private caseActionService: CaseActionService) { }
+    private caseActionService: CaseActionService,
+    private storageService: StorageService
+    ) { }
 
   ngOnInit() {
     this.initForm();
@@ -41,6 +44,7 @@ export class UpdateArrangementModalPage implements OnInit {
   }
   update() {
     if (this.updateArrangementForm.valid) {
+      this.storageService.set('is_case_updated', true);
       this.updateArrangementForm.value.date = moment(this.updateArrangementForm.value.date).format('YYYY-MM-DD');
       this.scheduleArrangement.date = this.updateArrangementForm.value.date;
       this.scheduleArrangement.amount = this.updateArrangementForm.value.amount;
