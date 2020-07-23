@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { VisitService, CaseService, DatabaseService } from 'src/app/services';
 import { StorageService } from 'src/app/services/storage.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, AlertController } from '@ionic/angular';
+import { ModalController, AlertController, NavController } from '@ionic/angular';
 import { CommonService } from 'src/app/services';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
@@ -40,6 +40,8 @@ export class VisitFormPage implements OnInit {
   distance;
   locationOverride = false;
   tomiles = 1609.34;
+  linked = [];
+  linked_cases_to_visit = [];
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -51,7 +53,8 @@ export class VisitFormPage implements OnInit {
     private commonService: CommonService,
     private databaseService: DatabaseService,
     private networkService: NetworkService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private navCtrl: NavController,
   ) { }
 
   ngOnInit() {
@@ -70,7 +73,7 @@ export class VisitFormPage implements OnInit {
   async ionViewWillEnter() {
     this.caseId = this.route.snapshot.params.id;
     this.getLocation();
-    this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'))
+    this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'));
     if (this.visitCaseData) {
       if (this.visitCaseData.debtor.enforcement_addresses) {
         this.addressData = {
@@ -251,7 +254,7 @@ export class VisitFormPage implements OnInit {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            this.router.navigate(['/home/job-list']);
+            this.goBack();
           }
         },
         {
@@ -265,7 +268,54 @@ export class VisitFormPage implements OnInit {
     });
     await alert.present();
   }
+  async goBack() {
+    if (this.storageService.get('from_map_page')) {
+      this.storageService.set('not_reload_map', true);
+      this.storageService.remove('from_map_page');
+    }
+    this.navCtrl.back();
+  }
   async onSubmit(event) {
+
+
+    if (this.visitCaseData.linked_cases && this.visitCaseData.linked_cases.length) {
+      this.visitCaseData.linked_cases.forEach(element => {
+        this.linked.push({
+          name: 'linked_cases',
+          type: 'checkbox',
+          value: element.id,
+          label: element.id
+        });
+      });
+      const alert = await this.alertCtrl.create({
+        header: 'Add visit to linked cases',
+        message: `Do you want to add same visit to linked cases?`,
+        inputs: this.linked,
+        buttons: [
+          {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+              this.submitForm(event);
+            }
+          },
+          {
+            text: 'Yes',
+            handler: data => {
+              console.log(data);
+              this.linked_cases_to_visit = data;
+              this.submitForm(event);
+            }
+          }
+        ]
+      });
+      await alert.present();
+    } else {
+      this.submitForm(event);
+    }
+
+  }
+  submitForm(event) {
     this.storageService.set('is_case_updated', true);
     // console.log(event, event.data);
     // console.log(this.paymentInfo);
@@ -296,11 +346,12 @@ export class VisitFormPage implements OnInit {
     const form_data = {
       form_id: this.formData.id,
       case_id: this.caseId,
+      linked_cases_to_visit: this.linked_cases_to_visit,
       status: 1,
       form_values: visit_report_data
     };
     console.log(form_data);
-    let visitFormData = [
+    const visitFormData = [
       { name: 'case_id', value: this.caseId },
       { name: 'form_data', value: `'${encodeURI(JSON.stringify(form_data))}'` },
       { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
@@ -326,7 +377,6 @@ export class VisitFormPage implements OnInit {
 
     }
   }
-
   ionViewWillLeave() {
     this.storageService.remove('caseId');
   }

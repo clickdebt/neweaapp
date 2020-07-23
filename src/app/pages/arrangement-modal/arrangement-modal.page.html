@@ -118,7 +118,7 @@
         <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
           <ion-label position="floating">First Payment Date<ion-text color="danger">*</ion-text>
           </ion-label>
-          <ion-datetime displayFormat="DD-MM-YYYY" formControlName="firstPaymentDate"></ion-datetime>
+          <ion-input formControlName="firstPaymentDate" (click)="openCalendar('firstPaymentDate')" readonly=""></ion-input>
         </ion-item>
         <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
           <ion-label position="floating">First Amount<ion-text color="danger">*</ion-text>
@@ -135,7 +135,7 @@
         <ion-item>
           <ion-label position="floating">Start Date <ion-text color="danger">*</ion-text>
           </ion-label>
-          <ion-datetime displayFormat="DD-MM-YYYY" formControlName="start"></ion-datetime>
+          <ion-input formControlName="start" (click)="openCalendar('start')"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="floating">Method<ion-text color="danger">*</ion-text>

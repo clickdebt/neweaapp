@@ -56,7 +56,7 @@ export class CaseActionService {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/update/${caseId}/${type}/default/0/update/${arrangementId}?source=API`;
     return this.http.post(apiURL, data);
   }
-  createArrangement(data, caseId, type='edit') {
+  createArrangement(data, caseId, type = 'edit') {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/arrangements/case_actions_panels/${type}/${caseId}?source=API`;
     return this.http.post(apiURL, data);
   }
@@ -80,5 +80,14 @@ export class CaseActionService {
   selfCaseAllocate(caseId) {
     const apiURL = localStorage.getItem('server_url') + `b/system/v3/cases/self_case_allocate/${caseId}?source=API`;
     return this.http.get(apiURL);
+  }
+
+  takePayment(data) {
+    const apiURL = localStorage.getItem('server_url') + `b/payment/sage_pay_actions/makePayment?source=API`;
+    return this.http.post(apiURL, data);
+  }
+  addPayment(data, caseId) {
+    const apiURL = localStorage.getItem('server_url') + 'b/payment/sage_pay_actions/create_payment/' + caseId + '/0?source=API';
+    return this.http.post(apiURL, data);
   }
 }

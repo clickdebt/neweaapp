@@ -22,7 +22,7 @@ export class JobListPage implements OnInit {
   filters = [];
   filterMaster;
   quick = [
-    { title: 'Need a Visit', isChecked: false, id: 'Visit', type: 'stageType' }
+    { title: 'Need a Visit', isChecked: true, id: 'Visit', type: 'stageType' }
   ];
   sortVal = '';
   shouldShowCancel: boolean;
@@ -73,7 +73,7 @@ export class JobListPage implements OnInit {
     this.showSort = false;
     // this.getFilters();
     if (!(this.cases.length > 0)) {
-      this.getCases('');
+      this.filterCases();
     } else if (await this.storageService.get('is_case_updated')) {
       this.page = 1;
       this.cases = [];
@@ -122,9 +122,12 @@ export class JobListPage implements OnInit {
   }
 
   filterCases() {
-    Object.keys(this.filterMaster).forEach(key => {
-      this.filters[key] = this.filterMaster[key].filter(elm => elm.isChecked).map(s => s.id);
-    });
+    if (this.filterMaster) {
+      Object.keys(this.filterMaster).forEach(key => {
+        this.filters[key] = this.filterMaster[key].filter(elm => elm.isChecked).map(s => s.id);
+      });
+    }
+
     this.quick.forEach(elm => {
       this.filters[elm.type] = [];
       if (elm.isChecked) {
@@ -150,6 +153,7 @@ export class JobListPage implements OnInit {
       limit: this.limit,
       page: this.page
     };
+    console.log(this.filters);
     Object.keys(this.filters).forEach(fil => {
       if (this.filters[fil] != undefined && this.filters[fil].length) {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
@@ -258,7 +262,7 @@ export class JobListPage implements OnInit {
 
     caseData.forEach((elem) => {
       if (this.linkedIds.indexOf(elem.id) == -1) {
-        console.log(elem.id);
+        // console.log(elem.id);
         elem.linkedCasesTotalBalance = 0;
         // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
         elem.linked_cases_group = linkedCases.filter(linked => (

@@ -10,6 +10,7 @@ import { CaseActionService } from 'src/app/services/case-action.service';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
 import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
+import { TakePaymentPage } from '../take-payment/take-payment.page';
 
 @Component({
   selector: 'app-case-details',
@@ -56,6 +57,7 @@ export class CaseDetailsPage implements OnInit {
   actions: string[];
   SelectedAction = '';
   caseDocuments = [];
+  linkedTotal = 0;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -70,10 +72,10 @@ export class CaseDetailsPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.caseId = this.route.snapshot.params.id;
   }
 
   async ionViewWillEnter() {
+    this.caseId = this.route.snapshot.params.id;
     this.fromVrmSearch = localStorage.getItem('from_vrm');
     this.loadInitData();
     this.actionList();
@@ -93,16 +95,27 @@ export class CaseDetailsPage implements OnInit {
         this.actions.push('Upload Document');
       }
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
-        this.actions.push('Add payment');
+        this.actions.push('Add Payment');
+      }
+      if (1 || await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
+        this.actions.push('Take Payment');
       }
     } else {
-      this.actions = ['Add Note', 'Add Fee', 'Visit Case', 'Deallocate case', 'Add Payment', 'Arrangement', 'Upload Document'];
+      this.actions = ['Add Note', 'Add Fee', 'Visit Case', 'Deallocate case', 'Add Payment', 'Take Payment'
+        , 'Arrangement', 'Upload Document'];
     }
   }
   loadInitData() {
 
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
+      if (this.currentCaseData.linked_cases && this.currentCaseData.linked_cases.length) {
+        const linkedCasesTotalBalance = parseFloat(this.currentCaseData.d_outstanding)
+          + this.currentCaseData.linked_cases.reduce((accumulator, currentValue) => {
+            return accumulator + parseFloat(currentValue.d_outstanding);
+          }, 0);
+        this.linkedTotal = linkedCasesTotalBalance;
+      }
       this.getCaseMarkers();
       this.getSummary();
       this.getClient();
@@ -126,6 +139,8 @@ export class CaseDetailsPage implements OnInit {
       this.addFee();
     } else if (this.SelectedAction === 'Add Payment') {
       this.addPayment();
+    } else if (this.SelectedAction === 'Take Payment') {
+      this.takePayment();
     } else if (this.SelectedAction === 'Arrangement') {
       this.addArrangement();
     } else if (this.SelectedAction === 'Upload Document') {
@@ -408,6 +423,7 @@ export class CaseDetailsPage implements OnInit {
             };
             this.caseActionService.deAllocationCase(data, this.caseId).
               subscribe(async (response) => {
+                this.storageService.set('is_case_updated', true);
                 // TODO
                 // let cases = await this.storageService.get('cases');
                 // console.log(cases);
@@ -443,6 +459,18 @@ export class CaseDetailsPage implements OnInit {
 
     await AddPaymentModal.present();
   }
+  async takePayment() {
+    const takePaymentModal = await this.modalCtrl.create({
+      component: TakePaymentPage,
+      componentProps: {
+        caseId: this.caseId,
+        debtorId: this.currentCaseData.debtorid,
+        isDetailsPage: true
+      }
+    });
+
+    await takePaymentModal.present();
+  }
   async addArrangement() {
     const AddArrangementModal = await this.modalCtrl.create({
       component: ArrangementModalPage,
@@ -464,7 +492,11 @@ export class CaseDetailsPage implements OnInit {
     });
     await uploadDocument.present();
   }
-  goBack() {
+  async goBack() {
+    if (this.storageService.get('from_map_page')) {
+      this.storageService.set('not_reload_map', true);
+      this.storageService.remove('from_map_page');
+    }
     this.navCtrl.back();
   }
 

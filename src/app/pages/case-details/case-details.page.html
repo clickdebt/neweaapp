@@ -281,10 +281,10 @@
           </ion-col>
           <!-- Total Data End -->
           <!-- Linked Case Data  -->
-          <ion-col size-md="3" *ngIf="currentCaseData.linked_cases">
+          <ion-col size-md="3" *ngIf="currentCaseData.linked_cases && currentCaseData.linked_cases.length">
             <ion-card>
               <ion-item class="card-title-bg">
-                <ion-card-title>Linked cases</ion-card-title>
+                <ion-card-title>Linked Cases</ion-card-title>
               </ion-item>
 
               <ion-card-content>
@@ -306,6 +306,18 @@
                   <ion-item>
                     <span class="text-color-light">
                       {{linked_case.d_outstanding | number:'0.2-2'}}
+                    </span>
+                  </ion-item>
+                </div>
+                <div class="d-flex ion-justify-content-between">
+                  <ion-item>
+                    <span class="text-color-light">
+                      Total 
+                    </span>
+                  </ion-item>
+                  <ion-item>
+                    <span class="text-color-light">
+                      {{linkedTotal | number:'0.2-2'}}
                     </span>
                   </ion-item>
                 </div>
