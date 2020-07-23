@@ -7,6 +7,8 @@ import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-a
 import { NetworkService } from 'src/app/services/network.service';
 import * as moment from 'moment';
 import { CommonService, StorageService } from 'src/app/services';
+import { CalendarModal, CalendarModalOptions } from 'ion2-calendar';
+
 @Component({
   selector: 'app-arrangement-modal',
   templateUrl: './arrangement-modal.page.html',
@@ -42,6 +44,8 @@ export class ArrangementModalPage implements OnInit {
   isGroupArrangement = false;
   baseOutstanding;
   groupArrId;
+  date;
+
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -50,7 +54,7 @@ export class ArrangementModalPage implements OnInit {
     private caseActionService: CaseActionService,
     private networkService: NetworkService,
     private commonService: CommonService,
-    private storageService: StorageService
+    private storageService: StorageService,
   ) {
     this.caseId = navParams.get('caseId');
     this.baseOutstanding = this.outstanding = navParams.get('d_outstanding');
@@ -77,6 +81,31 @@ export class ArrangementModalPage implements OnInit {
     this.modalCtrl.dismiss({
       saved: false
     });
+  }
+  async openCalendar(input) {
+    console.log(input);
+    this.date = input;
+    const options: CalendarModalOptions = {
+      title: '',
+      canBackwardsSelected: true
+    };
+    const myCalendar = await this.modalCtrl.create({
+      component: CalendarModal,
+      componentProps: {
+        options: options
+      }
+    });
+
+    myCalendar.onDidDismiss()
+      .then((response) => {
+        console.log(this.date);
+        const date = this.date;
+        console.log(response);
+        if (response.role == 'done') {
+          this.arrangementForm.controls[date].patchValue(moment(response.data.dateObj).format('YYYY-MM-DD'), { onlySelf: true });
+        }
+      });
+    await myCalendar.present();
   }
   initForm() {
     this.arrangementForm = this.formBuilder.group({
@@ -183,7 +212,7 @@ export class ArrangementModalPage implements OnInit {
       this.currentArrangementString += `<strong>&pound;${this.currArrangement.amount}</strong> with a <strong>
       ${this.frequencies[this.currArrangement.freq]}</strong> on <strong>
       ${moment(this.currArrangement.start).format('DD-MM-YYYY')}</strong>.</p>`;
-      if(this.isGroupArrangement) {
+      if (this.isGroupArrangement) {
         this.currentArrangementString += `<div>Selected Cases:  ${JSON.parse(this.currArrangement.caseids).join()}</div>`;
       }
     } else {

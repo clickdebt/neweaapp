@@ -8,6 +8,7 @@ import { ArrangementModalPageRoutingModule } from './arrangement-modal-routing.m
 
 import { ArrangementModalPage } from './arrangement-modal.page';
 import { UpdateArrangementModalPageModule } from '../update-arrangement-modal/update-arrangement-modal.module';
+import { CalendarModule } from 'ion2-calendar';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { UpdateArrangementModalPageModule } from '../update-arrangement-modal/up
     ReactiveFormsModule,
     IonicModule,
     ArrangementModalPageRoutingModule,
-    UpdateArrangementModalPageModule
+    UpdateArrangementModalPageModule,
+    CalendarModule
   ],
   declarations: [ArrangementModalPage],
   exports: [ArrangementModalPage],

@@ -26,6 +26,7 @@ import { Network } from '@ionic-native/network/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
+import { TakePaymentPageModule } from './pages/take-payment/take-payment.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -43,7 +44,9 @@ import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
     FormsModule,
     FormioModule,
     PaymentModalPageModule,
-    ArrangementModalPageModule
+    TakePaymentPageModule,
+    ArrangementModalPageModule,
+
   ],
   providers: [
     StatusBar,

@@ -52,6 +52,7 @@ export class MapViewPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.storageService.remove('not_reload_map');
   }
 
   async ionViewDidEnter() {
@@ -67,21 +68,25 @@ export class MapViewPage implements OnInit {
   }
   async getCases() {
     const caseIds = await this.storageService.get('selected_cases_for_map');
-    let params: any;
-    if (caseIds) {
-      params = { cases: caseIds, nonblocking: 1 };
-    } else {
-      params = { page: this.page++, limit: this.limit, nonblocking: 1 };
-    }
-    this.apiReq = this.caseService.getCases(params).subscribe((res: any) => {
-      this.cases = this.cases.concat(res.data);
-      if (res.data && res.data.length) {
-        this.getAddresses(res.data);
-        if (!caseIds) {
-          this.getCases();
-        }
+    const back = await this.storageService.get('not_reload_map');
+    this.storageService.remove('not_reload_map');
+    if (!back) {
+      let params: any;
+      if (caseIds) {
+        params = { cases: caseIds, nonblocking: 1 };
+      } else {
+        params = { page: this.page++, limit: this.limit, nonblocking: 1 };
       }
-    });
+      this.apiReq = this.caseService.getCases(params).subscribe((res: any) => {
+        this.cases = this.cases.concat(res.data);
+        if (res.data && res.data.length) {
+          this.getAddresses(res.data);
+          if (!caseIds) {
+            this.getCases();
+          }
+        }
+      });
+    }
   }
   getAddresses(cases) {
     if (cases) {
@@ -139,16 +144,27 @@ export class MapViewPage implements OnInit {
         (obj.debtor.debtor_phone ? '<p> <b>' + obj.debtor.debtor_phone + '</b></p>' : '') +
         '</div>' +
         '</div>' +
-        (isVisit ? '<button id="' + obj.id + '" class="' + obj.id + ' btn btn-primary visitButton">Visit Case</button>' : '');
+        '<ion-button size="small" color="secondary" id="' + obj.id + '" class="detail-' + obj.id + ' detailsButton">Details</ion-button>' +
+        (isVisit ? '<ion-button size="small" color="tertiary" id="' + obj.id + '" class="' + obj.id + ' visitButton">Visit</ion-button>' : '');
       const infowindow = new google.maps.InfoWindow({
         content: contentString
       });
       google.maps.event.addDomListener(infowindow, 'domready', () => {
         const btn = document.querySelector('.visitButton');
+        const detailsButton = document.querySelector('.detailsButton');
         google.maps.event.addDomListener(btn, 'click', () => {
           const caseId = btn.getAttribute('id');
           if (caseId) {
+            this.setCaseForBackLink();
+
             this.router.navigate(['/home/visit-form/' + caseId]);
+          }
+        });
+        google.maps.event.addDomListener(detailsButton, 'click', () => {
+          const caseId = detailsButton.getAttribute('id');
+          if (caseId) {
+            this.setCaseForBackLink();
+            this.router.navigate(['/home/case-details/' + caseId]);
           }
         });
       });
@@ -167,11 +183,14 @@ export class MapViewPage implements OnInit {
       });
     }
   }
+  async setCaseForBackLink() {
+    this.storageService.set('from_map_page', true);
+  }
   async getCurrentLocation() {
     const { coords } = await this.geolocation.getCurrentPosition();
     this.currLang = coords.longitude;
     this.currLat = coords.latitude;
-    console.log(this.currLang, this.currLat)
+    // console.log(this.currLang, this.currLat);
     return coords;
   }
 

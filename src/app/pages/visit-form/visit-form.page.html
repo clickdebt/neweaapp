@@ -1,6 +1,6 @@
 <ion-header class="shadow">
   <ion-toolbar class="ion-text-center">
-    <ion-buttons slot="start" [routerLink]="['/home/job-list']">
+    <ion-buttons slot="start" (click)="goBack()">
       <ion-icon size="large" name="arrow-back-outline"></ion-icon>
     </ion-buttons>
     <ion-title>#{{caseId}}</ion-title>

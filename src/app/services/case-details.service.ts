@@ -40,10 +40,14 @@ export class CaseDetailsService {
   }
   updateCaseMarker(col, caseId, linked) {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${caseId}/${col}?source=API`;
-    return this.http.post(apiURL, {'linked': linked});
+    return this.http.post(apiURL, { 'linked': linked });
   }
   getSchemeSpecificDetails(caseId) {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/custom/panels/important_panel/${caseId}/0/app_scheme_case_info/scheme_panel?source=API`;
+    return this.http.get(apiURL);
+  }
+  getDebtordata(caseId, debtorId) {
+    const apiURL = localStorage.getItem('server_url') + 'b/clickdebt_panel_layout/legacy/debtor_panels/manage_debtor_addresses/' + debtorId + '/' + caseId + '?source=API';
     return this.http.get(apiURL);
   }
 }
