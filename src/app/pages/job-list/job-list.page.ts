@@ -121,19 +121,25 @@ export class JobListPage implements OnInit {
     this.getCases('');
   }
 
-  filterCases() {
+  filterCases(clear = true) {
+    this.filters = [];
+    if(this.searchBarValue) {
+      this.filters['q'] = this.searchBarValue;
+    }
+
     if (this.filterMaster) {
       Object.keys(this.filterMaster).forEach(key => {
         this.filters[key] = this.filterMaster[key].filter(elm => elm.isChecked).map(s => s.id);
       });
     }
-
-    this.quick.forEach(elm => {
-      this.filters[elm.type] = [];
-      if (elm.isChecked) {
-        this.filters[elm.type] = [elm.id];
-      }
-    });
+    if (!this.filters['q']) {
+      this.quick.forEach(elm => {
+        this.filters[elm.type] = [];
+        if (elm.isChecked) {
+          this.filters[elm.type] = [elm.id];
+        }
+      });
+    }
     this.filters['sorting'] = this.sortVal;
     this.page = 1;
     this.cases = [];
@@ -143,10 +149,10 @@ export class JobListPage implements OnInit {
     this.getCases('');
 
   }
-  onInput() {
-    this.filters['q'] = this.searchBarValue;
-    this.filterCases();
-  }
+  // onInput() {
+  //   this.filters['q'] = this.searchBarValue;
+  //   this.filterCases();
+  // }
 
   async getCases(infiniteScrollEvent) {
     let params = {
