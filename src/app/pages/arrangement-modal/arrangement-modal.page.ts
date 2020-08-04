@@ -4,6 +4,7 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-arrangement-modal.page';
+import { AuthorizeCardPage } from '../authorize-card/authorize-card.page';
 import { NetworkService } from 'src/app/services/network.service';
 import * as moment from 'moment';
 import { CommonService, StorageService } from 'src/app/services';
@@ -16,6 +17,7 @@ import { CalendarModal, CalendarModalOptions } from 'ion2-calendar';
 })
 export class ArrangementModalPage implements OnInit {
   caseId = '';
+  debtorId;
   outstanding;
   arrangementForm: FormGroup;
   // tslint:disable: max-line-length
@@ -25,6 +27,7 @@ export class ArrangementModalPage implements OnInit {
   currentArrangementString = '';
   currArrangement;
   arrangementMode = 'make';
+  savedCards = [];
   activeArrangements: any = {
     currentArrangements: {
       show: true
@@ -45,6 +48,7 @@ export class ArrangementModalPage implements OnInit {
   baseOutstanding;
   groupArrId;
   date;
+  paymentGateways = [];
 
   constructor(
     private modalCtrl: ModalController,
@@ -118,7 +122,10 @@ export class ArrangementModalPage implements OnInit {
       note: ['', []],
       differentFirstPayment: [false, []],
       firstPaymentAmount: [''],
-      firstPaymentDate: ['']
+      firstPaymentDate: [''],
+      repeatPayment: [false, ''],
+      payment_method: [],
+      payment_card_list: [],
     });
   }
   save() {
@@ -135,7 +142,10 @@ export class ArrangementModalPage implements OnInit {
         first_amount: this.arrangementForm.value.firstPaymentAmount,
         first_date: this.arrangementForm.value.firstPaymentDate ? moment(this.arrangementForm.value.firstPaymentDate).format('YYYY-MM-DD') : '',
         note: this.arrangementForm.value.note,
-        mode: this.arrangementMode
+        mode: this.arrangementMode,
+        repeatPayment: this.arrangementForm.value.repeatPayment,
+        payment_method: this.arrangementForm.value.payment_method,
+        payment_card_list: this.arrangementForm.value.payment_card_list,
       };
       let linkedCases = this.arrangementForm.value.selectedLinkCaseIds;
       let type = 'edit';
@@ -171,7 +181,57 @@ export class ArrangementModalPage implements OnInit {
       this.arrangementForm.controls["firstPaymentDate"].setValidators([]);
     }
   }
+  repeatPaymentSelected(event) {
+    if (event.detail.checked) {
+      this.arrangementForm.controls.payment_card_list.setValidators([Validators.required]);
+    } else {
+      this.arrangementForm.controls.payment_card_list.setValidators([]);
+    }
+  }
+  getCards() {
+    if (this.arrangementForm.value.payment_method) {
+      let method = '';
+      let id = this.debtorId;
+      const linkedCases = this.arrangementForm.value.selectedLinkCaseIds;
+      console.log(linkedCases);
+      let grpSelCases = '';
+      if (linkedCases) {
+        method = 'group';
+        linkedCases.push(this.caseId);
+        linkedCases.forEach(element => {
+          grpSelCases += element + '@@';
+        });
+        id = grpSelCases;
+      }
+      this.caseActionService.getSavedCards(id, this.arrangementForm.value.payment_method, method).subscribe((res) => {
+        if (res) {
+          const cards = [];
+          Object.keys(res).forEach(element => {
+            cards.push({ key: element, value: res[element] });
+          });
+          this.savedCards = cards;
+        }
+      });
+    }
 
+  }
+  async manageCards() {
+    const manageCards = await this.modalCtrl.create({
+      component: AuthorizeCardPage,
+      componentProps: {
+        caseId: this.isGroupArrangement ? this.groupArrId : this.caseId,
+        debtorId: this.debtorId,
+        isGroupArr: this.isGroupArrangement
+      }
+    });
+    manageCards.onDidDismiss()
+      .then((response) => {
+        if (response) {
+          this.getCards();
+        }
+      });
+    await manageCards.present();
+  }
   toggleShow(object) {
     object.show = !object.show;
   }
@@ -181,7 +241,11 @@ export class ArrangementModalPage implements OnInit {
   getActiveArrangements() {
     this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
       this.currArrangement = Object.values(response.current_arrangement);
-
+      if (response.case.debtorid) {
+        this.debtorId = response.case.debtorid;
+        console.log(this.debtorId);
+      }
+      this.paymentGateways = response.paymentGatewayList;
       if (this.currentCase.linked_cases && this.currArrangement == '' && response.group_arrangement) {
         this.groupArrId = response.group_arrangement.case_id;
         this.currArrangement = [response.group_arrangement];

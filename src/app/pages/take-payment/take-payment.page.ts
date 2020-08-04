@@ -83,7 +83,7 @@ export class TakePaymentPage implements OnInit {
         // debtor_id: this.caseList[0].debtor_id,
         amount: this.paymentsForm.value.amount,
         card_no: this.paymentsForm.value.card_number,
-        expiry_month: moment(this.paymentsForm.value.card_expiry).format('MMYY'),
+        expiry_month: this.paymentsForm.value.card_expiry,
         cvc_no: this.paymentsForm.value.card_cvc,
         card_name: this.paymentsForm.value.card_name,
         debtor_name: this.paymentsForm.value.debtor_name,

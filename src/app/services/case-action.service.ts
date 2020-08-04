@@ -90,4 +90,16 @@ export class CaseActionService {
     const apiURL = localStorage.getItem('server_url') + 'b/payment/sage_pay_actions/create_payment/' + caseId + '/0?source=API';
     return this.http.post(apiURL, data);
   }
+  authorizeCard(data) {
+    const apiURL = localStorage.getItem('server_url') + 'b/payment/sage_pay_actions/identify_card?source=API';
+    return this.http.post(apiURL, data);
+  }
+  saveCardDetails(data) {
+    const apiURL = localStorage.getItem('server_url') + 'b/payment/sage_pay_actions/save_card_identifier?source=API';
+    return this.http.post(apiURL, data);
+  }
+  getSavedCards(debtorId, gateway, type) {
+    const apiURL = localStorage.getItem('server_url') + `b/payment/sage_pay_actions/get_card_list/${debtorId}/${gateway}/${type}?source=API`;
+    return this.http.get(apiURL);
+  }
 }
