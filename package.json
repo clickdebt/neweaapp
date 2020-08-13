@@ -20,6 +20,7 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
+    "@ionic-native/aes-256": "^5.27.0",
     "@ionic-native/background-mode": "^5.23.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/geolocation": "^5.22.0",
@@ -40,12 +41,14 @@
     "cordova-android": "^8.1.0",
     "cordova-browser": "^6.0.0",
     "cordova-plugin-actionsheet": "^2.3.3",
+    "cordova-plugin-aes256-encryption": "^2.0.1",
     "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.2",
     "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
     "cordova-plugin-nativegeocoder": "^3.2.2",
     "cordova-plugin-network-information": "^2.0.2",
+    "cordova-plugin-stetho-android": "0.0.1",
     "cordova-sqlite-storage": "^4.0.0",
     "core-js": "^2.5.4",
     "ion2-calendar": "^3.0.0-rc.0",
@@ -107,7 +110,9 @@
       "cordova-plugin-network-information": {},
       "cordova-plugin-nativeaudio": {},
       "cordova-plugin-background-mode": {},
-      "cordova-plugin-navigationbar": {}
+      "cordova-plugin-navigationbar": {},
+      "cordova-plugin-aes256-encryption": {},
+      "com.outsystems.mobile.stetho": {}
     },
     "platforms": [
       "android",

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonService } from 'src/app/services';
+import { CommonService, StorageService } from 'src/app/services';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +17,7 @@ export class DashboardPage implements OnInit {
   ionViewWillEnter() {
     this.checkPermissions();
   }
-  async checkPermissions(){
+  async checkPermissions() {
     this.hasVRMpermission = await this.commonService.hasPermission(this.commonService.permissionSlug.VRM);
   }
 

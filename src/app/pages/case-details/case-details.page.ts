@@ -84,7 +84,11 @@ export class CaseDetailsPage implements OnInit {
   async actionList() {
     const isNewlyn = this.commonService.isClient('newlyn');
     if (isNewlyn) {
-      this.actions = ['Add Note', 'Add Fee', 'Visit Case'];
+      this.actions = ['Add Note', 'Add Fee'];
+      console.log(this.caseDetails);
+      if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
+        this.actions.push('Visit Case');
+      }
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddArrangement)) {
         this.actions.push('Arrangement');
       }
@@ -94,15 +98,18 @@ export class CaseDetailsPage implements OnInit {
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.Document)) {
         this.actions.push('Upload Document');
       }
-      if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
-        this.actions.push('Add Payment');
-      }
+      // if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
+      //   this.actions.push('Add Payment');
+      // }
       if (1 || await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
         this.actions.push('Take Payment');
       }
     } else {
-      this.actions = ['Add Note', 'Add Fee', 'Visit Case', 'Deallocate case', 'Add Payment', 'Take Payment'
+      this.actions = ['Add Note', 'Add Fee', 'Deallocate case'
         , 'Arrangement', 'Upload Document'];
+      if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
+        this.actions.push('Visit Case');
+      }
     }
   }
   loadInitData() {
@@ -146,6 +153,8 @@ export class CaseDetailsPage implements OnInit {
     } else if (this.SelectedAction === 'Upload Document') {
       this.uploadDocument();
     } else if (this.SelectedAction === 'Visit Case') {
+      localStorage.setItem('visit_case_data', JSON.stringify(this.currentCaseData));
+      this.storageService.set('caseId', this.currentCaseData.id);
       this.router.navigate([`/home/visit-form/${this.caseId}`]);
     }
     this.SelectedAction = '';

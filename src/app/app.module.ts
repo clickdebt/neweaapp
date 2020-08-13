@@ -28,6 +28,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
 import { TakePaymentPageModule } from './pages/take-payment/take-payment.module';
 import { AuthorizeCardPageModule } from './pages/authorize-card/authorize-card.module';
+import { AES256 } from '@ionic-native/aes-256/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -70,6 +71,7 @@ import { AuthorizeCardPageModule } from './pages/authorize-card/authorize-card.m
     Network,
     NativeAudio,
     BackgroundMode,
+    AES256
   ],
   bootstrap: [AppComponent]
 })
