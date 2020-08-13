@@ -35,7 +35,7 @@
         <ion-item>
           <ion-label position="floating">Card Expiry <ion-text color="danger">*</ion-text>
           </ion-label>
-          <ion-input type="number" formControlName="card_expiry"></ion-input>
+          <ion-datetime displayFormat="MM/YY" pickerFormat="MM YYYY" [min]="datemin" [max]="datemax" formControlName="card_expiry"></ion-datetime>
         </ion-item>
 
         <ion-item>

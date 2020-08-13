@@ -113,7 +113,7 @@ export class ArrangementModalPage implements OnInit {
   }
   initForm() {
     this.arrangementForm = this.formBuilder.group({
-      selectedLinkCaseIds: [[], []],
+      selectedLinkCaseIds: [[]],
       frequency: ['', [Validators.required]],
       amount: ['', [Validators.required]],
       ref_amount: [this.outstanding, [Validators.required]],
@@ -195,7 +195,7 @@ export class ArrangementModalPage implements OnInit {
       const linkedCases = this.arrangementForm.value.selectedLinkCaseIds;
       console.log(linkedCases);
       let grpSelCases = '';
-      if (linkedCases) {
+      if (linkedCases.length) {
         method = 'group';
         linkedCases.push(this.caseId);
         linkedCases.forEach(element => {
@@ -248,8 +248,9 @@ export class ArrangementModalPage implements OnInit {
       this.paymentGateways = response.paymentGatewayList;
       if (this.currentCase.linked_cases && this.currArrangement == '' && response.group_arrangement) {
         this.groupArrId = response.group_arrangement.case_id;
-        this.currArrangement = [response.group_arrangement];
-        if (this.currArrangement) {
+        this.currArrangement = response.group_arrangement;
+        if (this.currArrangement && this.currArrangement.length) {
+          console.log('==innnn-====', this.currArrangement);
           this.isGroupArrangement = true;
         }
       }

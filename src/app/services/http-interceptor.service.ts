@@ -43,8 +43,8 @@ export class HttpInterceptorService implements HttpInterceptor {
             }),
             catchError(error => {
                 this.commonService.showToast(error.error.message);
+                this.commonService.dismissLoader();
                 if (error.status === 401 && !req.url.includes('login')) {
-                    this.commonService.dismissLoader();
                     localStorage.removeItem('remote_token');
                     localStorage.removeItem('userdata');
                     this.router.navigate(['/login']);

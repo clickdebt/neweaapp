@@ -59,7 +59,7 @@ export class LoginPage implements OnInit {
                 });
                 permissionArr = permissionArr.concat(p);
               });
-              console.log(permissionArr);
+              // console.log(permissionArr);
               this.storageService.set('permissionArray', permissionArr);
             }
             localStorage.setItem('remote_token', data['data']['remote_token']);

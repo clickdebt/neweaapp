@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { NetworkService } from 'src/app/services/network.service';
 import { CaseActionService } from 'src/app/services/case-action.service';
-import { StorageService } from 'src/app/services';
+import { StorageService, CommonService } from 'src/app/services';
 import * as moment from 'moment';
 @Component({
   selector: 'app-take-payment',
@@ -18,11 +18,14 @@ export class TakePaymentPage implements OnInit {
   caseId;
   debtorId;
   networkStatus;
+  datemin = moment().format('YYYY-MM-DD');
+  datemax = moment().add('100', 'years').format('YYYY-MM-DD');
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
     private router: Router,
-    navParams: NavParams,
+    private navParams: NavParams,
+    private commonService: CommonService,
     private caseDetailsService: CaseDetailsService,
     private networkService: NetworkService,
     private caseActionService: CaseActionService,
@@ -46,7 +49,7 @@ export class TakePaymentPage implements OnInit {
       reference: [''],
       card_name: ['', [Validators.required]],
       card_number: ['', [Validators.required, Validators.pattern('^[0-9]{12,20}$')]],
-      card_expiry: ['', [Validators.required, Validators.pattern('^[0-9]{4}$')]],
+      card_expiry: ['', [Validators.required]],
       card_cvc: ['', [Validators.required, Validators.pattern('^[0-9]{3,4}$')]],
       method: ['1'],
       source: ['1'],
@@ -83,7 +86,7 @@ export class TakePaymentPage implements OnInit {
         // debtor_id: this.caseList[0].debtor_id,
         amount: this.paymentsForm.value.amount,
         card_no: this.paymentsForm.value.card_number,
-        expiry_month: this.paymentsForm.value.card_expiry,
+        expiry_month: moment(this.paymentsForm.value.card_expiry).format('MMYY'),
         cvc_no: this.paymentsForm.value.card_cvc,
         card_name: this.paymentsForm.value.card_name,
         debtor_name: this.paymentsForm.value.debtor_name,
@@ -94,8 +97,8 @@ export class TakePaymentPage implements OnInit {
       console.log(obj);
       this.caseActionService.takePayment(obj).subscribe((res: any) => {
         console.log(res);
-        if (res.errors) {
-
+        if (res.status == 'Invalid') {
+          this.commonService.showToast(res.statusDetail);
         } else {
           this.addPayment(res);
         }
@@ -125,6 +128,12 @@ export class TakePaymentPage implements OnInit {
     };
     this.caseActionService.addPayment(obj, this.caseId).subscribe((response: any) => {
       console.log(res);
+      this.storageService.set('is_case_updated', true);
+      this.commonService.showToast(res.message);
+      if (res.success) {
+        this.paymentsForm.reset();
+        this.dismiss();
+      }
     });
 
   }

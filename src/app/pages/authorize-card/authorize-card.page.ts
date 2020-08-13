@@ -18,6 +18,8 @@ export class AuthorizeCardPage implements OnInit {
   caseId;
   debtorId;
   networkStatus;
+  datemin = moment().format('YYYY-MM-DD');
+  datemax = moment().add('100', 'years').format('YYYY-MM-DD');
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -42,7 +44,7 @@ export class AuthorizeCardPage implements OnInit {
     this.addCardForm = this.formBuilder.group({
       card_name: ['', [Validators.required]],
       card_number: ['', [Validators.required, Validators.pattern('^[0-9]{12,20}$')]],
-      card_expiry: ['', [Validators.required, Validators.pattern('^[0-9]{4}$')]],
+      card_expiry: ['', [Validators.required]],
       card_cvc: ['', [Validators.required, Validators.pattern('^[0-9]{3,4}$')]],
     });
   }
@@ -50,14 +52,14 @@ export class AuthorizeCardPage implements OnInit {
     if (this.addCardForm.valid) {
       const obj = {
         card_no: this.addCardForm.value.card_number,
-        expiry_month: this.addCardForm.value.card_expiry,
+        expiry_month: moment(this.addCardForm.value.card_expiry).format('MMYY'),
         cvc_no: this.addCardForm.value.card_cvc,
         card_name: this.addCardForm.value.card_name,
       };
 
       this.caseActionService.authorizeCard(obj).subscribe((res: any) => {
         console.log(res);
-        if (res.success) {
+        if (res.success == true) {
           // save card details
           const data = {
             debtor_id: this.debtorId,
@@ -72,11 +74,17 @@ export class AuthorizeCardPage implements OnInit {
             if (response.status == 'success') {
               this.commonService.showToast('card added successfully.');
             } else {
-              this.commonService.showToast(response.errors);
+              this.commonService.showToast(response.errors ? response.errors : response.result.statusDetail);
             }
           });
         } else {
-          this.commonService.showToast(res.message ? res.message : 'Unable to authenticate card.');
+          if (res.message) {
+            this.commonService.showToast(res.message);
+          } else {
+            (res.data.errors).forEach(element => {
+              this.commonService.showToast(element.description);
+            });
+          }
         }
       });
     }

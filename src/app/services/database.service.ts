@@ -27,7 +27,8 @@ export class DatabaseService {
 
         this.database = await this.sqlite.create({
           name: 'fieldAgentV3.db',
-          location: 'default'
+          location: 'default',
+          key: 'u3a5wIA73vmG6ruB'
         });
 
         const value = await this.storageService.get('database_filled');
@@ -78,7 +79,7 @@ export class DatabaseService {
   async executeQuery(query, params = null) {
     try {
       const result = await this.database.executeSql(query, params);
-      console.log('exexute query', result);
+      // console.log('exexute query', result);
 
       return result;
     } catch (error) {
