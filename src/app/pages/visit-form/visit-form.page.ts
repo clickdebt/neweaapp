@@ -42,6 +42,7 @@ export class VisitFormPage implements OnInit {
   tomiles = 1609.34;
   linked = [];
   linked_cases_to_visit = [];
+  isNewlyn = false;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -72,21 +73,12 @@ export class VisitFormPage implements OnInit {
 
   async ionViewWillEnter() {
     this.caseId = this.route.snapshot.params.id;
-    this.getLocation();
     this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'));
-    if (this.visitCaseData) {
-      if (this.visitCaseData.debtor.enforcement_addresses) {
-        this.addressData = {
-          address_ln1: this.visitCaseData.debtor.enforcement_addresses[0].address_ln1,
-          address_ln2: this.visitCaseData.debtor.enforcement_addresses[0].address_ln2,
-          address_ln3: this.visitCaseData.debtor.enforcement_addresses[0].address_ln3,
-          address_town: this.visitCaseData.debtor.enforcement_addresses[0].address_town,
-          address_postcode: this.visitCaseData.debtor.enforcement_addresses[0].address_postcode,
-        };
-        this.addressData.address_str = Object.values(this.addressData).join(',');
-        this.getGeocodesLatLongs(this.addressData);
-      }
-    }
+    this.isNewlyn = this.commonService.isClient('newlyn');
+    this.commonService.checkLocation();
+    this.getLocation();
+  }
+  async getVisitFormAndOutcome() {
     if (this.networkService.getCurrentNetworkStatus() === 1) {
       this.visitService.getVisitForm().subscribe(res => {
         this.caseService.getVisitOutcomes(this.caseId).subscribe(response => {
@@ -108,23 +100,26 @@ export class VisitFormPage implements OnInit {
     }
   }
   getGeocodesLatLongs(obj) {
-    this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
-      if (res.status === 'OK' && res.results && res.results[0]) {
-        obj.location = res.results[0]['geometry']['location'];
-        const source = new google.maps.LatLng(obj.location.lat, obj.location.lng);
-        const destination = new google.maps.LatLng(this.currLat, this.currLang);
-        this.distance = google.maps.geometry.spherical.computeDistanceBetween(source, destination);
-        console.log(obj.location.lat, obj.location.lng, this.currLat, this.currLang, this.distance);
-        if (this.distance > 200) {
-          this.confirmLocation();
+    if (this.networkService.getCurrentNetworkStatus() == 1 && this.isNewlyn) {
+      this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
+        if (res.status === 'OK' && res.results && res.results[0]) {
+          obj.location = res.results[0]['geometry']['location'];
+          const source = new google.maps.LatLng(obj.location.lat, obj.location.lng);
+          const destination = new google.maps.LatLng(this.currLat, this.currLang);
+          this.distance = google.maps.geometry.spherical.computeDistanceBetween(source, destination);
+          console.log(obj.location.lat, obj.location.lng, this.currLat, this.currLang, this.distance);
+          if (this.distance > 200) {
+            this.confirmLocation();
+          }
+        } else {
+          this.commonService.showToast('Address not found');
+          console.log(obj, res);
         }
-      } else {
-        this.commonService.showToast('Address not found');
-        console.log(obj, res);
-      }
-    }, err => {
-      console.log(err);
-    });
+      }, err => {
+        console.log(err);
+        this.commonService.showToast(err);
+      });
+    }
   }
   dataRead(obj) {
     this.formData = obj.data[0];
@@ -179,6 +174,31 @@ export class VisitFormPage implements OnInit {
     const { coords } = await this.geolocation.getCurrentPosition();
     this.currLang = coords.longitude;
     this.currLat = coords.latitude;
+    console.log(this.currLang, this.currLat);
+    if (this.visitCaseData) {
+      if (this.visitCaseData.debtor.enforcement_addresses.length) {
+        this.addressData = {
+          address_ln1: this.visitCaseData.debtor.enforcement_addresses[0].address_ln1,
+          address_ln2: this.visitCaseData.debtor.enforcement_addresses[0].address_ln2,
+          address_ln3: this.visitCaseData.debtor.enforcement_addresses[0].address_ln3,
+          address_town: this.visitCaseData.debtor.enforcement_addresses[0].address_town,
+          address_postcode: this.visitCaseData.debtor.enforcement_addresses[0].address_postcode,
+        };
+        this.addressData.address_str = Object.values(this.addressData).join(',');
+        this.getGeocodesLatLongs(this.addressData);
+      } else if (this.visitCaseData.debtor.addresses.length) {
+        this.addressData = {
+          address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
+          address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
+          address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
+          address_town: this.visitCaseData.debtor.addresses[0].address_town,
+          address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
+        };
+        this.addressData.address_str = Object.values(this.addressData).join(',');
+        this.getGeocodesLatLongs(this.addressData);
+      }
+    }
+    this.getVisitFormAndOutcome();
     // const source = new google.maps.LatLng(-34, 151);
     // const destination = new google.maps.LatLng(-35, 151);
     // const distance = google.maps.geometry.spherical.computeDistanceBetween(source, destination);

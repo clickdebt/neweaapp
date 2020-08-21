@@ -216,7 +216,9 @@
             <td>{{case.d_outstanding}}</td>
             <td>{{case.linkedCasesTotalBalance}}</td>
             <td>
-              {{case.debtor.enforcement_addresses.length ? case.debtor.enforcement_addresses[0].address_postcode : ''}}
+              {{case.debtor.enforcement_addresses.length ? case.debtor.enforcement_addresses[0].address_postcode : (
+                case.debtor.addresses.length ? case.debtor.addresses[0].address_postcode : ''
+              )}}
             </td>
             <td>{{case.visitcount_total}}</td>
             <td>{{case.current_status.status_name}}</td>
@@ -347,8 +349,13 @@
             </ion-col>
             <ion-col size="6">
               Postcode :
-              <span *ngIf="case.debtor.enforcement_addresses.length">
+              <span *ngIf="case.debtor.enforcement_addresses.length else add_postcode">
                 {{case.debtor.enforcement_addresses[0].address_postcode}} </span>
+              <ng-template #add_postcode>
+                <span *ngIf="case.debtor.addresses.length">
+                  {{case.debtor.addresses[0].address_postcode}} </span>
+              </ng-template>
+
             </ion-col>
             <ion-col size="6">
               visit :
@@ -435,9 +442,8 @@
     </ion-infinite-scroll>
   </div>
   <!-- mobile card ends-->
-
 </ion-content>
-<ion-footer>
+<ion-footer *ngIf="selectedCaseIds.length>0">
   <ion-toolbar>
     <ion-button *ngIf="selectedCaseIds.length>0" (click)="showCasesOnMap()" color="secondary" expand="full">Show
       {{selectedCaseIds.length}} cases

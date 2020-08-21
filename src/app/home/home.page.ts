@@ -70,7 +70,7 @@ export class HomePage implements OnInit {
           filterMasterData: this.caseService.getFilterMasterData(),
           visitOutcomes: this.caseService.getVisitOutcomes(0)
         }).subscribe(async (response: any) => {
-          await this.databaseService.setCases(response.cases.data);
+          await this.databaseService.setCases(response.cases.data, response.cases.linked);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setvisitOutcomes(response.visitOutcomes.data);
@@ -85,7 +85,7 @@ export class HomePage implements OnInit {
           if (diffMs >= 5) {
             this.caseService.getCases({ last_update_date: downloadStatus.time }, 1).subscribe(async (response: any) => {
               if (response) {
-                await this.databaseService.setCases(response.data);
+                await this.databaseService.setCases(response.data, response.linked);
                 this.caseService.getFilterMasterData().subscribe(async (data: any) => {
                   await this.databaseService.setFilterMasterData(data.data);
                 });
@@ -143,7 +143,7 @@ export class HomePage implements OnInit {
   }
 
   startBackgroundEvent() {
-    this.backgroundMode.setDefaults({ title: 'Field Agent', ticker: 'Field Agent', text: 'Running in Background' });
+    this.backgroundMode.setDefaults({ title: 'FieldAgent v3.0', ticker: 'FieldAgent v3.0', text: 'Running in Background' });
     this.backgroundMode.enable();
     this.bgSubscription = this.backgroundMode.on('activate').subscribe(() => {
       console.log('active');

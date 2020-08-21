@@ -12,7 +12,8 @@ export class IndexPage implements OnInit {
 
   ngOnInit() {
   }
-  ionViewWillEnter(){
+  ionViewWillEnter() {
+    this.statusBar.styleDefault();
     this.statusBar.backgroundColorByHexString('#fff');
   }
 

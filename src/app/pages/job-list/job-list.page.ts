@@ -123,7 +123,7 @@ export class JobListPage implements OnInit {
 
   filterCases(clear = true) {
     this.filters = [];
-    if(this.searchBarValue) {
+    if (this.searchBarValue) {
       this.filters['q'] = this.searchBarValue;
     }
 
@@ -206,7 +206,7 @@ export class JobListPage implements OnInit {
               }
               query += ' and (' + vcquery + ') ';
             } else if (key === 'stageType') {
-              query += ' and scheme_id in ( ? )';
+              query += ' and stage_type in ( ? )';
               p.push(params[key]);
             } else if (key === 'outstandingAmount') {
               const osfilter = params[key].split(',');
@@ -226,15 +226,16 @@ export class JobListPage implements OnInit {
                 }
               });
               query += ' and ( ' + osQuery.join(' or ') + ') ';
-            } else if (key === 'stageType') {
-
-              // query += ' ' + key + 'in ? and ';
-              // p.push('(' + params[key] + ')');
+            } else if (key === 'q') {
+              query += ' and (id = ? or ref LIKE ?) ';
+              p.push(params[key]);
+              p.push('%' + params[key] + '%');
             }
           }
         }
       }
       query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
+      console.log(query);
       this.databaseService.executeQuery(query, p).then((data) => {
         const results: any[] = [];
         let item;
@@ -243,9 +244,11 @@ export class JobListPage implements OnInit {
           item.data = JSON.parse(decodeURI(item.data));
           results.push(item.data);
         }
-        if (data.rows.length > 0) {
+        console.log(results);
+        if (data && data.rows.length > 0) {
           this.page++;
           this.parseCaseData(results, []);
+
         }
         if (infiniteScrollEvent) {
           infiniteScrollEvent.target.complete();
@@ -266,38 +269,40 @@ export class JobListPage implements OnInit {
   }
   parseCaseData(caseData, linkedCases) {
 
-    caseData.forEach((elem) => {
-      if (this.linkedIds.indexOf(elem.id) == -1) {
-        // console.log(elem.id);
-        elem.linkedCasesTotalBalance = 0;
-        // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
-        elem.linked_cases_group = linkedCases.filter(linked => (
-          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
-          && (this.linkedIds.indexOf(linked.id) == -1)
-        ));
-        elem.linked_cases = linkedCases.filter(linked => (
-          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
-          && linked.id !== elem.id && (this.linkedIds.indexOf(linked.id) == -1)
-        ));
-        if (elem.linked_cases != '') {
-          (elem.linked_cases).forEach(l => {
-            l.parent_case_id = elem.id;
-            this.linkedIds.push(l.id);
-          });
-          const linked = elem.linked_cases.map(l => l.id);
-          caseData = caseData.filter(c => {
-            return (linked.indexOf(c.id) == -1);
-          });
-          elem.linked_cases = Object.values(elem.linked_cases);
-          elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
-            return accumulator + parseFloat(currentValue.d_outstanding);
-          }, 0);
-          elem.linkedCasesTotalBalance = (elem.linkedCasesTotalBalance).toFixed(2);
+    if (linkedCases) {
+      caseData.forEach((elem) => {
+        if (this.linkedIds.indexOf(elem.id) == -1) {
+          // console.log(elem.id);
+          elem.linkedCasesTotalBalance = 0;
+          // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
+          elem.linked_cases_group = linkedCases.filter(linked => (
+            ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
+            && (this.linkedIds.indexOf(linked.id) == -1)
+          ));
+          elem.linked_cases = linkedCases.filter(linked => (
+            ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
+            && linked.id !== elem.id && (this.linkedIds.indexOf(linked.id) == -1)
+          ));
+          if (elem.linked_cases != '') {
+            (elem.linked_cases).forEach(l => {
+              l.parent_case_id = elem.id;
+              this.linkedIds.push(l.id);
+            });
+            const linked = elem.linked_cases.map(l => l.id);
+            caseData = caseData.filter(c => {
+              return (linked.indexOf(c.id) == -1);
+            });
+            elem.linked_cases = Object.values(elem.linked_cases);
+            elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
+              return accumulator + parseFloat(currentValue.d_outstanding);
+            }, 0);
+            elem.linkedCasesTotalBalance = (elem.linkedCasesTotalBalance).toFixed(2);
+          }
+        } else {
+          caseData = caseData.filter(cd => cd.id != elem.id);
         }
-      } else {
-        caseData = caseData.filter(cd => cd.id != elem.id);
-      }
-    });
+      });
+    }
     this.cases = this.cases.concat(caseData);
     // no need to select cases that will load after select all
     if (this.selectedAll) {
@@ -371,7 +376,7 @@ export class JobListPage implements OnInit {
       if (response) {
         console.log(response);
 
-        await this.databaseService.setCases(response.data);
+        await this.databaseService.setCases(response.data, response.linked);
         this.caseService.getFilterMasterData().subscribe(async (data: any) => {
           await this.databaseService.setFilterMasterData(data.data);
         });

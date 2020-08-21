@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "855118638704",
+    "firebase_url": "https://field-agent-c85a7.firebaseio.com",
+    "project_id": "field-agent-c85a7",
+    "storage_bucket": "field-agent-c85a7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855118638704:android:36f5b21942d04c9e958eb5",
+        "android_client_info": {
+          "package_name": "com.lateral.fieldagent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "855118638704-5pbs617sprjrvcuovfrcca10rmb49djq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB19_1YZPF2yhEtVYzVR-tkjdZTBx73cnY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "855118638704-5pbs617sprjrvcuovfrcca10rmb49djq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
