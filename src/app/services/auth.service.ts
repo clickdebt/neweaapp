@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+
 
 @Injectable()
 export class AuthService {
 
     constructor(
-        private http: HttpClient
-    ) {
-    }
+        private http: HttpClient,
+    ) { }
 
     authenticate(username, password) {
         const apiURL = localStorage.getItem('server_url') + 'b/system/v1/' + 'session/login';

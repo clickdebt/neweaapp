@@ -140,16 +140,26 @@ ion-toolbar {
 }
 
 .joblist-card {
-  h3 {
+  h6 {
     display: inline-block;
     color: #000;
     font-weight: 600;
+    font-size: 16px;
     width: 80%;
   }
   ion-col {
     span {
       color: #000;
     }
+  }
+  .d-grid {
+    display: grid;
+  }
+  .font-16 {
+    font-size: 16px;
+  }
+  .text-color-light {
+    color: #585858 !important;
   }
 }
 
@@ -175,4 +185,16 @@ ion-toolbar {
 }
 .bg-hold {
   background-color: #ffcfcf !important;
+}
+.footer-button {
+  padding: 10px;
+  margin: 8px;
+  color: white;
+  border-radius: 4px;
+  &.map {
+    background-color: #cc0092;
+  }
+  &.guard {
+    background-color: #5fc7c7;
+  }
 }

@@ -1,8 +1,8 @@
 {
-  "name": "enforce",
+  "name": "fieldagent_v3.0",
   "version": "0.0.1",
   "author": "Lateral",
-  "homepage": "https://ionicframework.com/",
+  "homepage": "https://getlateral.com/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -23,9 +23,11 @@
     "@ionic-native/aes-256": "^5.27.0",
     "@ionic-native/background-mode": "^5.23.0",
     "@ionic-native/core": "^5.0.0",
+    "@ionic-native/diagnostic": "^5.27.0",
     "@ionic-native/geolocation": "^5.22.0",
     "@ionic-native/google-maps": "^5.5.0",
     "@ionic-native/launch-navigator": "^5.22.0",
+    "@ionic-native/location-accuracy": "^5.28.0",
     "@ionic-native/native-audio": "^5.23.0",
     "@ionic-native/native-geocoder": "^5.22.0",
     "@ionic-native/navigation-bar": "^5.26.0",
@@ -48,15 +50,19 @@
     "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
     "cordova-plugin-nativegeocoder": "^3.2.2",
     "cordova-plugin-network-information": "^2.0.2",
+    "cordova-plugin-request-location-accuracy": "^2.3.0",
     "cordova-plugin-stetho-android": "0.0.1",
     "cordova-sqlite-storage": "^4.0.0",
+    "cordova.plugins.diagnostic": "^6.0.2",
     "core-js": "^2.5.4",
     "ion2-calendar": "^3.0.0-rc.0",
     "moment": "^2.27.0",
+    "recursive-readdir": "^2.2.2",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
     "uk.co.workingedge.cordova.plugin.sqliteporter": "^1.1.1",
     "uk.co.workingedge.phonegap.plugin.launchnavigator": "^3.2.2",
+    "xml-js": "^1.6.11",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
@@ -112,10 +118,12 @@
       "cordova-plugin-background-mode": {},
       "cordova-plugin-navigationbar": {},
       "cordova-plugin-aes256-encryption": {},
-      "com.outsystems.mobile.stetho": {}
+      "com.outsystems.mobile.stetho": {},
+      "cordova-plugin-request-location-accuracy": {
+        "PLAY_SERVICES_LOCATION_VERSION": "16.+"
+      }
     },
     "platforms": [
-      "android",
       "browser"
     ]
   }

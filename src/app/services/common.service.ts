@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ToastController, LoadingController } from '@ionic/angular';
 import { StorageService } from './storage.service';
+import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
+import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +20,9 @@ export class CommonService {
   constructor(
     private toastController: ToastController,
     private loadingController: LoadingController,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private diagnostic: Diagnostic,
+    private locationAccuracy: LocationAccuracy,
   ) {
 
   }
@@ -55,5 +59,63 @@ export class CommonService {
       return true;
     }
     return false;
+  }
+  askUserPermissions() {
+    this.storageService
+      .get('permissionAsked')
+      .then(permissionAsked => {
+        if (!permissionAsked) {
+          const permissions = [
+            this.diagnostic.permission.READ_EXTERNAL_STORAGE,
+            this.diagnostic.permission.WRITE_EXTERNAL_STORAGE,
+            this.diagnostic.permission.ACCESS_FINE_LOCATION,
+            this.diagnostic.permission.ACCESS_COARSE_LOCATION
+          ];
+          this.diagnostic
+            .requestRuntimePermissions(permissions)
+            .then(
+              statuses => {
+                // tslint:disable-next-line: forin
+                for (const permission in statuses) {
+                  switch (statuses[permission]) {
+                    case this.diagnostic.permissionStatus.GRANTED:
+                      // console.log('Permission granted to use ' + permission);
+                      break;
+                    case this.diagnostic.permissionStatus.NOT_REQUESTED:
+                      // console.log('Permission to use ' + permission + ' has not been requested yet');
+                      break;
+                    // tslint:disable-next-line: deprecation
+                    case this.diagnostic.permissionStatus.DENIED:
+                      // console.log('Permission denied to use ' + permission + ' - ask again?');
+                      break;
+                    case this.diagnostic.permissionStatus.DENIED_ALWAYS:
+                      // console.log('Permission permanently denied to use ' + permission + ' - guess we won't be using it then!');
+                      break;
+                  }
+                }
+              },
+              error => {
+                console.error('The following error occurred: ' + error);
+              }
+            )
+            .finally(() => {
+              this.storageService.set(
+                'permissionAsked',
+                true
+              );
+            });
+        }
+      });
+  }
+  checkLocation() {
+    this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+      if (canRequest) {
+        // the accuracy option will be ignored by iOS
+        this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
+          () => console.log('Request successful'),
+          error => console.log('Error requesting location permissions', error)
+        );
+      }
+    });
   }
 }

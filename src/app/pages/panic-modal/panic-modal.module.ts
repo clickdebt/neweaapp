@@ -7,7 +7,8 @@ import { IonicModule } from '@ionic/angular';
 import { PanicModalPageRoutingModule } from './panic-modal-routing.module';
 
 import { PanicModalPage } from './panic-modal.page';
-import {RoundProgressModule} from 'angular-svg-round-progressbar';
+import { RoundProgressModule } from 'angular-svg-round-progressbar';
+import { TimerPageModule } from '../timer/timer.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import {RoundProgressModule} from 'angular-svg-round-progressbar';
     FormsModule,
     IonicModule,
     PanicModalPageRoutingModule,
-    RoundProgressModule
+    RoundProgressModule,
+    TimerPageModule
   ],
   declarations: [PanicModalPage],
   exports: [PanicModalPage]

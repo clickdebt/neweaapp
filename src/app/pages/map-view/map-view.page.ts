@@ -59,6 +59,7 @@ export class MapViewPage implements OnInit {
     this.page = 1;
     this.markers = [];
     this.index = 0;
+    this.commonService.checkLocation();
     this.getCurrentLocation();
     this.getCases();
   }
@@ -79,7 +80,9 @@ export class MapViewPage implements OnInit {
       }
       this.apiReq = this.caseService.getCases(params).subscribe((res: any) => {
         this.cases = this.cases.concat(res.data);
+        console.log(this.cases);
         if (res.data && res.data.length) {
+          console.log(res);
           this.getAddresses(res.data);
           if (!caseIds) {
             this.getCases();
@@ -96,11 +99,17 @@ export class MapViewPage implements OnInit {
             `${da.debtor.enforcement_addresses[0].address_ln2}, ` +
             `${da.debtor.enforcement_addresses[0].address_ln3}, ` +
             `${da.debtor.enforcement_addresses[0].address_postcode}`;
+        } else if (da.debtor.addresses.length) {
+          da.address_str = `${da.debtor.addresses[0].address_ln1}, ` +
+            `${da.debtor.addresses[0].address_ln2}, ` +
+            `${da.debtor.addresses[0].address_ln3}, ` +
+            `${da.debtor.addresses[0].address_postcode}`;
         } else {
           da.address_str = '';
         }
 
         da.location = {};
+        console.log(da.address_str);
         if (da.address_str) {
           this.getGeocodesLatLongs(da, caseIndex);
         }

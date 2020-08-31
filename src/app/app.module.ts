@@ -29,6 +29,8 @@ import { NavigationBar } from '@ionic-native/navigation-bar/ngx';
 import { TakePaymentPageModule } from './pages/take-payment/take-payment.module';
 import { AuthorizeCardPageModule } from './pages/authorize-card/authorize-card.module';
 import { AES256 } from '@ionic-native/aes-256/ngx';
+import { Diagnostic } from '@ionic-native/diagnostic/ngx';
+import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -71,7 +73,9 @@ import { AES256 } from '@ionic-native/aes-256/ngx';
     Network,
     NativeAudio,
     BackgroundMode,
-    AES256
+    AES256,
+    Diagnostic,
+    LocationAccuracy
   ],
   bootstrap: [AppComponent]
 })

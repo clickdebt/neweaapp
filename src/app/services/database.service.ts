@@ -12,6 +12,7 @@ import * as moment from 'moment';
 export class DatabaseService {
   private database: SQLiteObject;
   private databaseReady: BehaviorSubject<boolean>;
+  linkedIds = [];
 
   constructor(
     private platform: Platform,
@@ -53,6 +54,7 @@ export class DatabaseService {
       custom5 TEXT,
       manual_link_id INTEGER,
       hold_until TEXT,
+      stage_type TEXT,
       client_id INTEGER,
       current_status_id INTEGER,
       current_stage_id INTEGER,
@@ -73,7 +75,6 @@ export class DatabaseService {
     const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
-    const result = await this.select('rdebt_cases');
   }
 
   async executeQuery(query, params = null) {
@@ -83,7 +84,7 @@ export class DatabaseService {
 
       return result;
     } catch (error) {
-      console.log('error', error);
+      console.log('error', error, query);
     }
   }
 
@@ -102,18 +103,55 @@ export class DatabaseService {
     return this.executeQuery(query);
   }
 
-  async setCases(data) {
+  parseCaseData(caseData, linkedCases) {
+    caseData.forEach((elem) => {
+      if (this.linkedIds.indexOf(elem.id) == -1) {
+        // console.log(elem.id);
+        elem.linkedCasesTotalBalance = 0;
+        // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
+        elem.linked_cases_group = linkedCases.filter(linked => (
+          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
+          && (this.linkedIds.indexOf(linked.id) == -1)
+        ));
+        elem.linked_cases = linkedCases.filter(linked => (
+          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
+          && linked.id !== elem.id && (this.linkedIds.indexOf(linked.id) == -1)
+        ));
+        if (elem.linked_cases != '') {
+          (elem.linked_cases).forEach(l => {
+            l.parent_case_id = elem.id;
+            this.linkedIds.push(l.id);
+          });
+          const linked = elem.linked_cases.map(l => l.id);
+          caseData = caseData.filter(c => {
+            return (linked.indexOf(c.id) == -1);
+          });
+          elem.linked_cases = Object.values(elem.linked_cases);
+          elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
+            return accumulator + parseFloat(currentValue.d_outstanding);
+          }, 0);
+          elem.linkedCasesTotalBalance = (elem.linkedCasesTotalBalance).toFixed(2);
+        }
+      } else {
+        caseData = caseData.filter(cd => cd.id != elem.id);
+      }
+    });
+    return caseData;
+  }
+
+  async setCases(data, linked) {
+    // const cases = this.parseCaseData(data, linked);
     const sql = [];
     const sqlStart = `insert or replace INTO rdebt_cases
     ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
-      last_allocated_date, custom5, manual_link_id, hold_until,
+      last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
       client_id, current_status_id, current_stage_id, data ) VALUES `;
-
     data.forEach((values) => {
+      const v = encodeURI(JSON.stringify(values));
       sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
-        "${values.hold_until}", ${values.client_id}, ${values.current_status_id},
+        "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
          ${values.current_stage_id}, "${encodeURI(JSON.stringify(values))}")`);
     });
 

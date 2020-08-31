@@ -9,6 +9,7 @@ import { HomePageRoutingModule } from './home-routing.module';
 import { HomePage } from './home.page';
 import { DatabaseService } from '../services';
 import { PanicModalPageModule } from '../pages/panic-modal/panic-modal.module';
+import { TimerPageModule } from '../pages/timer/timer.module';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { PanicModalPageModule } from '../pages/panic-modal/panic-modal.module';
     FormsModule,
     IonicModule,
     HomePageRoutingModule,
-    PanicModalPageModule
+    PanicModalPageModule,
+    TimerPageModule
   ],
   declarations: [HomePage],
   providers: [DatabaseService]

@@ -13,8 +13,8 @@ import { JobListPage } from './job-list.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    JobListPageRoutingModule
+    JobListPageRoutingModule,
   ],
   declarations: [JobListPage]
 })
-export class JobListPageModule {}
+export class JobListPageModule { }

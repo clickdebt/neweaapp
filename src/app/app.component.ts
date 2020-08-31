@@ -4,6 +4,7 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { NetworkService, ConnectionStatus } from './services/network.service';
+import { CommonService } from './services';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ export class AppComponent implements OnInit {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private commonService: CommonService,
   ) {
     this.initializeApp();
   }
@@ -25,6 +27,8 @@ export class AppComponent implements OnInit {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.commonService.checkLocation();
+      this.commonService.askUserPermissions();
       this.networkService.onNetworkChange().subscribe((status: ConnectionStatus) => {
         if (status === ConnectionStatus.Online) {
           // Perform upload to server

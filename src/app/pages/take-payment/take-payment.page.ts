@@ -97,10 +97,10 @@ export class TakePaymentPage implements OnInit {
       console.log(obj);
       this.caseActionService.takePayment(obj).subscribe((res: any) => {
         console.log(res);
-        if (res.status == 'Invalid') {
-          this.commonService.showToast(res.statusDetail);
-        } else {
+        if (res.status == 'success') {
           this.addPayment(res);
+        } else {
+          this.commonService.showToast(res.statusDetail);
         }
       });
     }
