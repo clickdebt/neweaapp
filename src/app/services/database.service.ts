@@ -84,7 +84,7 @@ export class DatabaseService {
 
       return result;
     } catch (error) {
-      console.log('error', error, query);
+      // console.log('error', error, query);
     }
   }
 
@@ -159,7 +159,7 @@ export class DatabaseService {
     sql.forEach(async (query) => promiseArray.push(this.executeQuery(query)));
     await Promise.all(promiseArray)
       .then((res: any) => {
-        console.log(res);
+        // console.log(res);
       })
       .catch((error) => { });
   }
