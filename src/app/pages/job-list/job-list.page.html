@@ -163,12 +163,12 @@
     </ion-grid>
   </div>
 </div>
+<!-- sort toolbar -->
+
+<!-- sort toolbar -->
+
+<!-- table -->
 <ion-content>
-  <!-- sort toolbar -->
-
-  <!-- sort toolbar -->
-
-  <!-- table -->
   <div class="table-responsive" *ngIf="!isMobile">
     <table class="table table-striped">
       <thead>
@@ -179,15 +179,18 @@
             </ion-checkbox>
           </th>
           <th>Case ID</th>
-          <th>Ref</th>
           <th>Name</th>
+          <th *ngFor="let caseField of caseFields">
+            <span>{{caseField.label}}</span>
+          </th>
+          <!-- <th>Ref</th>
           <th>Amount</th>
           <th>Linked Cases Amount Total</th>
           <th>Postcode</th>
           <th>Visits</th>
           <th>Status</th>
           <th>Hold</th>
-          <th>VRM</th>
+          <th>VRM</th> -->
           <th>Details</th>
           <th>Visit</th>
         </tr>
@@ -211,8 +214,12 @@
                 color="secondary" slot="start"></ion-checkbox>
             </td>
             <td>{{case.id}}</td>
-            <td>{{case.ref}}</td>
             <td>{{case.debtor.debtor_name}}</td>
+            <td *ngFor="let caseField of caseFields">
+              <span [innerHTML]="getCaseFieldValue(case,caseField.field)"></span>
+            </td>
+            <!-- 
+              <td>{{case.ref}}</td>
             <td>{{case.d_outstanding}}</td>
             <td>{{case.linkedCasesTotalBalance}}</td>
             <td>
@@ -223,7 +230,7 @@
             <td>{{case.visitcount_total}}</td>
             <td>{{case.current_status.status_name}}</td>
             <td>{{case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
-            <td>{{case.custom5}}</td>
+            <td>{{case.custom5}}</td> -->
             <td class="action ">
               <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
                 (click)="goToCaseDetails(case)">
@@ -238,7 +245,7 @@
             </td>
           </tr>
           <tr class="linked-case" *ngIf="case.linked_cases != '' && caseLinks[case.id]">
-            <td class="p-x-0 p-y-0" colspan=14>
+            <td class="p-x-0 p-y-0" [attr.colspan]="colspanLength">
               <div>
                 <h4>Linked cases</h4>
                 <table class="table">
@@ -246,15 +253,19 @@
                     <th width="3%"></th>
                     <th width="3%"></th>
                     <th>Case ID</th>
-                    <th>Ref</th>
                     <th>Name</th>
+                    <th *ngFor="let caseField of caseFields">
+                      <span>{{caseField.label}}</span>
+                    </th>
+                    <!-- 
+                    <th>Ref</th>
                     <th>Amount</th>
                     <th>Date</th>
                     <th>Postcode</th>
                     <th>Visit Count</th>
                     <th>Status</th>
                     <th>Hold</th>
-                    <th>VRM</th>
+                    <th>VRM</th> -->
                     <th>Details</th>
                     <th>Visit</th>
                   </tr>
@@ -266,15 +277,18 @@
                         (ionChange)="selectCase($event,link_case.id)" slot="start"></ion-checkbox>
                     </td>
                     <td>{{link_case.id}}</td>
-                    <td>{{link_case.ref}}</td>
                     <td>{{link_case.debtor_name}}</td>
+                    <td *ngFor="let caseField of caseFields">
+                      <span [innerHTML]="getLinkedCaseFieldValue(link_case,caseField.field)"></span>
+                    </td>
+                    <!-- <td>{{link_case.ref}}</td>
                     <td>{{link_case.d_outstanding}}</td>
                     <td>{{link_case.date}}</td>
                     <td>{{link_case.address_postcode}}</td>
                     <td>{{link_case.visitcount_total}}</td>
                     <td>{{link_case.status_name}}</td>
                     <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
-                    <td>{{link_case.custom5}}</td>
+                    <td>{{link_case.custom5}}</td> -->
                     <td class="action ">
                       <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
                         (click)="goToCaseDetails(link_case)">
@@ -319,23 +333,30 @@
           <div *ngIf="case.linked_cases == '' " class="w-15"></div>
           <ion-checkbox class="m-r-10" mode="md" color="secondary" [(ngModel)]="case.checked"
             (ionChange)="selectCase($event,case.id)" slot="start"></ion-checkbox>
-          <h3>{{case.debtor.debtor_name}}
+          <h6>{{case.debtor.debtor_name}}
             <span class="d-block"> (#{{case.id}}) </span>
-          </h3>
-          <span class="d-flex">
+          </h6>
+          <div class="d-grid">
             <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
               (click)="goToCaseDetails(case)">
-              <ion-icon name="information-circle-outline"></ion-icon>
+              <ion-icon name="information-circle-outline"></ion-icon><span>Details</span>
             </ion-button>
             <ion-button size="small" color="tertiary" *ngIf="case.stage.stage_type.stage_type == 'Visit'"
               (click)="goToVisitForm(case)">
-              <ion-icon name="reader-outline"></ion-icon>
+              <ion-icon name="reader-outline"></ion-icon><span>Visit</span>
             </ion-button>
-          </span>
+          </div>
         </div>
         <ion-grid class="m-t-10">
           <ion-row>
-            <ion-col size="6">
+            <ion-col *ngFor="let caseField of caseFields" size="6">
+              <span *ngIf="getCaseFieldValue(case,caseField.field)">
+                <span class="font-weight-bold font-16 text-nowrap">{{caseField.label}} :</span>
+                <span class="font-16 text-color-light text-nowrap"
+                  [innerHTML]="getCaseFieldValue(case,caseField.field)"></span>
+              </span>
+            </ion-col>
+            <!-- <ion-col size="6">
               Ref :
               <span> {{case.ref}} </span>
             </ion-col>
@@ -372,7 +393,7 @@
             <ion-col size="6" *ngIf="case.custom5">
               VRM :
               <span> {{case.custom5}} </span>
-            </ion-col>
+            </ion-col> -->
           </ion-row>
         </ion-grid>
         <div *ngIf="case.linked_cases != '' && caseLinks[case.id]">
@@ -381,23 +402,30 @@
               <div class="d-flex align-items-center">
                 <ion-checkbox class="m-r-10" mode="md" color="secondary" [(ngModel)]="link_case.checked"
                   (ionChange)="selectCase($event,link_case.id)" slot="start"></ion-checkbox>
-                <h3>{{link_case.debtor_name}}
+                <h6>{{link_case.debtor_name}}
                   <span class="d-block"> (#{{link_case.id}}) </span>
-                </h3>
-                <span class="d-flex">
+                </h6>
+                <span class="d-grid">
                   <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
                     (click)="goToCaseDetails(link_case)">
-                    <ion-icon name="information-circle-outline"></ion-icon>
+                    <ion-icon name="information-circle-outline"></ion-icon><span>Details</span>
                   </ion-button>
                   <ion-button size="small" color="tertiary" *ngIf="link_case.stage_type == 'Visit'"
                     (click)="goToVisitForm(link_case)">
-                    <ion-icon name="reader-outline"></ion-icon>
+                    <ion-icon name="reader-outline"></ion-icon><span>Visit</span>
                   </ion-button>
                 </span>
               </div>
               <ion-grid class="m-t-10">
                 <ion-row>
-                  <ion-col size="6">
+                  <ion-col *ngFor="let caseField of caseFields" size="6">
+                    <span *ngIf="getLinkedCaseFieldValue(link_case,caseField.field)">
+                      <span class="font-weight-bold font-16 text-nowrap"> {{caseField.label}} :</span>
+                      <span class="font-16 text-color-light text-nowrap"
+                        [innerHTML]="getLinkedCaseFieldValue(link_case,caseField.field)"></span>
+                    </span>
+                  </ion-col>
+                  <!-- <ion-col size="6">
                     Ref :
                     <span>{{link_case.ref}} </span>
                   </ion-col>
@@ -428,7 +456,7 @@
                   <ion-col size="6" *ngIf="link_case.custom5">
                     VRM :
                     <span> {{link_case.custom5}} </span>
-                  </ion-col>
+                  </ion-col> -->
                 </ion-row>
               </ion-grid>
             </ion-card-content>
@@ -443,10 +471,11 @@
   </div>
   <!-- mobile card ends-->
 </ion-content>
-<ion-footer *ngIf="selectedCaseIds.length>0">
-  <ion-toolbar>
-    <ion-button *ngIf="selectedCaseIds.length>0" (click)="showCasesOnMap()" color="secondary" expand="full">Show
-      {{selectedCaseIds.length}} cases
-      on Map</ion-button>
-  </ion-toolbar>
+<ion-footer class="d-flex ion-justify-content-evenly" *ngIf="selectedCaseIds.length>0">
+  <button class="footer-button map" *ngIf="selectedCaseIds.length>0" (click)="showCasesOnMap()">
+    <ion-icon name="location-sharp"></ion-icon> Show {{selectedCaseIds.length}} on Map
+  </button>
+  <button class="footer-button guard " (click)="openPanicModal()" *ngIf="selectedCaseIds.length==1">
+    <ion-icon name="shield-checkmark"></ion-icon> Set SafeGuard
+  </button>
 </ion-footer>

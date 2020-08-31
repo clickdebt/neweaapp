@@ -4,17 +4,18 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { JobListPageRoutingModule } from './job-list-routing.module';
+import { TimerPageRoutingModule } from './timer-routing.module';
 
-import { JobListPage } from './job-list.page';
+import { TimerPage } from './timer.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    JobListPageRoutingModule,
+    TimerPageRoutingModule
   ],
-  declarations: [JobListPage]
+  declarations: [TimerPage],
+  exports: [TimerPage]
 })
-export class JobListPageModule { }
+export class TimerPageModule { }

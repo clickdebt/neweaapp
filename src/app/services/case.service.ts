@@ -54,4 +54,8 @@ export class CaseService {
       return this.http.get(apiURL);
     }
   }
+  getCaseSettings() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/app_config/get_config/1';
+    return this.http.get(apiURL);
+  }
 }

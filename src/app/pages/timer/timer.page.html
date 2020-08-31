@@ -1,0 +1,15 @@
+<div class="d-flex bg-white" *ngIf="isSafeGuardActive">
+  <span class="m-2">{{timeLeft}}</span>
+  <ion-button class="m-1" *ngIf="!isPause" size="small" shape="round" fill="solid" color="tertiary"
+    (click)="pauseTimer()">
+    <ion-icon name="pause-outline"></ion-icon>
+  </ion-button>
+  <ion-button class="m-1" *ngIf="isPause" size="small" shape="round" fill="solid" color="tertiary"
+    (click)="playTimer()">
+    <ion-icon name="play-outline"></ion-icon>
+  </ion-button>
+
+  <ion-button class="m-1" size="small" shape="round" fill="solid" color="secondary" (click)="stopTimer()">
+    <ion-icon name="stop-circle-outline"></ion-icon>
+  </ion-button>
+</div>

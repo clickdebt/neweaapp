@@ -37,14 +37,15 @@
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button (click)="openPanicModal()">
-        <ion-icon  size="large" name="alert-circle"></ion-icon>
+        <ion-icon size="large" name="shield-checkmark"></ion-icon>
       </ion-button>
+      <app-timer></app-timer>
       <ion-button (click)="confirmLogout()">
         <ion-icon size="large" name="log-out-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-img *ngIf="logo" class="logo" [src]="logo"></ion-img>
-    <ion-title *ngIf="!logo">FieldAgent v3.0</ion-title>
+    <ion-title *ngIf="!logo">FieldAgent 3.0</ion-title>
   </ion-toolbar>
   <ion-content>
     <ion-router-outlet id="main-content"></ion-router-outlet>

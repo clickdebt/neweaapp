@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AlertController, ModalController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { DatabaseService, CaseService, VisitService, StorageService, CommonService } from '../services';
-import { PanicModalPage } from '../pages/panic-modal/panic-modal.page'
+import { PanicModalPage } from '../pages/panic-modal/panic-modal.page';
 import { forkJoin } from 'rxjs';
 import { NetworkService } from '../services/network.service';
 import * as moment from 'moment';
@@ -56,10 +56,14 @@ export class HomePage implements OnInit {
     this.username = JSON.parse(localStorage.getItem('userdata')).name;
     this.checkPermissions();
   }
-  async checkPermissions(){
+  async checkPermissions() {
     this.hasVRMpermission = await this.commonService.hasPermission(this.commonService.permissionSlug.VRM);
   }
   async ionViewDidEnter() {
+    this.caseService.getCaseSettings().subscribe(async (response: any) => {
+      await this.storageService.set('fields', response.data.fields);
+      this.saveTimeSettings(response.data.time);
+    });
     if ((this.platform.is('android') || this.platform.is('ios'))
       && this.networkService.getCurrentNetworkStatus() === 1) {
       const downloadStatus = await this.databaseService.getDownloadStatus();
@@ -100,7 +104,6 @@ export class HomePage implements OnInit {
       }
     }
   }
-
   async confirmLogout() {
     const alert = await this.alertCtrl.create({
       header: 'Confirm Logout!',
@@ -143,7 +146,7 @@ export class HomePage implements OnInit {
   }
 
   startBackgroundEvent() {
-    this.backgroundMode.setDefaults({ title: 'FieldAgent v3.0', ticker: 'FieldAgent v3.0', text: 'Running in Background' });
+    this.backgroundMode.setDefaults({ title: 'FieldAgent 3.0', ticker: 'FieldAgent 3.0', text: 'Running in Background' });
     this.backgroundMode.enable();
     this.bgSubscription = this.backgroundMode.on('activate').subscribe(() => {
       console.log('active');
@@ -178,5 +181,29 @@ export class HomePage implements OnInit {
         }
       });
     }
+  }
+  saveTimeSettings(timeSettings) {
+    timeSettings = timeSettings.map((time) => {
+      const res = time.split(' ');
+      let totalSeconds = 0;
+      let displayText = '';
+      const hours = parseInt(res[0], 10);
+      const minutes = parseInt(res[2], 10);
+      const seconds = parseInt(res[4], 10);
+      if (hours) {
+        totalSeconds += hours * 60 * 60;
+        displayText += res[0] + ' ' + res[1] + ' ';
+      }
+      if (minutes) {
+        totalSeconds += minutes * 60;
+        displayText += res[2] + ' ' + res[3] + ' ';
+      }
+      if (seconds) {
+        totalSeconds += seconds;
+        displayText += res[4] + ' ' + res[5];
+      }
+      return { time: totalSeconds, label: displayText };
+    });
+    this.storageService.set('timeSettings', timeSettings);
   }
 }

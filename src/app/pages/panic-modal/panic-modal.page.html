@@ -1,7 +1,17 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Panic</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <span>Set SafeGuard</span>
+    </ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="changeSoundSetting()">
+        <ion-icon size="large" slot="end" [name]="volumeClass"></ion-icon>
+      </ion-button>
       <ion-button (click)="dismiss()">
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
@@ -9,34 +19,60 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-item>
-    <ion-icon (click)="changeSoundSetting()" size="large" slot="end" [name]="volumeClass"></ion-icon>
-  </ion-item>
-  <ion-grid>
+<ion-content class="body-top-border">
+  <ion-grid class="m-3" *ngIf="!isSafeGuardActive">
+    <ion-row class="ion-justify-content-center">
+      <ion-col size-md="3">
+        <ion-item class="ion-no-border">
+          <ion-select [(ngModel)]="selectedTime" (ionFocus)="onSelectChange($event)" value="" okText="Okay"
+            cancelText="Dismiss">
+            <ion-select-option disabled="true" value="">Select a Time</ion-select-option>
+            <ion-select-option [value]="timeSetting.time" *ngFor="let timeSetting of timeSettings">{{timeSetting.label}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-justify-content-center">
+      <ion-col>
+        <ion-item class="w-100" lines="none">
+          <ion-textarea [(ngModel)]="note" rows="10" placeholder="Note" required></ion-textarea>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-justify-content-center">
+      <ion-col>
+        <ion-button expand="full" shape="round" [disabled]="selectedTime==''" color="secondary"
+          (click)="startSafeGuard()">
+          Start SafeGuard
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid *ngIf="isSafeGuardActive">
     <ion-row size="3" class="ion-margin-top ion-justify-content-center">
       <div class="position-relative">
         <div class="current" [ngStyle]="getOverlayStyle()">
-          {{10 - progress}}
+          {{timeLeft}}
         </div>
-        <round-progress class="progressRound" [current]="progress" [max]="10" [color]="'#cc0092'"
-          [background]="'#eaeaea'" [radius]="radius" [stroke]="20" [rounded]="true" [clockwise]="true" [duration]="10"
-          [animation]="'easeInOutQuart'" [animationDelay]="0">
+        <round-progress class="progressRound" [current]="progress" [max]="selectedTime" [color]="'#cc0092'"
+          [background]="'#eaeaea'" [radius]="radius" [stroke]="20" [rounded]="true" [clockwise]="true"
+          [duration]="selectedTime" [animation]="'easeInOutQuart'" [animationDelay]="0">
         </round-progress>
       </div>
     </ion-row>
     <ion-row class="ion-margin-top ion-justify-content-center">
       <ion-col size="3">
         <ion-buttons class="ion-justify-content-center">
-          <ion-button size="small" shape="round" fill="solid" [disabled]="isPause" color="secondary"
-            (click)="pausePanicCounter()">
+          <ion-button *ngIf="!isPause" size="small" shape="round" fill="solid" [disabled]="isPause" color="tertiary"
+            (click)="pauseTimer()">
             Pause
           </ion-button>
-          <ion-button size="small" shape="round" fill="solid" [disabled]="isStart" color="secondary"
-            (click)="startPanicCounter()">
-            Start
+          <ion-button *ngIf="isPause" size="small" shape="round" fill="solid" [disabled]="isStart" color="tertiary"
+            (click)="playTimer()">
+            Play
           </ion-button>
-          <ion-button size="small" shape="round" fill="solid" color="secondary" (click)="dismiss()">Cancel
+          <ion-button size="small" shape="round" fill="solid" color="secondary" (click)="stopTimer()">Stop
           </ion-button>
         </ion-buttons>
       </ion-col>

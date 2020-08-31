@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CaseService, DatabaseService } from '../../services';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storage.service';
-import { Platform } from '@ionic/angular';
+import { Platform, ModalController } from '@ionic/angular';
 import * as moment from 'moment';
 import { NetworkService } from 'src/app/services/network.service';
 import { element } from 'protractor';
+import { PanicModalPage } from '../panic-modal/panic-modal.page';
+import { SosService } from 'src/app/services/sos.service';
 @Component({
   selector: 'app-job-list',
   templateUrl: './job-list.page.html',
@@ -53,16 +55,61 @@ export class JobListPage implements OnInit {
   currentDate;
   linkedIds = [];
   busy = false;
+  caseFields;
+  colspanLength;
+  totalFields = [
+    { field: 'id', label: 'Id' },
+    { field: 'scheme_id', label: 'Scheme Id' },
+    { field: 'ref', label: 'Ref' },
+    { field: 'debtorid', label: 'Debtor Id' },
+    { field: 'debtor.debtor_id', label: 'Debtor Id' },
+    { field: 'debtor.debtor_name', label: 'Debtor Name' },
+    { field: 'debtor.debtor_phone', label: 'Debtor Phone' },
+    { field: 'debtor.debtor_mobile', label: 'Debtor Mobile' },
+    { field: 'client_id', label: 'Debtor Mobile' },
+    { field: 'manual_link_id', label: 'Manual Link Id' },
+    { field: 'bailiffid', label: 'Ballif Id' },
+    { field: 'd_outstanding', label: 'Amount' },
+    { field: 'visitcount_total', label: 'visit' },
+    { field: 'current_status.status_name', label: 'Status' },
+    { field: 'current_status_id', label: 'Current Status ID' },
+    { field: 'current_status.status_type', label: 'Current Status Type' },
+    { field: 'current_stage_id', label: 'Current Stage ID' },
+    { field: 'stage.stage_type.stage_type', label: 'Stage Type' },
+    { field: 'date', label: 'Date' },
+    { field: 'last_allocated_date', label: 'Last Allocate Date' },
+    { field: 'hold_until', label: 'Hold' },
+    { field: 'debtor.enforcement_addresses[0].address_ln1', label: 'Enforcement Address Line 1' },
+    { field: 'debtor.enforcement_addresses[0].address_ln2', label: 'Enforcement Address Line 2' },
+    { field: 'debtor.enforcement_addresses[0].address_ln3', label: 'Enforcement Address Line 3' },
+    { field: 'debtor.enforcement_addresses[0].address_town', label: 'Enforcement Address Town' },
+    { field: 'debtor.enforcement_addresses[0].address_postcode', label: 'Postcode' },
+    { field: 'debtor.addresses[0].address_ln1', label: 'Address Line 1' },
+    { field: 'debtor.addresses[0].address_ln2', label: 'Address Line 2' },
+    { field: 'debtor.addresses[0].address_ln3', label: 'Address Line 3' },
+    { field: 'debtor.addresses[0].address_town', label: 'Address Line Town' },
+    { field: 'debtor.addresses[0].address_postcode', label: 'Postcode' },
+    { field: 'custom5', label: 'VRM' },
+    { field: 'linkedCasesTotalBalance', label: ' Linked Cases Amount Total' }
+  ];
   constructor(
     private caseService: CaseService,
     private router: Router,
     private storageService: StorageService,
     private platform: Platform,
     private networkService: NetworkService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private modalCtrl: ModalController,
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.caseFields = await this.storageService.get('fields');
+    this.caseFields = this.totalFields.filter((c) => {
+      if (this.caseFields.includes(c.field)) {
+        return true;
+      }
+    });
+    this.colspanLength = 6 + this.caseFields.length;
     this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
   }
@@ -247,7 +294,8 @@ export class JobListPage implements OnInit {
         console.log(results);
         if (data && data.rows.length > 0) {
           this.page++;
-          this.parseCaseData(results, []);
+          this.cases = this.cases.concat(results);
+          // this.parseCaseData(results, []);
 
         }
         if (infiniteScrollEvent) {
@@ -308,6 +356,7 @@ export class JobListPage implements OnInit {
     if (this.selectedAll) {
       this.selectAllCase();
     }
+    console.log(this.cases);
     this.storageService.set('cases', this.cases);
   }
 
@@ -386,5 +435,57 @@ export class JobListPage implements OnInit {
         });
       }
     });
+  }
+  async openPanicModal() {
+    const selectedCase = this.cases.filter((c) => c.id === this.selectedCaseIds[0]);
+
+    const panicModalPage = await this.modalCtrl.create({
+      component: PanicModalPage, componentProps: {
+        cssClass: 'case-action-modal',
+        selectedCase: selectedCase[0]
+      }
+    });
+    await panicModalPage.present();
+  }
+
+  getCaseFieldValue(value, caseField) {
+    const currentCase = value;
+    const res = caseField.split('.');
+    res.forEach((r) => {
+      r = r.split('[')[0];
+      value = value[r];
+      if (Array.isArray(value)) {
+        if (value[0]) {
+          value = value[0];
+        } else {
+          value = [];
+        }
+      }
+      if (r === 'address_postcode') {
+        if (!value && currentCase.debtor.addresses[0].address_postcode) {
+          value = currentCase.debtor.addresses[0].address_postcode;
+        }
+      }
+      if (r === 'hold_until') {
+        if (value != null && value > new Date()) {
+          value = 'Yes';
+        } else {
+          value = 'No';
+        }
+      }
+    });
+    return value;
+  }
+  getLinkedCaseFieldValue(value, caseField) {
+    const res = caseField.split('.');
+    if (res[res.length - 1] === 'hold_until') {
+      if (value[res[res.length - 1]] != null && value[res[res.length - 1]] > new Date()) {
+        return 'Yes';
+      } else {
+        return 'No';
+      }
+    } else {
+      return value[res[res.length - 1]];
+    }
   }
 }
