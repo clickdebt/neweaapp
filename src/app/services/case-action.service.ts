@@ -83,13 +83,13 @@ export class CaseActionService {
   }
 
   takePayment(data) {
-    const apiURL = localStorage.getItem('server_url') + `b/payment/sage_pay_actions/makePayment?source=API`;
+    const apiURL = localStorage.getItem('server_url') + `b/payment/sage_pay_actions/take_app_payment?source=API`;
     return this.http.post(apiURL, data);
   }
-  addPayment(data, caseId) {
-    const apiURL = localStorage.getItem('server_url') + 'b/payment/sage_pay_actions/create_payment/' + caseId + '/0?source=API';
-    return this.http.post(apiURL, data);
-  }
+  // addPayment(data, caseId) {
+  //   const apiURL = localStorage.getItem('server_url') + 'b/payment/sage_pay_actions/create_payment/' + caseId + '/0?source=API';
+  //   return this.http.post(apiURL, data);
+  // }
   authorizeCard(data) {
     const apiURL = localStorage.getItem('server_url') + 'b/payment/sage_pay_actions/identify_card?source=API';
     return this.http.post(apiURL, data);

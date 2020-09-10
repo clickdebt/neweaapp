@@ -81,6 +81,7 @@ export class TakePaymentPage implements OnInit {
   }
   save() {
     if (this.paymentsForm.valid) {
+      const date = new Date().toISOString();
       const obj = {
         case_id: this.caseId,
         // debtor_id: this.caseList[0].debtor_id,
@@ -92,51 +93,64 @@ export class TakePaymentPage implements OnInit {
         debtor_name: this.paymentsForm.value.debtor_name,
         address: (this.paymentsForm.value.address_ln1).concat(this.paymentsForm.value.address_ln2),
         post_code: this.paymentsForm.value.post_code,
-        town: this.paymentsForm.value.town
+        town: this.paymentsForm.value.town,
+        take_payment_method: 'sagepay',
+        created_by: JSON.parse(localStorage.getItem('userdata')).id,
+        created_at: date,
+        updated_by: JSON.parse(localStorage.getItem('userdata')).id,
+        updated_at: date,
+        sent: 1,
+        sent_at: date
       };
-      console.log(obj);
+      // console.log(obj);
       this.caseActionService.takePayment(obj).subscribe((res: any) => {
         console.log(res);
-        if (res.status == 'success') {
-          this.addPayment(res);
+        if (res.status == 'Ok') {
+          this.storageService.set('is_case_updated', true);
+          this.commonService.showToast('Payment added successfully');
+          if (res.data.success) {
+            this.paymentsForm.reset();
+            this.dismiss();
+          }
+          // this.addPayment(res);
         } else {
-          this.commonService.showToast(res.statusDetail);
+          this.commonService.showToast('Error while creating payment');
         }
       });
     }
 
   }
-  addPayment(res) {
-    const date = new Date().toISOString();
-    const obj = {
-      created_by: this.debtorId,
-      created_at: date,
-      updated_by: date,
-      updated_at: date,
-      case_id: this.caseId,
-      sent: 1,
-      sent_at: date,
-      transaction_ref: res.transactionId,
-      status: 'submitted',
-      net_amount: res.amount.totalAmount,
-      surcharge_amount: res.amount.surchargeAmount,
-      is_card: 1,
-      card_type: res.paymentMethod.card.cardType,
-      card_auth_no: res.paymentMethod.card.cardIdentifier,
-      gateway_configuration: 'sage',
-      gateway_status: res.bankAuthorisationCode
-    };
-    this.caseActionService.addPayment(obj, this.caseId).subscribe((response: any) => {
-      console.log(res);
-      this.storageService.set('is_case_updated', true);
-      this.commonService.showToast(res.message);
-      if (res.success) {
-        this.paymentsForm.reset();
-        this.dismiss();
-      }
-    });
+  // addPayment(res) {
+  //   const date = new Date().toISOString();
+  //   const obj = {
+  //     created_by: JSON.parse(localStorage.getItem('userdata')).id,
+  //     created_at: date,
+  //     updated_by: JSON.parse(localStorage.getItem('userdata')).id,
+  //     updated_at: date,
+  //     case_id: this.caseId,
+  //     // sent: 1,
+  //     // sent_at: date,
+  //     transaction_ref: res.transactionId,
+  //     status: 'submitted',
+  //     net_amount: res.amount.totalAmount,
+  //     surcharge_amount: res.amount.surchargeAmount,
+  //     is_card: 1,
+  //     card_type: res.paymentMethod.card.cardType,
+  //     card_auth_no: res.paymentMethod.card.cardIdentifier,
+  //     gateway_configuration: 'sage',
+  //     gateway_status: res.bankAuthorisationCode
+  //   };
+  //   this.caseActionService.addPayment(obj, this.caseId).subscribe((response: any) => {
+  //     console.log(response);
+  //     this.storageService.set('is_case_updated', true);
+  //     this.commonService.showToast(response.data.message);
+  //     if (response.data.success) {
+  //       this.paymentsForm.reset();
+  //       this.dismiss();
+  //     }
+  //   });
+  // }
 
-  }
   dismiss() {
     // using the injected ModalController this page
     // can "dismiss" itself and optionally pass back data
