@@ -61,7 +61,7 @@ export class ArrangementModalPage implements OnInit {
     private storageService: StorageService,
   ) {
     this.caseId = navParams.get('caseId');
-    this.baseOutstanding = this.outstanding = navParams.get('d_outstanding');
+    this.baseOutstanding = this.outstanding = navParams.get('outstanding');
     this.isDetailsPage = navParams.get('isDetailsPage');
     this.currentCase = navParams.get('currentCase');
   }
