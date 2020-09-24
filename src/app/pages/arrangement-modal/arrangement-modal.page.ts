@@ -317,12 +317,9 @@ export class ArrangementModalPage implements OnInit {
   }
   onLinkCaseSelectChange(event) {
     const linked = this.currentCase.linked_cases.filter(lc => (this.arrangementForm.value.selectedLinkCaseIds).indexOf(lc.id) != -1);
-    console.log(linked);
-    console.log(this.baseOutstanding);
     const linkedCasesTotalBalance = parseFloat(this.baseOutstanding) + linked.reduce((accumulator, currentValue) => {
       return accumulator + parseFloat(currentValue.d_outstanding);
     }, 0);
-    console.log(linked);
     this.outstanding = linkedCasesTotalBalance;
     this.arrangementForm.patchValue({ 'ref_amount': linkedCasesTotalBalance });
 
