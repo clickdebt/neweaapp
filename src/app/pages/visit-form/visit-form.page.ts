@@ -219,7 +219,11 @@ export class VisitFormPage implements OnInit {
     if (event.type === 'change' && event.srcElement.name.includes('data[singlePaymentMade]')) {
       if (event.srcElement.defaultValue == 1) {
         const paymodalPage = await this.modalCtrl.create({
-          component: PaymentModalPage, componentProps: { 'cssClass': 'case-action-modal', 'caseId': this.caseId }
+          component: PaymentModalPage, componentProps: {
+            cssClass: 'case-action-modal',
+            caseId: this.caseId,
+            currentCase: this.visitCaseData
+          }
         });
         try {
           await paymodalPage.present();
@@ -242,7 +246,10 @@ export class VisitFormPage implements OnInit {
 
         const arrmodalPage = await this.modalCtrl.create({
           component: ArrangementModalPage, componentProps: {
-            'cssClass': 'case-action-modal', 'caseId': this.caseId, 'outstanding': this.visitCaseData.d_outstanding
+            cssClass: 'case-action-modal',
+            caseId: this.caseId,
+            outstanding: this.visitCaseData.d_outstanding,
+            currentCase: this.visitCaseData
           }
         });
         try {

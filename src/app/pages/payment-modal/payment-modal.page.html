@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="dark">
     <ion-title>Payment</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
@@ -11,7 +11,7 @@
 <ion-content class="ion-padding">
 
   <div class="ion-margin-top" [hidden]="!networkStatus">
-    <ion-item class="bg-main" (click)="toggleShow(payments)" ng-class="{active: isShown(payments)}">
+    <ion-item class="bg-main" (click)="toggleShow(payments)" color="secondary" ng-class="{active: isShown(payments)}">
       <ion-label>
         <h2>Payments</h2>
       </ion-label>
@@ -56,7 +56,7 @@
     </ion-grid>
   </div>
   <div class="ion-margin-top">
-    <ion-item class="bg-main" (click)="toggleShow(paymentObj)" ng-class="{active: isShown(paymentObj)}">
+    <ion-item class="bg-main" (click)="toggleShow(paymentObj)" color="secondary" ng-class="{active: isShown(paymentObj)}">
       <ion-label>
         <h2>Create Payment</h2>
       </ion-label>

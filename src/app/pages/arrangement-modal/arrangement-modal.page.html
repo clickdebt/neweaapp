@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="dark">
     <ion-title>Arrangement</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
@@ -11,7 +11,7 @@
 <ion-content class="ion-padding">
 
   <div class="ion-margin-top " [hidden]="!networkStatus">
-    <ion-item class="bg-main" (click)="toggleShow(activeArrangements?.currentArrangements)"
+    <ion-item color="secondary" class="bg-main" (click)="toggleShow(activeArrangements?.currentArrangements)"
       ng-class="{active: isShown(activeArrangements?.currentArrangements)}">
       <ion-label>
         <h2>Current Arrangement</h2>
@@ -27,8 +27,8 @@
     </ion-grid>
   </div>
 
-  <div class=" ion-margin-top" [hidden]="!networkStatus">
-    <ion-item class="bg-main" (click)="toggleShow(activeArrangements?.scheduleArrangements)"
+  <div class=" ion-margin-top" [hidden]="!networkStatus" *ngIf="activeArrangements.scheduleArrangements.data">
+    <ion-item  color="secondary" class="bg-main" (click)="toggleShow(activeArrangements?.scheduleArrangements)"
       ng-class="{active: isShown(activeArrangements?.scheduleArrangements)}">
       <ion-label>
         <h2>Arrangement Schedule</h2>
@@ -78,7 +78,7 @@
   </div>
 
   <div class="ion-margin-top">
-    <ion-item class="bg-main" (click)="toggleShow(arrangementObj)" ng-class="{active: isShown(arrangementObj)}">
+    <ion-item class="bg-main" (click)="toggleShow(arrangementObj)" color="secondary" ng-class="{active: isShown(arrangementObj)}">
       <ion-label>
         <h2>Create Arrangement <span *ngIf="outstanding"> - O/S {{outstanding}}</span></h2>
       </ion-label>
@@ -88,7 +88,7 @@
 
     <form [formGroup]="arrangementForm" name="arrangementForm" [hidden]="!isShown(arrangementObj)">
       <ion-list lines="full" class="ion-no-margin ion-no-padding">
-        <ion-item *ngIf="currentCase.linked_cases.length>0">
+        <ion-item *ngIf="currentCase.linked_cases && currentCase.linked_cases.length>0">
           <ion-label position="floating">Select Linked case</ion-label>
           <ion-select multiple="true" formControlName="selectedLinkCaseIds"
             (ionChange)="onLinkCaseSelectChange($event)">
@@ -194,9 +194,8 @@
     </form>
   </div>
 
-  <div class="ion-margin-top" [hidden]="!networkStatus">
-    <ion-item class="bg-main" (click)="toggleShow(inActiveArrangements)"
-      ng-class="{active: isShown(inActiveArrangements)}">
+  <div class="ion-margin-top" [hidden]="!networkStatus" *ngIf="inActiveArrangements.data  && (inActiveArrangements.data).length">
+    <ion-item class="bg-main" (click)="toggleShow(inActiveArrangements)" color="secondary" ng-class="{active: isShown(inActiveArrangements)}">
       <ion-label>
         <h2>Inactive arrangements</h2>
       </ion-label>
