@@ -11,6 +11,7 @@ import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
 import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
 import { TakePaymentPage } from '../take-payment/take-payment.page';
+import { VisitDetailsPage } from '../visit-details/visit-details.page';
 
 @Component({
   selector: 'app-case-details',
@@ -68,7 +69,8 @@ export class CaseDetailsPage implements OnInit {
     private caseActionService: CaseActionService,
     private commonService: CommonService,
     private navCtrl: NavController,
-    private caseService: CaseService
+    private caseService: CaseService,
+    private modalController: ModalController
   ) { }
 
   ngOnInit() {
@@ -167,7 +169,15 @@ export class CaseDetailsPage implements OnInit {
   isShown(object) {
     return object.show;
   }
-
+  async showVisitDetails(history) {
+    const modal = await this.modalController.create({
+      component: VisitDetailsPage, componentProps: {
+        cssClass: 'case-action-modal',
+        visitId: history.document_id
+      }
+    });
+    return await modal.present();
+  }
   getCaseMarkers() {
     this.caseDetailsService.getCaseMarkers(this.caseId).subscribe((response: any) => {
       this.caseDetails.caseMarkers.fields = response.data.fields;

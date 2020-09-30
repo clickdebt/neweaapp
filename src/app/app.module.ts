@@ -31,6 +31,7 @@ import { AuthorizeCardPageModule } from './pages/authorize-card/authorize-card.m
 import { AES256 } from '@ionic-native/aes-256/ngx';
 import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
+import { VisitDetailsModule } from './pages/visit-details/visit-details.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -51,7 +52,7 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
     TakePaymentPageModule,
     AuthorizeCardPageModule,
     ArrangementModalPageModule,
-
+    VisitDetailsModule
   ],
   providers: [
     StatusBar,

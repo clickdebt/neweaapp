@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { CaseService } from 'src/app/services';
+import { VisitDetailsPage } from '../visit-details/visit-details.page';
 
 @Component({
   selector: 'app-visit-reports',
@@ -14,7 +16,8 @@ export class VisitReportsPage implements OnInit {
   caseId;
   created_at = '3';
   constructor(
-    private caseservice: CaseService
+    private caseservice: CaseService,
+    public modalController: ModalController
   ) { }
 
   ngOnInit() {
@@ -59,6 +62,7 @@ export class VisitReportsPage implements OnInit {
     data.forEach(element => {
       const form_values = JSON.parse(element.form_values);
       const obj = {
+        id: element.id,
         case_id: element.case_id,
         created_at: element.created_at,
         address: form_values.form_data != undefined ? form_values.form_data.address1
@@ -66,10 +70,20 @@ export class VisitReportsPage implements OnInit {
           + form_values.form_data.address3
           + form_values.form_data.townCity : '',
         postcode: form_values.form_data.postcode,
-        outcome: form_values.form_data.visit_outcome
+        outcome: form_values.form_data.visit_outcome,
+        data: form_values
       };
       this.visitReports.push(obj);
     });
+  }
+  async showDetails(report) {
+    const modal = await this.modalController.create({
+      component: VisitDetailsPage, componentProps: {
+        cssClass: 'case-action-modal',
+        visitData: report
+      }
+    });
+    return await modal.present();
   }
 
   loadData(infiniteScrollEvent) {
