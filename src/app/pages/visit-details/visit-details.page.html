@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <span>Visit Details</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="body-top-border">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th><h4>Field</h4></th>
+        <th><h4>Value</h4></th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let data of visitData.data.form_data | keyvalue">
+        <tr *ngIf="data.value">
+          <td>{{camelToNormaltext(data.key)}}</td>
+          <td>{{data.value}}</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</ion-content>

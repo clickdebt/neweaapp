@@ -312,7 +312,7 @@
                 <div class="d-flex ion-justify-content-between">
                   <ion-item>
                     <span class="text-color-light">
-                      Total 
+                      Total
                     </span>
                   </ion-item>
                   <ion-item>
@@ -623,6 +623,12 @@
             <ion-label>Attachment:</ion-label>
             <span class="text-color-light ion-margin-start">
               <a [href]="history.attachment" target="_blank">Download</a></span>
+          </ion-col>
+          <ion-col size-md="4" size="12" *ngIf="history.type == 'EA Added Visit Form' && history.document_id > 0">
+            <ion-label>Details:</ion-label>
+            <span class="text-color-light ion-margin-start">
+              <ion-button size="small" color="secondary" (click)='showVisitDetails(history)'>Details</ion-button>
+            </span>
           </ion-col>
           <ion-col size-md="12" size="12" *ngIf="history.user?.name">
             <ion-label>Name:</ion-label>
