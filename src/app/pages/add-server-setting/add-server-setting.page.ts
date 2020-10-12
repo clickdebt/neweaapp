@@ -32,7 +32,7 @@ export class AddServerSettingPage implements OnInit {
   }
 
   fetchSettings() {
-    this.url_array = []
+    this.url_array = [];
     this.submitted = true;
     if (this.settingForm.controls['company_code'].valid) {
       this.settingsService.loadServerSettings(this.settingForm.controls['company_code'].value).subscribe(res => {
@@ -46,6 +46,8 @@ export class AddServerSettingPage implements OnInit {
               });
             }
           }
+        } else {
+          this.commonService.showToast('Invalid company code', 'danger');
         }
       });
     }
@@ -61,7 +63,7 @@ export class AddServerSettingPage implements OnInit {
     if (ss.length > 0) {
       if (!(ss.find(s => s.url == setting.url))) {
         if (!ss.find(s => s.active == true)) {
-          setting.active = 1
+          setting.active = 1;
         }
         ss.push(setting);
         this.commonService.showToast('Server added successfully');
@@ -75,7 +77,12 @@ export class AddServerSettingPage implements OnInit {
       this.commonService.showToast('Server added successfully');
     }
     this.settingForm.reset();
+    this.url_array = [];
     localStorage.setItem('serverSettings', JSON.stringify(ss));
-    this.router.navigate(['server-settings']);
+    if (ss.length > 1) {
+      this.router.navigate(['server-settings']);
+    } else {
+      this.router.navigate(['login']);
+    }
   }
 }
