@@ -39,7 +39,8 @@ export class CommonService {
 
   async showLoader(content = 'Loading ...') {
     this.loader = await this.loadingController.create({
-      message: content
+      message: content,
+      duration: 10000
     });
     this.loader.present();
   }
