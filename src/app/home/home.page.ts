@@ -51,6 +51,7 @@ export class HomePage implements OnInit {
 
   ionViewWillEnter() {
     this.statusBar.styleLightContent();
+    this.statusBar.overlaysWebView(false);
     this.statusBar.backgroundColorByHexString('#000');
     this.server_url = localStorage.getItem('server_url');
     this.username = JSON.parse(localStorage.getItem('userdata')).name;
