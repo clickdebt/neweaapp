@@ -48,6 +48,9 @@ export class PanicModalPage implements OnInit, OnDestroy {
     this.selectedTime = '';
     this.progress = 0;
     this.timeSettings = await this.storageService.get('timeSettings');
+    if(!this.timeSettings) {
+      this.timeSettings= [{"time":10,"label":"10 seconds"}];
+    }
     if (this.isSafeGuardActive) {
       this.getTimerDetails();
     }
