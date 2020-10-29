@@ -104,11 +104,15 @@ export class JobListPage implements OnInit {
 
   async ngOnInit() {
     this.caseFields = await this.storageService.get('fields');
-    this.caseFields = this.totalFields.filter((c) => {
-      if (this.caseFields.includes(c.field)) {
-        return true;
-      }
-    });
+    if(this.caseFields) {
+      this.caseFields = this.totalFields.filter((c) => {
+        if (this.caseFields.includes(c.field)) {
+          return true;
+        }
+      });
+    } else {
+      this.caseFields = ["current_status.status_name","ref","d_outstanding","visitcount_total","custom5","debtor.enforcement_addresses[0].address_postcode"];
+    }
     this.colspanLength = 6 + this.caseFields.length;
     this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
