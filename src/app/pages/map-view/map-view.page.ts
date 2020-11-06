@@ -172,6 +172,10 @@ export class MapViewPage implements OnInit {
         google.maps.event.addDomListener(detailsButton, 'click', () => {
           const caseId = detailsButton.getAttribute('id');
           if (caseId) {
+            const currentCase = this.cases.find((currenCase) => {
+              return currenCase.id === caseId;
+            });
+            localStorage.setItem('detais_case_data', JSON.stringify(currentCase));
             this.setCaseForBackLink();
             this.router.navigate(['/home/case-details/' + caseId]);
           }
