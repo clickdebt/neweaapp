@@ -42,11 +42,12 @@ export class StorageService {
   }
 
   async get(key) {
-    if (this.platform.is('android') || this.platform.is('ios')) {
-      return await this.decrypt(await this.storage.get(key));
-    } else {
-      return await this.storage.get(key);
-    }
+    return await this.storage.get(key);
+    // if (this.platform.is('android') || this.platform.is('ios')) {
+    //   return await this.decrypt(await this.storage.get(key));
+    // } else {
+    //   return await this.storage.get(key);
+    // }
   }
 
   async remove(key) {
@@ -54,12 +55,13 @@ export class StorageService {
   }
 
   async set(key, value) {
-    if (this.platform.is('android') || this.platform.is('ios')) {
-      const vv = await this.encrypt(value);
-      return await this.storage.set(key, vv);
-    } else {
-      return await this.storage.set(key, value);
-    }
+    return await this.storage.set(key, value);
+    // if (this.platform.is('android') || this.platform.is('ios')) {
+    //   const vv = await this.encrypt(value);
+    //   return await this.storage.set(key, vv);
+    // } else {
+    //   return await this.storage.set(key, value);
+    // }
 
   }
 }
