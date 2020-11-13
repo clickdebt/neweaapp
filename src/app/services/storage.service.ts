@@ -20,6 +20,9 @@ export class StorageService {
     }
   }
 
+  async clearAll() {
+    await this.storage.clear();
+  }
   async encrypt(data) {
     const str = JSON.stringify(data);
     return await this.aes256.encrypt(this.secureKey, this.secureIV, str)

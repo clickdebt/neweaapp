@@ -360,7 +360,7 @@ export class JobListPage implements OnInit {
     if (this.selectedAll) {
       this.selectAllCase();
     }
-    console.log(this.cases);
+    // console.log(this.cases);
     this.storageService.set('cases', this.cases);
   }
 
@@ -456,8 +456,12 @@ export class JobListPage implements OnInit {
     const currentCase = value;
     const res = caseField.split('.');
     res.forEach((r) => {
-      r = r.split('[')[0];
-      value = value[r];
+      let r1 = r.split('[');
+      if(r1.length > 1) {
+        value = value[r1[0]][0];
+      } else {
+        value = value[r];
+      }
       if (Array.isArray(value)) {
         if (value[0]) {
           value = value[0];

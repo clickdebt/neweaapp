@@ -127,9 +127,10 @@ export class HomePage implements OnInit {
     await alert.present();
   }
 
-  logout() {
+  async logout() {
     localStorage.removeItem('remote_token');
     localStorage.removeItem('userdata');
+    await this.storageService.clearAll();
     this.router.navigate(['/login']);
   }
   async openPanicModal() {

@@ -279,7 +279,7 @@
                     <td>{{link_case.id}}</td>
                     <td>{{link_case.debtor_name}}</td>
                     <td *ngFor="let caseField of caseFields">
-                      <span [innerHTML]="getLinkedCaseFieldValue(link_case,caseField.field)"></span>
+                      <span [innerHTML]="getCaseFieldValue(link_case,caseField.field)"></span>
                     </td>
                     <!-- <td>{{link_case.ref}}</td>
                     <td>{{link_case.d_outstanding}}</td>
