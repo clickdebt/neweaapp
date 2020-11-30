@@ -3,6 +3,7 @@ import { ModalController, NavParams } from '@ionic/angular';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { CommonService, StorageService } from 'src/app/services';
+import { NetworkService } from 'src/app/services/network.service';
 @Component({
   selector: 'app-upload-document-modal',
   templateUrl: './upload-document-modal.page.html',
@@ -18,7 +19,8 @@ export class UploadDocumentModalPage implements OnInit {
     private caseActionService: CaseActionService,
     private navParams: NavParams,
     private commonUtils: CommonService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private networkService: NetworkService
   ) {
     this.caseId = navParams.get('caseId');
   }
@@ -41,18 +43,36 @@ export class UploadDocumentModalPage implements OnInit {
   }
   onFileInputChange(event) {
     this.file = event.target.files[0];
+    console.log(this.file);
+
   }
   uploadDocument() {
     if (this.uploadForm.valid && this.file) {
-      this.storageService.set('is_case_updated', true);
-      this.caseActionService.uploadDocument(this.file, this.caseId).subscribe((res: any) => {
-        if (res.message) {
-          this.commonUtils.showToast(res.message);
-          this.modalCtrl.dismiss({
-            saved: true
-          });
-        }
-      });
+      if (this.networkService.getCurrentNetworkStatus() == 1) {
+        this.storageService.set('is_case_updated', true);
+        this.caseActionService.uploadDocument(this.file, this.caseId).subscribe((res: any) => {
+          if (res.message) {
+            this.commonUtils.showToast(res.message);
+            this.modalCtrl.dismiss({
+              saved: true
+            });
+          }
+        });
+      } else {
+        const formData = new FormData();
+        formData.append('file', this.file);
+        this.caseActionService.saveActionOffline(
+          `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${this.caseId}?source=API`,
+          'post',
+          formData
+        );
+        this.modalCtrl.dismiss({
+          saved: true
+        });
+      }
+
+
+
     }
   }
 }

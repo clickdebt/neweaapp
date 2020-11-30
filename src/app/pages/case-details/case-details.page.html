@@ -19,7 +19,7 @@
         <ion-icon slot="end" [name]="isShown(caseDetails.caseMarkers) ? 'chevron-up-outline':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <ion-list class="ion-no-border ion-margin-start" [hidden]="!isShown(caseDetails.caseMarkers)">
+      <ion-list class="ion-no-border detial-cover ion-margin-start" [hidden]="!isShown(caseDetails.caseMarkers)">
         <ion-button (click)="onCaseMarkerClick(caseMarker)" size="default" [color]="colorCondition(caseMarker.value)"
           *ngFor="let caseMarker of caseDetails.caseMarkers.fields">
           {{caseMarker.label}}
@@ -37,7 +37,7 @@
         <ion-icon slot="end" [name]="isShown(currentCaseData) ? 'chevron-up-sharp':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <ion-grid class="ion-no-border ion-margin-start" [hidden]="!isShown(currentCaseData)">
+      <ion-grid class="ion-no-border detial-cover ion-margin-start" [hidden]="!isShown(currentCaseData)">
         <ion-row>
           <ion-col>
             <span>Debtor Name:</span>
@@ -81,7 +81,7 @@
         <ion-icon slot="end" [name]="isShown(caseDetails.caseSummary) ? 'chevron-up-sharp':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <ion-grid class="ion-no-border ion-margin-start" [hidden]="!isShown(caseDetails.caseSummary)">
+      <ion-grid class="ion-no-border detial-cover ion-margin-start" [hidden]="!isShown(caseDetails.caseSummary)">
         <ion-row>
           <ion-col>
             <span>Client Reference:</span>
@@ -152,7 +152,7 @@
         <ion-icon slot="end" [name]="isShown(caseDetails.financialDetails) ? 'chevron-up-outline':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <ion-grid class="ion-no-border" [hidden]="!isShown(caseDetails.financialDetails)">
+      <ion-grid class="ion-no-border detial-cover" [hidden]="!isShown(caseDetails.financialDetails)">
         <ion-row>
           <ion-col size-md="3">
             <ion-card>
@@ -339,13 +339,13 @@
         <ion-icon slot="end" [name]="isShown(caseDetails.payments) ? 'chevron-up-outline':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <ion-grid class="ion-no-border ion-margin-bottom ion-margin-horizontal" [hidden]="!isShown(caseDetails.payments)">
+      <ion-grid class="ion-no-border detial-cover ion-margin-bottom" [hidden]="!isShown(caseDetails.payments)">
         <ion-row *ngIf="!caseDetails.payments?.paymentData?.length">
           <ion-col class="text-color-light ion-text-center">
             <span>No Payments Found </span>
           </ion-col>
         </ion-row>
-        <ion-row class="history-bg ion-margin-top pt-1 pl-1" *ngFor="let payment of caseDetails.payments.paymentData">
+        <ion-row class="history-bg mt-1 pt-1 pl-1" *ngFor="let payment of caseDetails.payments.paymentData">
           <ion-col size-md="8" size="12">
             <ion-label>Date & Time:</ion-label>
             <span class="text-color-light ion-margin-start">{{payment.date}}</span>
@@ -377,11 +377,11 @@
         <ion-icon slot="end" [name]="isShown(caseDetails.caseDetail) ? 'chevron-up-outline':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <div [hidden]="!isShown(caseDetails.caseDetail)">
+      <div class="detial-cover" [hidden]="!isShown(caseDetails.caseDetail)">
         <ion-grid class="ion-no-border" *ngIf="getCaseSchemeSpecificDetail">
           <ion-row *ngFor="let data of getCaseSchemeSpecificData">
-            <ion-col>{{data.label}}</ion-col>
-            <ion-col>{{data.value}}</ion-col>
+            <ion-col>{{data.label}}:</ion-col>
+            <ion-col class="text-color-light">{{data.value}}</ion-col>
           </ion-row>
         </ion-grid>
         <ion-grid class="ion-no-border" *ngIf="!getCaseSchemeSpecificDetail">
@@ -557,7 +557,7 @@
         <ion-icon slot="end" [name]="isShown(caseDetails.documents) ? 'chevron-up-outline':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <ion-grid class="ion-no-border ion-margin-bottom ion-margin-horizontal"
+      <ion-grid class="ion-no-border detial-cover ion-margin-bottom"
         [hidden]="!isShown(caseDetails.documents)">
         <ion-row *ngIf="!caseDocuments.length">
           <ion-col class="text-color-light ion-text-center">
@@ -568,15 +568,15 @@
           <ion-col size-md="4" size="12">
             <ion-label>Name:</ion-label>
             <span
-              class="text-color-light ion-margin-start">{{document.label ? document.label : document.document_history.action}}</span>
+              class="text-color-light ion-margin-start">{{document.label ? document.label : document.action}}</span>
           </ion-col>
           <ion-col size-md="4" size="12">
             <ion-label>Date:</ion-label>
-            <span class="text-color-light ion-margin-start">{{document.document_history.time}}</span>
+            <span class="text-color-light ion-margin-start">{{document.time}}</span>
           </ion-col>
           <ion-col size-md="4" size="12">
             <ion-label>Link:</ion-label>
-            <span><a [href]="document.document_history.attachment" target="_blank">Download</a></span>
+            <span><a [href]="document.attachment" target="_blank">Download</a></span>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -593,7 +593,7 @@
         <ion-icon slot="end" [name]="isShown(caseDetails.history) ? 'chevron-up-outline':'chevron-down-sharp'">
         </ion-icon>
       </ion-item>
-      <ion-grid class="ion-no-border ion-margin-bottom ion-margin-horizontal" [hidden]="!isShown(caseDetails.history)">
+      <ion-grid class="ion-no-border detial-cover ion-margin-bottom " [hidden]="!isShown(caseDetails.history)">
         <ion-row class="ion-justify-content-end">
           <ion-col size-md="4">
             <ion-item lines="none">
@@ -603,7 +603,7 @@
             </ion-item>
           </ion-col>
         </ion-row>
-        <ion-row class="history-bg ion-margin-top pt-1 pl-1" *ngFor="let history of historyFilterData">
+        <ion-row class="history-bg mt-1 pt-1 pl-1" *ngFor="let history of historyFilterData">
           <ion-col size-md="8" size="12">
             <ion-label>Action:</ion-label>
             <span class="text-color-light ion-margin-start"

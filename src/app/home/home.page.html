@@ -1,13 +1,13 @@
 <ion-app>
   <ion-menu side="start" content-id="main-content">
-    <ion-header>
-      <ion-toolbar translucent>
+    <ion-header class="ion-no-border h-25">
+      <ion-toolbar class="h-100 ion-align-items-center ion-justify-content-center d-flex" translucent>
         <ion-list-header>{{username}}</ion-list-header>
-        <ion-list-header>{{server_url}}</ion-list-header>
+        <ion-list-header class="url">{{server_url}}</ion-list-header>
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list>
+      <ion-list class="pt-1">
         <ion-menu-toggle auto-hide="true">
           <ion-item [routerLink]="['/home/dashboard']" detail="false">
             <ion-icon slot="start" name="home-outline"></ion-icon>
@@ -41,6 +41,11 @@
         </ion-menu-toggle>
       </ion-list>
     </ion-content>
+    <ion-footer>
+      <ion-row class="m-1 ion-justify-content-center">
+        <ion-label>FieldAgent 3.0</ion-label>
+      </ion-row>
+    </ion-footer>
   </ion-menu>
   <ion-toolbar color="dark">
     <ion-buttons slot="start">

@@ -58,7 +58,11 @@ export class DatabaseService {
       client_id INTEGER,
       current_status_id INTEGER,
       current_stage_id INTEGER,
-      data TEXT
+      data TEXT,
+      case_markers TEXT,
+      case_Summary TEXT,
+      Financials TEXT,
+      case_details TEXT
     );`;
 
     const visitReports = `CREATE TABLE IF NOT EXISTS visit_reports(
@@ -70,7 +74,36 @@ export class DatabaseService {
       visit_form_data_id INTEGER
     );`;
 
-    const sql = rdebCases + visitReports;
+    const history = `CREATE TABLE IF NOT EXISTS history(
+      id INTEGER PRIMARY KEY ,
+      caseid INTEGER,
+      document_id INTEGER,
+      action TEXT,
+      attachment TEXT,
+      name TEXT,
+      note TEXT,
+      time DATETIME
+    );`;
+
+    const payment = `CREATE TABLE IF NOT EXISTS payment(
+      id INTEGER PRIMARY KEY ,
+      caseid INTEGER,
+      amount INTEGER,
+      payment_type TEXT,
+      source_name TEXT,
+      date DATETIME
+    );`;
+
+    const document = `CREATE TABLE IF NOT EXISTS document(
+      id INTEGER PRIMARY KEY ,
+      case_id INTEGER,
+      label TEXT,
+      action TEXT,
+      attachment TEXT,
+      time DATETIME
+    );`;
+
+    const sql = rdebCases + visitReports + history + payment + document;
 
     const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
     this.databaseReady.next(true);
@@ -90,8 +123,9 @@ export class DatabaseService {
 
   async insert(tableName, params = []) {
     const fields = params.map(item => item.name);
-    const values = params.map(item => item.value);
-    return this.executeQuery(`INSERT INTO ${tableName} (${fields.toString()}) VALUES (${values.toString()})`);
+    const values = params.map(item => `'${item.value}'`);
+    const query = `INSERT OR REPLACE INTO ${tableName} (${fields.join(', ')}) VALUES (${values.join(', ')})`;
+    return await this.executeQuery(query);
   }
   async updateVisitForm(is_sync, visit_form_data_id, form_id) {
     const updateQuery = `update visit_reports set is_sync = ${is_sync} and
@@ -164,6 +198,72 @@ export class DatabaseService {
       .catch((error) => { });
   }
 
+  async storeToSqlite(tableName, entries) {
+    try {
+      const promiseArray = [];
+      for (const entrie of entries) {
+        const params = Object.entries(entrie).map(([name, value]) => {
+          if (typeof value === 'object') {
+            value = JSON.stringify(value);
+          }
+          if (typeof value === 'string' && value.includes(`'`)) {
+            value = value.replace(/'/g, `''`);
+          }
+          return ({ name, value });
+        });
+        promiseArray.push(this.insert(tableName, params));
+      }
+      return await Promise.all(promiseArray);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  getEncodeString(data) {
+    return encodeURI(JSON.stringify(data));
+  }
+  getDecodeString(data) {
+    return JSON.parse(decodeURI(data));
+  }
+  async setcaseDetails(data) {
+    try {
+      const promiseArray = [];
+      for (const currentCase of data.cases) {
+        console.log(currentCase);
+
+        const caseSummary = {
+          clientRef: currentCase.caseData.ref,
+          clientName: currentCase.caseData.client.title,
+          scheme: currentCase.caseData.scheme.title,
+          stage: currentCase.caseData.stage.name,
+          status: currentCase.caseData.current_status.status_name,
+          lastVisitDate: currentCase.caseData.last_visit_date ? currentCase.caseData.last_visit_date : '-'
+        };
+        const sqlStart = `UPDATE rdebt_cases SET case_markers='${this.getEncodeString(currentCase.marker_fields)}',
+        case_Summary='${this.getEncodeString(caseSummary)}',
+        Financials='${this.getEncodeString(currentCase.case_financials)}',
+        case_details='${this.getEncodeString(currentCase.scheme_panel_data)}' WHERE id = ${currentCase.caseData.id}`;
+        promiseArray.push(this.executeQuery(sqlStart));
+      }
+
+      await this.storeToSqlite('history', data.history);
+      await this.storeToSqlite('payment', data.payments);
+      await this.storeToSqlite('document', data.documents);
+
+      await Promise.all(promiseArray)
+        .then((res: any) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+
+        });
+    } catch (r) {
+      console.log(r);
+
+    }
+  }
+
   async setVisitForm(data) {
     await this.storageService.set('visit_form', data);
   }
@@ -192,5 +292,52 @@ export class DatabaseService {
   }
   async getDownloadStatus() {
     return await this.storageService.get('downloadStatus');
+  }
+
+  async getOfflinecaseDetails(id) {
+    const caseDetails: any = {
+    };
+    let query = `select case_markers,case_Summary,Financials,case_details from rdebt_cases where id = ${id}`;
+
+    let result = await this.executeQuery(query);
+    let finalResult = await this.extractResult(result);
+    console.log(finalResult);
+
+    caseDetails.caseMarkers = this.getDecodeString(finalResult[0].case_markers);
+    caseDetails.case_Summary = this.getDecodeString(finalResult[0].case_Summary);
+    caseDetails.Financials = this.getDecodeString(finalResult[0].Financials);
+    caseDetails.case_details = this.getDecodeString(finalResult[0].case_details);
+
+    query = `select * from history where caseid = '210565076'`;
+    // query = `select * from history where caseid = ${id}`;
+    result = await this.executeQuery(query);
+    finalResult = await this.extractResult(result);
+    caseDetails.history = finalResult;
+
+    query = `select * from payment where caseid = '210565076'`;
+    // query = `select * from payment where caseid = ${id}`;
+    result = await this.executeQuery(query);
+    finalResult = await this.extractResult(result);
+    caseDetails.paymentData = finalResult;
+
+    query = `select * from document where case_id = '210565076'`;
+    // query = `select * from document where case_id = ${id}`;
+    result = await this.executeQuery(query);
+    finalResult = await this.extractResult(result);
+    caseDetails.caseDocuments = finalResult;
+
+    return caseDetails;
+  }
+
+  async extractResult(value) {
+    const results: any[] = [];
+    let item;
+    if (value && value.rows) {
+      for (let i = 0; i < value.rows.length; i++) {
+        item = value.rows.item(i);
+        results.push(item);
+      }
+    }
+    return results;
   }
 }
