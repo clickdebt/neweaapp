@@ -232,7 +232,7 @@
             <td>{{case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
             <td>{{case.custom5}}</td> -->
             <td class="action ">
-              <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+              <ion-button size="small" color="secondary"
                 (click)="goToCaseDetails(case)">
                 Details
               </ion-button>
@@ -290,7 +290,7 @@
                     <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
                     <td>{{link_case.custom5}}</td> -->
                     <td class="action ">
-                      <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                      <ion-button size="small" color="secondary"
                         (click)="goToCaseDetails(link_case)">
                         Details
                       </ion-button>
@@ -337,7 +337,7 @@
             <span class="d-block"> (#{{case.id}}) </span>
           </h6>
           <div class="d-grid">
-            <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+            <ion-button size="small" color="secondary"
               (click)="goToCaseDetails(case)">
               <ion-icon name="information-circle-outline"></ion-icon><span>Details</span>
             </ion-button>
@@ -406,7 +406,7 @@
                   <span class="d-block"> (#{{link_case.id}}) </span>
                 </h6>
                 <span class="d-grid">
-                  <ion-button size="small" color="secondary" *ngIf="currentNetworkStatus == 1"
+                  <ion-button size="small" color="secondary"
                     (click)="goToCaseDetails(link_case)">
                     <ion-icon name="information-circle-outline"></ion-icon><span>Details</span>
                   </ion-button>

@@ -1,12 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CommonService } from './common.service';
+import { StorageService } from './storage.service';
+import { forkJoin } from 'rxjs';
+import { DatabaseService } from './database.service';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CaseActionService {
   // tslint:disable: max-line-length
-  constructor(public http: HttpClient) { }
+  constructor(
+    public http: HttpClient,
+    private storageService: StorageService,
+    private commonService: CommonService,
+    private databaseService: DatabaseService
+  ) { }
 
   getFeeOptions(caseId) {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/financial/case_actions_panels/case_action_fee_options/${caseId}?source=API`;
@@ -101,5 +111,45 @@ export class CaseActionService {
   getSavedCards(debtorId, gateway, type) {
     const apiURL = localStorage.getItem('server_url') + `b/payment/sage_pay_actions/get_card_list/${debtorId}/${gateway}/${type}?source=API`;
     return this.http.get(apiURL);
+  }
+
+  async offlineActions() {
+    // const caseDetailsActions = await this.storageService.get('case_details_action');
+    // const requests = [];
+    // caseDetailsActions.forEach((caseDerailsAction) => {
+    //   requests.push(this.http.request(caseDerailsAction.type, localStorage.getItem('server_url') + `b/clickdebt_panel_layout/` + caseDerailsAction.url, caseDerailsAction.data));
+    // });
+
+    // forkJoin(requests).subscribe(data => {
+    //   console.log(data);
+    //   this.storageService.set('case_details_action', []);
+    // });
+  }
+
+  saveActionOffline(table, data) {
+
+    // this.storageService.get('case_details_action').then((caseDetailsActions) => {
+    //   if (!caseDetailsActions) {
+    //     caseDetailsActions = [];
+    //   }
+      // const req = [
+      //   { name: 'case_id', value: `'${case_id}'` },
+      //   { name: 'url', value: `'${url}'` },
+      //   { name: 'type', value: `'${type}'` },
+      //   { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
+      //   { name: 'is_sync', value: 0 },
+      //   { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+      // ];
+
+      // caseDetailsActions.push(req);
+      // this.storageService.set('case_details_action', caseDetailsActions);
+      this.commonService.showToast('Your Response is Saved will affect when you come online', 'success');
+      this.databaseService.insert(table, data).then(async (data) => {
+        // await this.storageService.set('isVisitFormSync', false);
+        this.databaseService.changeIsApiPending(true);
+        this.commonService.showToast('Data Saved Locally.');        
+      }, (error) => {
+      // });
+    });
   }
 }

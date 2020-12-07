@@ -1,15 +1,29 @@
 .bg-main {
-  --ion-background-color: #f5f5f5;
-  color: #342e32;
+  // --ion-background-color: #f5f5f5;
+  // color: #342e32;
+  // border-radius: 4px;
+  // border: 1px #342e32 solid;
+  color: black;
+  border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+  --ion-background-color: #f7f7f7;
+  border-bottom: 1px solid #dee2e6;
 }
 .text-color-light {
   color: #726e72 !important;
 }
 .card-title-bg {
-  --ion-background-color: #f1f1f1;
+  --ion-background-color: #f7f7f7;
 }
 .history-bg {
-  background-color: #f1f1f1;
+  // background-color: #f1f1f1;
+  border: 1px #dee2e6 solid;
+  border-radius:  calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+}
+.detial-cover {
+  margin-top: 4px;
+  padding: 8px;
+  margin-left: 0px;
+  border: 1px solid #dee2e6 !important;
 }
 .highlight {
   background-color: #ffff00 !important;

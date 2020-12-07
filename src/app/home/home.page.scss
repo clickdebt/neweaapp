@@ -3,3 +3,16 @@
     width: 150px;
     padding: 5px;
 }
+.url {
+    overflow-wrap: anywhere;
+    font-size: inherit;
+}
+ion-menu {
+    ion-toolbar {
+        --background: #347ee7;
+        box-shadow: 1px 1px 2px #347ee7;
+    }
+    ion-list-header {
+        color: white;
+    }
+}

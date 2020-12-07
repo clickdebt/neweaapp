@@ -1,18 +1,19 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { StorageService, CommonService, CaseService } from 'src/app/services';
-import { CaseDetailsService } from 'src/app/services/case-details.service';
-import { ModalController, AlertController, NavController } from '@ionic/angular';
-import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
-import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
-import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AlertController, ModalController, NavController } from '@ionic/angular';
+import * as moment from 'moment';
+import { CaseService, CommonService, DatabaseService, StorageService } from 'src/app/services';
 import { CaseActionService } from 'src/app/services/case-action.service';
-import { PaymentModalPage } from '../payment-modal/payment-modal.page';
+import { CaseDetailsService } from 'src/app/services/case-details.service';
+import { NetworkService } from 'src/app/services/network.service';
+import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
+import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
-import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
+import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
+import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { TakePaymentPage } from '../take-payment/take-payment.page';
+import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
 import { VisitDetailsPage } from '../visit-details/visit-details.page';
-
 @Component({
   selector: 'app-case-details',
   templateUrl: './case-details.page.html',
@@ -70,7 +71,9 @@ export class CaseDetailsPage implements OnInit {
     private commonService: CommonService,
     private navCtrl: NavController,
     private caseService: CaseService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private databaseService: DatabaseService,
+    private networkService: NetworkService,
   ) { }
 
   ngOnInit() {
@@ -87,7 +90,6 @@ export class CaseDetailsPage implements OnInit {
     const isNewlyn = this.commonService.isClient('newlyn');
     if (isNewlyn) {
       this.actions = ['Add Note', 'Add Fee'];
-      console.log(this.caseDetails);
       if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
         this.actions.push('Visit Case');
       }
@@ -114,7 +116,7 @@ export class CaseDetailsPage implements OnInit {
       }
     }
   }
-  loadInitData() {
+  async loadInitData() {
 
     if (localStorage.getItem('detais_case_data')) {
       this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
@@ -125,20 +127,58 @@ export class CaseDetailsPage implements OnInit {
           }, 0);
         this.linkedTotal = linkedCasesTotalBalance;
       }
-      this.getCaseMarkers();
-      this.getSummary();
-      this.getClient();
-      this.getfinancialDetails();
-      this.getCaseDetails();
-      this.getCaseSchemeSpecificDetails();
-      this.getHistory();
-      this.getPayments();
-      this.getCaseDocuments();
+      this.getOfflinecaseDetails();
+      // this.getCaseMarkers();
+      // this.getSummary();
+      // this.getClient();
+      // this.getfinancialDetails();
+      // this.getCaseDetails();
+      // this.getCaseSchemeSpecificDetails();
+      // this.getHistory();
+      // this.getPayments();
+      // this.getCaseDocuments();
+
     } else {
       this.router.navigate(['/home/job-list']);
     }
     this.currentCaseData.show = false;
   }
+
+  async getOfflinecaseDetails() {
+
+    const result = await this.databaseService.getOfflinecaseDetails(this.currentCaseData.id);
+    console.log(result);
+
+    this.caseDetails.caseMarkers.fields = result.caseMarkers;
+    this.caseDetails.caseSummary = result.case_Summary;
+    this.caseDetails.financialDetails = result.Financials;
+    this.caseDetails.payments.paymentData = result.paymentData;
+    this.caseDetails.history = result.history;
+    this.caseDocuments = result.caseDocuments;
+    this.getCaseSchemeSpecificDetail = true;
+    this.getCaseSchemeSpecificData = result.case_details;
+
+    this.caseDetails.payments.paymentData.sort((a, b) => {
+      if (new Date(a.date) > new Date(b.date)) {
+        return -1;
+      } else if (new Date(a.date) < new Date(b.date)) {
+        return 1;
+      }
+      return 0;
+    });
+
+    this.caseDetails.history.sort((a, b) => {
+      if (new Date(a.time) > new Date(b.time)) {
+        return -1;
+      } else if (new Date(a.time) < new Date(b.time)) {
+        return 1;
+      }
+      return 0;
+    });
+    this.historyData = this.caseDetails.history;
+    this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
+  }
+
   onSelectChange(event) {
     if (this.SelectedAction === 'Add Note') {
       this.addNote();
@@ -184,7 +224,6 @@ export class CaseDetailsPage implements OnInit {
     });
   }
   async onCaseMarkerClick(caseMarker) {
-    console.log(caseMarker);
     if (caseMarker.shortcode === 'hold') {
       this.onHold(caseMarker);
     } else {
@@ -213,10 +252,23 @@ export class CaseDetailsPage implements OnInit {
               if (data.length > 0 && data[0] === 'linked_cases') {
                 linked = this.currentCaseData.linked_cases.map(ca => ca.id);
               }
-              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
-                .subscribe((response) => {
-                  this.getCaseMarkers();
-                });
+              if (this.networkService.getCurrentNetworkStatus() == 1) {
+                this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
+                  .subscribe((response) => {
+                    this.getCaseMarkers();
+                  });
+              } else {
+                const data = [{'name': 'linked', value: `'${linked}'` }];
+                const api_data = [
+                  { name: 'case_id', value: `'${this.caseId}'` },
+                  { name: 'url', value: `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${this.caseId}/${caseMarker.col}?source=API` },
+                  { name: 'type', value: `post` },
+                  { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
+                  { name: 'is_sync', value: 0 },
+                  { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+                ]
+                this.caseActionService.saveActionOffline('api_calls', api_data);
+              }
             }
           }
         ]
@@ -262,7 +314,6 @@ export class CaseDetailsPage implements OnInit {
   }
   getCaseSchemeSpecificDetails() {
     this.caseDetailsService.getSchemeSpecificDetails(this.caseId).subscribe((response: any) => {
-      // console.log(response);
       if (response && response.prepare_array) {
         this.getCaseSchemeSpecificDetail = true;
         this.getCaseSchemeSpecificData = response.prepare_array;
@@ -293,7 +344,6 @@ export class CaseDetailsPage implements OnInit {
   onInput(event) {
     this.searchBarValue = event.target.value.toLowerCase();
     this.historyFilterData = [];
-    console.log(this.searchBarValue, event);
 
     if (this.searchBarValue) {
       this.historyData = this.caseDetails.history.history_data.filter((history) => {
@@ -323,7 +373,6 @@ export class CaseDetailsPage implements OnInit {
         }
         return 0;
       });
-      console.log(this.caseDetails);
     });
   }
   getCaseDocuments() {
@@ -440,27 +489,43 @@ export class CaseDetailsPage implements OnInit {
             const data = {
               field_agent_id: -1
             };
-            this.caseActionService.deAllocationCase(data, this.caseId).
-              subscribe(async (response) => {
-                this.storageService.set('is_case_updated', true);
-                // TODO
-                // let cases = await this.storageService.get('cases');
-                // console.log(cases);
-                // cases = cases.filter((currentCase) => {
-                //   if (currentCase.id === this.caseId) {
-                //     return false;
-                //   } else {
-                //     if (currentCase.linked_cases) {
-                //       currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
-                //     }
-                //     return true;
-                //   }
-                // });
-                // this.storageService.set('cases', cases);
-                // localStorage.removeItem('detais_case_data');
-                // localStorage.setItem('detais_case_data_deallocated', 'true');
-                this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
-              });
+            if (this.networkService.getCurrentNetworkStatus() == 1) {
+              this.caseActionService.deAllocationCase(data, this.caseId).
+                subscribe(async (response) => {
+                  this.storageService.set('is_case_updated', true);
+                  // TODO
+                  // let cases = await this.storageService.get('cases');
+                  // console.log(cases);
+                  // cases = cases.filter((currentCase) => {
+                  //   if (currentCase.id === this.caseId) {
+                  //     return false;
+                  //   } else {
+                  //     if (currentCase.linked_cases) {
+                  //       currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
+                  //     }
+                  //     return true;
+                  //   }
+                  // });
+                  // this.storageService.set('cases', cases);
+                  // localStorage.removeItem('detais_case_data');
+                  // localStorage.setItem('detais_case_data_deallocated', 'true');
+                  this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
+                });
+            } else {
+                const api_data = [
+                  { name: 'case_id', value: `'${this.caseId}'` },
+                  { name: 'url', value: `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${this.caseId}?source=API` },
+                  { name: 'type', value: `post` },
+                  { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
+                  { name: 'is_sync', value: 0 },
+                  { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+                ]
+                this.caseActionService.saveActionOffline('api_calls', api_data);
+          
+              this.storageService.set('is_case_updated', true);
+              this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
+            }
+
           }
         }
       ]

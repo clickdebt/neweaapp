@@ -28,6 +28,10 @@ export class CaseService {
     return this.http.get(apiURL);
   }
 
+  getCaseDetails() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/getCaseDetailsData';
+    return this.http.get(apiURL);
+  }
   getFilterMasterData() {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/filter';
     return this.http.get(apiURL);
