@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { CommonService } from './common.service';
 import { StorageService } from './storage.service';
 import { forkJoin } from 'rxjs';
+import { DatabaseService } from './database.service';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,8 @@ export class CaseActionService {
   constructor(
     public http: HttpClient,
     private storageService: StorageService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private databaseService: DatabaseService
   ) { }
 
   getFeeOptions(caseId) {
@@ -111,31 +114,42 @@ export class CaseActionService {
   }
 
   async offlineActions() {
-    const caseDetailsActions = await this.storageService.get('case_details_action');
-    const requests = [];
-    caseDetailsActions.forEach((caseDerailsAction) => {
-      requests.push(this.http.request(caseDerailsAction.type, localStorage.getItem('server_url') + `b/clickdebt_panel_layout/` + caseDerailsAction.url, caseDerailsAction.data));
-    });
+    // const caseDetailsActions = await this.storageService.get('case_details_action');
+    // const requests = [];
+    // caseDetailsActions.forEach((caseDerailsAction) => {
+    //   requests.push(this.http.request(caseDerailsAction.type, localStorage.getItem('server_url') + `b/clickdebt_panel_layout/` + caseDerailsAction.url, caseDerailsAction.data));
+    // });
 
-    forkJoin(requests).subscribe(data => {
-      console.log(data);
-      this.storageService.set('case_details_action', []);
-    });
+    // forkJoin(requests).subscribe(data => {
+    //   console.log(data);
+    //   this.storageService.set('case_details_action', []);
+    // });
   }
 
-  saveActionOffline(url, type, data) {
-    this.storageService.get('case_details_action').then((caseDetailsActions) => {
-      if (!caseDetailsActions) {
-        caseDetailsActions = [];
-      }
-      const req = {
-        url: url,
-        type: type,
-        data: data,
-      };
-      caseDetailsActions.push(req);
-      this.storageService.set('case_details_action', caseDetailsActions);
+  saveActionOffline(table, data) {
+
+    // this.storageService.get('case_details_action').then((caseDetailsActions) => {
+    //   if (!caseDetailsActions) {
+    //     caseDetailsActions = [];
+    //   }
+      // const req = [
+      //   { name: 'case_id', value: `'${case_id}'` },
+      //   { name: 'url', value: `'${url}'` },
+      //   { name: 'type', value: `'${type}'` },
+      //   { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
+      //   { name: 'is_sync', value: 0 },
+      //   { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+      // ];
+
+      // caseDetailsActions.push(req);
+      // this.storageService.set('case_details_action', caseDetailsActions);
       this.commonService.showToast('Your Response is Saved will affect when you come online', 'success');
+      this.databaseService.insert(table, data).then(async (data) => {
+        // await this.storageService.set('isVisitFormSync', false);
+        this.databaseService.changeIsApiPending(true);
+        this.commonService.showToast('Data Saved Locally.');        
+      }, (error) => {
+      // });
     });
   }
 }

@@ -40,31 +40,31 @@
         <div class="label-width">
           <ion-label position="fixed">Fee Name:</ion-label>
         </div>
-        <span class="text-color-light ion-margin-start">{{feeAction.fee.name}}</span>
+        <span class="text-color-light ion-margin-start">{{feeAction.fee_name}}</span>
       </ion-col>
       <ion-col class="d-flex" size-md="4" size="12">
         <div class="label-width">
           <ion-label>Date Added:</ion-label>
         </div>
-        <span class="text-color-light ion-margin-start">{{feeAction.dateentered}}</span>
+        <span class="text-color-light ion-margin-start">{{feeAction.date}}</span>
       </ion-col>
       <ion-col class="d-flex" size-md="8" size="12">
         <div class="label-width">
           <ion-label>Amount:</ion-label>
         </div>
-        <span class="text-color-light ion-margin-start">{{feeAction.fixed_amount_total}}</span>
+        <span class="text-color-light ion-margin-start">{{feeAction.amount}}</span>
       </ion-col>
       <ion-col class="d-flex" size-md="8" size="12">
         <div class="label-width">
           <ion-label>VAT:</ion-label>
         </div>
-        <span class="text-color-light ion-margin-start">{{feeAction.fixed_amount_vat}}</span>
+        <span class="text-color-light ion-margin-start">{{feeAction.vat}}</span>
       </ion-col>
       <ion-col class="d-flex" size-md="4" size="12">
         <div class="label-width">
           <ion-label>Action:</ion-label>
         </div>
-        <ion-button size="small" color="danger" (click)="delete(feeAction.cf_id)">
+        <ion-button size="small" color="danger" (click)="delete(feeAction)">
           <ion-icon name="trash"></ion-icon>
         </ion-button>
       </ion-col>

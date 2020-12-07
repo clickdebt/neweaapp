@@ -216,7 +216,8 @@ export class JobListPage implements OnInit {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
       }
     });
-    if (this.networkService.getCurrentNetworkStatus() == 1) {
+    //not take case from api, take from sqlite/websql
+    if (0 && this.networkService.getCurrentNetworkStatus() == 1) {
       if (!this.busy) {
         this.busy = true;
         this.caseService.getCases(params).subscribe((res: any) => {
@@ -293,6 +294,7 @@ export class JobListPage implements OnInit {
         for (let i = 0; i < data.rows.length; i++) {
           item = data.rows.item(i);
           item.data = JSON.parse(decodeURI(item.data));
+          item.data.linked_cases = this.getLinkedCasesSqlite(item.id,item.manual_link_id,item.data.debtor_id);
           results.push(item.data);
         }
         console.log(results);
@@ -308,6 +310,22 @@ export class JobListPage implements OnInit {
       });
     }
 
+  }
+  getLinkedCasesSqlite(id, manual_link_id, debtor_id) {
+    
+    let query = 'select * from rdebt_linked_cases where (manual_link_id = ? or debtor_id = ? )and id != ?';
+    let p = [manual_link_id, debtor_id, id];
+    const results: any[] = [];
+    this.databaseService.executeQuery(query, p).then((data) => {
+      
+      let item;
+      for (let i = 0; i < data.rows.length; i++) {
+        item = data.rows.item(i);
+        item.data = JSON.parse(decodeURI(item.data));
+        results.push(item.data);
+      }
+    });
+    return results;
   }
 
   goToVisitForm(visitCase) {
@@ -365,18 +383,18 @@ export class JobListPage implements OnInit {
   }
 
   async getFilterMasterData() {
-    if (this.networkService.getCurrentNetworkStatus() == 1) {
-      this.caseService.getFilterMasterData().subscribe((res: any) => {
-        this.filterMaster = res.data;
-      }, err => {
-        console.log(err);
-      });
-    } else {
+    // if (this.networkService.getCurrentNetworkStatus() == 1) {
+    //   this.caseService.getFilterMasterData().subscribe((res: any) => {
+    //     this.filterMaster = res.data;
+    //   }, err => {
+    //     console.log(err);
+    //   });
+    // } else {
       const filters = await this.storageService.get('filters');
       if (filters) {
         this.filterMaster = filters;
       }
-    }
+    // }
   }
 
   selectCase(event, caseId) {

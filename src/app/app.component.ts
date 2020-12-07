@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
       this.networkService.onNetworkChange().subscribe(async (status: ConnectionStatus) => {
         if (status === ConnectionStatus.Online) {
           // Perform upload to server
-          // this.caseActionService.offlineActions();
+          this.caseActionService.offlineActions();
 
         } else if (status === ConnectionStatus.Offline) {
           // Perform upload to storage

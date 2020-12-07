@@ -4,6 +4,7 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { CommonService, StorageService } from 'src/app/services';
 import { NetworkService } from 'src/app/services/network.service';
+import * as moment from 'moment';
 @Component({
   selector: 'app-upload-document-modal',
   templateUrl: './upload-document-modal.page.html',
@@ -61,11 +62,16 @@ export class UploadDocumentModalPage implements OnInit {
       } else {
         const formData = new FormData();
         formData.append('file', this.file);
-        this.caseActionService.saveActionOffline(
-          `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${this.caseId}?source=API`,
-          'post',
-          formData
-        );
+        const api_data = [
+          { name: 'case_id', value: `'${this.caseId}'` },
+          { name: 'url', value: `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${this.caseId}?source=API` },
+          { name: 'type', value: `post` },
+          { name: 'data', value: `'${encodeURI(JSON.stringify(formData))}'` },
+          { name: 'is_sync', value: 0 },
+          { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+        ]
+        this.caseActionService.saveActionOffline('api_calls', api_data);
+       
         this.modalCtrl.dismiss({
           saved: true
         });

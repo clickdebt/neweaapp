@@ -9,6 +9,7 @@ import * as moment from 'moment';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { Network } from '@ionic-native/network/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { CaseActionService } from '../services/case-action.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -36,7 +37,8 @@ export class HomePage implements OnInit {
     private backgroundMode: BackgroundMode,
     private network: Network,
     private commonService: CommonService,
-    private statusBar: StatusBar
+    private statusBar: StatusBar,
+    private caseActionService: CaseActionService
   ) { }
 
   ngOnInit() {
@@ -65,7 +67,7 @@ export class HomePage implements OnInit {
       await this.storageService.set('fields', response.data.fields);
       this.saveTimeSettings(response.data.time);
     });
-    if ((this.platform.is('android') || this.platform.is('ios'))
+    if ((1 || this.platform.is('android') || this.platform.is('ios'))
       && this.networkService.getCurrentNetworkStatus() === 1) {
       const downloadStatus = await this.databaseService.getDownloadStatus();
       if (!downloadStatus || !downloadStatus.status) {
@@ -73,16 +75,20 @@ export class HomePage implements OnInit {
           cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
-          visitOutcomes: this.caseService.getVisitOutcomes(0)
+          visitOutcomes: this.caseService.getVisitOutcomes(0),
+          caseDetails: this.caseService.getCaseDetails(),
+          feeOptions: this.caseActionService.getFeeOptions(1)
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data, response.cases.linked);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setvisitOutcomes(response.visitOutcomes.data);
-          await this.databaseService.setDownloadStatus({
-            status: true,
-            time: moment().format('YYYY-MM-DD hh:mm:ss')
-          });
+          await this.databaseService.setcaseDetails(response.caseDetails),
+            await this.databaseService.setFeeOptions(response.feeOptions.data),
+            await this.databaseService.setDownloadStatus({
+              status: true,
+              time: moment().format('YYYY-MM-DD hh:mm:ss')
+            });
         });
       } else {
         if (downloadStatus) {

@@ -1,19 +1,19 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { StorageService, CommonService, CaseService, DatabaseService } from 'src/app/services';
-import { CaseDetailsService } from 'src/app/services/case-details.service';
-import { ModalController, AlertController, NavController } from '@ionic/angular';
-import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
-import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
-import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AlertController, ModalController, NavController } from '@ionic/angular';
+import * as moment from 'moment';
+import { CaseService, CommonService, DatabaseService, StorageService } from 'src/app/services';
 import { CaseActionService } from 'src/app/services/case-action.service';
-import { PaymentModalPage } from '../payment-modal/payment-modal.page';
-import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
-import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
-import { TakePaymentPage } from '../take-payment/take-payment.page';
-import { VisitDetailsPage } from '../visit-details/visit-details.page';
+import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { NetworkService } from 'src/app/services/network.service';
-
+import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
+import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
+import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
+import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
+import { PaymentModalPage } from '../payment-modal/payment-modal.page';
+import { TakePaymentPage } from '../take-payment/take-payment.page';
+import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
+import { VisitDetailsPage } from '../visit-details/visit-details.page';
 @Component({
   selector: 'app-case-details',
   templateUrl: './case-details.page.html',
@@ -127,16 +127,16 @@ export class CaseDetailsPage implements OnInit {
           }, 0);
         this.linkedTotal = linkedCasesTotalBalance;
       }
-      // this.getOfflinecaseDetails();
-      this.getCaseMarkers();
-      this.getSummary();
-      this.getClient();
-      this.getfinancialDetails();
-      this.getCaseDetails();
-      this.getCaseSchemeSpecificDetails();
-      this.getHistory();
-      this.getPayments();
-      this.getCaseDocuments();
+      this.getOfflinecaseDetails();
+      // this.getCaseMarkers();
+      // this.getSummary();
+      // this.getClient();
+      // this.getfinancialDetails();
+      // this.getCaseDetails();
+      // this.getCaseSchemeSpecificDetails();
+      // this.getHistory();
+      // this.getPayments();
+      // this.getCaseDocuments();
 
     } else {
       this.router.navigate(['/home/job-list']);
@@ -258,11 +258,16 @@ export class CaseDetailsPage implements OnInit {
                     this.getCaseMarkers();
                   });
               } else {
-                this.caseActionService.saveActionOffline(
-                  `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${this.caseId}/${caseMarker.col}?source=API`,
-                  'post',
-                  { 'linked': linked }
-                );
+                const data = [{'name': 'linked', value: `'${linked}'` }];
+                const api_data = [
+                  { name: 'case_id', value: `'${this.caseId}'` },
+                  { name: 'url', value: `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${this.caseId}/${caseMarker.col}?source=API` },
+                  { name: 'type', value: `post` },
+                  { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
+                  { name: 'is_sync', value: 0 },
+                  { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+                ]
+                this.caseActionService.saveActionOffline('api_calls', api_data);
               }
             }
           }
@@ -507,11 +512,16 @@ export class CaseDetailsPage implements OnInit {
                   this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
                 });
             } else {
-              await this.caseActionService.saveActionOffline(
-                `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${this.caseId}?source=API`,
-                'post',
-                data
-              );
+                const api_data = [
+                  { name: 'case_id', value: `'${this.caseId}'` },
+                  { name: 'url', value: `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${this.caseId}?source=API` },
+                  { name: 'type', value: `post` },
+                  { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
+                  { name: 'is_sync', value: 0 },
+                  { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+                ]
+                this.caseActionService.saveActionOffline('api_calls', api_data);
+          
               this.storageService.set('is_case_updated', true);
               this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
             }

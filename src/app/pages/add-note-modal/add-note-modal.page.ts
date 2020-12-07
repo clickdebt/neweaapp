@@ -3,7 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { CommonService, StorageService } from 'src/app/services';
 import { NetworkService } from 'src/app/services/network.service';
-
+import * as moment from 'moment';
 @Component({
   selector: 'app-add-note-modal',
   templateUrl: './add-note-modal.page.html',
@@ -53,18 +53,22 @@ export class AddNoteModalPage implements OnInit {
         display_officer: 1,
         case_ids: this.selectedLinkCaseIds
       };
-      if (this.networkService.getCurrentNetworkStatus() == 1) {
+      if (0 && this.networkService.getCurrentNetworkStatus() == 1) {
         this.storageService.set('is_case_updated', true);
         this.caseActionService.saveNoteData(data, this.caseId).subscribe((response: any) => {
           this.commonService.showToast(response.message, 'success');
           this.dismiss();
         });
       } else {
-        this.caseActionService.saveActionOffline(
-          `b/clickdebt_panel_layout/history/panels/add_case_note/${this.caseId}?source=API`,
-          'post',
-          data,
-        );
+        const api_data = [
+          { name: 'case_id', value: `${this.caseId}` },
+          { name: 'url', value: `b/clickdebt_panel_layout/history/panels/add_case_note/${this.caseId}?source=API`, },
+          { name: 'type', value: `post` },
+          { name: 'data', value: `${encodeURI(JSON.stringify(data))}` },
+          { name: 'is_sync', value: 0 },
+          { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+        ]
+        this.caseActionService.saveActionOffline('api_calls', api_data);
         this.dismiss();
       }
 
