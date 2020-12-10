@@ -29,24 +29,24 @@ export class JobListPage implements OnInit {
   sortVal = '';
   shouldShowCancel: boolean;
   sortOptions = [
-    { title: 'Old Cases', isChecked: false, value: 'id|ASC' },
-    { title: 'Latest Cases', isChecked: false, value: 'id|DESC' },
-    { title: 'Name A-Z', isChecked: false, value: 'ISNULL(Debtor.debtor_1_surname), Debtor.debtor_1_surname ASC, Debtor.debtor_name|ASC' },
-    { title: 'Name Z-A', isChecked: false, value: 'ISNULL(Debtor.debtor_1_surname), Debtor.debtor_1_surname DESC, Debtor.debtor_name|DESC' },
-    { title: 'Scheme', isChecked: false, value: 'Scheme.name|ASC' },
-    { title: 'Balance Low to High', isChecked: false, value: 'd_outstanding|ASC' },
-    { title: 'Balance High to Low', isChecked: false, value: 'd_outstanding|DESC' },
-    { title: 'Next payment Date', isChecked: false, value: 'ISNULL(ActiveArrangement.last_due_date), ActiveArrangement.last_due_date|ASC' },
-    { title: 'Hold Expires', isChecked: false, value: 'ISNULL(Cases.hold_until), Cases.hold_until|Asc' },
-    { title: 'Case Ref', isChecked: false, value: 'cast(Cases.ref as unsigned)|ASC' },
-    { title: 'PostCode', isChecked: false, value: 'EnforcementAddresses.address_postcode|ASC' },
-    { title: 'Visits Low to High', isChecked: false, value: 'visitcount_total|ASC' },
-    { title: 'Visits High to Low', isChecked: false, value: 'visitcount_total|DESC' },
-    { title: 'Visit Allocated Oldest to Newest', isChecked: false, value: 'last_allocated_date|ASC' },
-    { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date|DESC' },
-    { title: 'Work Type', isChecked: false, value: 'SchemeManager.name|ASC' },
-    { title: 'Last Visit Date Asc', isChecked: false, value: 'ISNULL(Cases.last_visit_date), Cases.last_visit_date|ASC' },
-    { title: 'Last Visit Date Desc', isChecked: false, value: 'ISNULL(Cases.last_visit_date), Cases.last_visit_date|DESC' }
+    { title: 'Old Cases', isChecked: false, value: 'id ASC' },
+    { title: 'Latest Cases', isChecked: false, value: 'id DESC' },
+    { title: 'Name A-Z', isChecked: false, value: 'debtor_name ASC' },
+    { title: 'Name Z-A', isChecked: false, value: 'debtor_name DESC' },
+    { title: 'Scheme', isChecked: false, value: 'scheme_id ASC' },
+    { title: 'Balance Low to High', isChecked: false, value: 'd_outstanding ASC' },
+    { title: 'Balance High to Low', isChecked: false, value: 'd_outstanding DESC' },
+    // { title: 'Next payment Date', isChecked: false, value: 'ISNULL(ActiveArrangement.last_due_date), ActiveArrangement.last_due_date|ASC' },
+    { title: 'Hold Expires', isChecked: false, value: 'hold_until Asc' },
+    { title: 'Case Ref', isChecked: false, value: 'ref ASC' },
+    { title: 'PostCode', isChecked: false, value: 'enforcement_addresses_postcode ASC' },
+    { title: 'Visits Low to High', isChecked: false, value: 'visitcount_total ASC' },
+    { title: 'Visits High to Low', isChecked: false, value: 'visitcount_total DESC' },
+    { title: 'Visit Allocated Oldest to Newest', isChecked: false, value: 'last_allocated_date ASC' },
+    { title: 'Visit Allocated Newest to Oldest', isChecked: false, value: 'last_allocated_date DESC' },
+    // { title: 'Work Type', isChecked: false, value: 'SchemeManager.name|ASC' },
+    // { title: 'Last Visit Date Asc', isChecked: false, value: 'ISNULL(Cases.last_visit_date), Cases.last_visit_date|ASC' },
+    // { title: 'Last Visit Date Desc', isChecked: false, value: 'ISNULL(Cases.last_visit_date), Cases.last_visit_date|DESC' }
   ];
   isMobile = false;
   selectedCaseIds: any[] = [];
@@ -104,14 +104,14 @@ export class JobListPage implements OnInit {
 
   async ngOnInit() {
     this.caseFields = await this.storageService.get('fields');
-    if(this.caseFields) {
+    if (this.caseFields) {
       this.caseFields = this.totalFields.filter((c) => {
         if (this.caseFields.includes(c.field)) {
           return true;
         }
       });
     } else {
-      this.caseFields = ["current_status.status_name","ref","d_outstanding","visitcount_total","custom5","debtor.enforcement_addresses[0].address_postcode"];
+      this.caseFields = ["current_status.status_name", "ref", "d_outstanding", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode"];
     }
     this.colspanLength = 6 + this.caseFields.length;
     this.isMobile = this.platform.is('mobile');
@@ -152,6 +152,7 @@ export class JobListPage implements OnInit {
   clearSort() {
     this.sortVal = '';
     this.showSort = false;
+    this.filters['sorting'] = this.sortVal
     this.page = 1;
     this.cases = [];
     this.linkedIds = [];
@@ -175,7 +176,7 @@ export class JobListPage implements OnInit {
   filterCases(clear = true) {
     this.filters = [];
     if (this.searchBarValue) {
-      this.filters['q'] = this.searchBarValue;
+      this.filters['q'] = this.searchBarValue.trim();
     }
 
     if (this.filterMaster) {
@@ -279,25 +280,31 @@ export class JobListPage implements OnInit {
               });
               query += ' and ( ' + osQuery.join(' or ') + ') ';
             } else if (key === 'q') {
-              query += ' and (id = ? or ref LIKE ?) ';
+              query += ' and (id = ? or ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ?) ';
               p.push(params[key]);
+              p.push('%' + params[key] + '%');
+              p.push('%' + params[key] + '%');
+              p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
             }
           }
         }
       }
+      if (this.filters['sorting']) {
+        query += ' ORDER BY ' + this.filters['sorting'];
+      }
       query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
       console.log(query);
       this.databaseService.executeQuery(query, p).then((data) => {
-        const results: any[] = [];
+        let results: any[] = [];
         let item;
         for (let i = 0; i < data.rows.length; i++) {
           item = data.rows.item(i);
           item.data = JSON.parse(decodeURI(item.data));
-          item.data.linked_cases = this.getLinkedCasesSqlite(item.id,item.manual_link_id,item.data.debtor_id);
+          item.data.linked_cases = this.getLinkedCasesSqlite(item.id, item.manual_link_id, item.data.debtor_id);
           results.push(item.data);
         }
-        console.log(results);
+        // console.log(results);
         if (data && data.rows.length > 0) {
           this.page++;
           this.cases = this.cases.concat(results);

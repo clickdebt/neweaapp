@@ -10,6 +10,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { Network } from '@ionic-native/network/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { CaseActionService } from '../services/case-action.service';
+import { LoaderService } from '../services/loader.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -38,7 +39,8 @@ export class HomePage implements OnInit {
     private network: Network,
     private commonService: CommonService,
     private statusBar: StatusBar,
-    private caseActionService: CaseActionService
+    private caseActionService: CaseActionService,
+    private loaderService: LoaderService
   ) { }
 
   ngOnInit() {
@@ -76,20 +78,21 @@ export class HomePage implements OnInit {
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
           visitOutcomes: this.caseService.getVisitOutcomes(0),
-          caseDetails: this.caseService.getCaseDetails(),
+          // caseDetails: this.caseService.getCaseDetails(),
           feeOptions: this.caseActionService.getFeeOptions(1)
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data, response.cases.linked);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setvisitOutcomes(response.visitOutcomes.data);
-          await this.databaseService.setcaseDetails(response.caseDetails),
-            await this.databaseService.setFeeOptions(response.feeOptions.data),
+          // await this.databaseService.setcaseDetails(response.caseDetails),
+          await this.databaseService.setFeeOptions(response.feeOptions.data),
             await this.databaseService.setDownloadStatus({
               status: true,
               time: moment().format('YYYY-MM-DD hh:mm:ss')
             });
         });
+        this.getcaseDetails();
       } else {
         if (downloadStatus) {
           const diffMs = Math.floor((new Date().getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
@@ -107,10 +110,38 @@ export class HomePage implements OnInit {
               }
             });
           }
+          if (new Date(downloadStatus.time).getDate() !== new Date().getDate()) {
+            this.getcaseDetails();
+          }
         }
       }
     }
   }
+
+  getcaseDetails() {
+    let downloded = 0
+    this.loaderService.show()
+    this.loaderService.displayText.next('cases Downloding')
+    this.caseService.getCaseDetails(1).subscribe((data) => {
+      downloded += 50;
+      let total = 120;
+      let page = 1
+      this.databaseService.setcaseDetails(data);
+      let count = Math.floor((total - downloded) / 50);
+      this.loaderService.displayText.next(`${downloded} cases Download`);
+      for (let i = 0; i <= count; i++) {
+        this.caseService.getCaseDetails(++page).subscribe((data) => {
+          downloded += 50;
+          this.loaderService.displayText.next(`${downloded} cases Download`);
+          this.databaseService.setcaseDetails(data);
+          if (downloded >= total) {
+            this.loaderService.hide();
+          }
+        });
+      }
+    });
+  }
+
   async confirmLogout() {
     const alert = await this.alertCtrl.create({
       header: 'Confirm Logout!',

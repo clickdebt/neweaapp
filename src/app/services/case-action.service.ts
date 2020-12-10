@@ -143,11 +143,11 @@ export class CaseActionService {
 
       // caseDetailsActions.push(req);
       // this.storageService.set('case_details_action', caseDetailsActions);
-      this.commonService.showToast('Your Response is Saved will affect when you come online', 'success');
+      // this.commonService.showToast('Your Response is Saved will affect when you come online', 'success');
       this.databaseService.insert(table, data).then(async (data) => {
         // await this.storageService.set('isVisitFormSync', false);
         this.databaseService.changeIsApiPending(true);
-        this.commonService.showToast('Data Saved Locally.');        
+        this.commonService.showToast('Data Saved Locally.');
       }, (error) => {
       // });
     });

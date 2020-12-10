@@ -28,8 +28,12 @@ export class CaseService {
     return this.http.get(apiURL);
   }
 
-  getCaseDetails() {
-    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/getCaseDetailsData';
+  getCaseDetails(page) {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/getCaseDetailsData?1=1&limit=50&page=' + page;
+    return this.http.get(apiURL);
+  }
+  getCaseDetailById(caseId) {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/getCaseDetailsData?1=1&case_id=' + caseId;
     return this.http.get(apiURL);
   }
   getFilterMasterData() {

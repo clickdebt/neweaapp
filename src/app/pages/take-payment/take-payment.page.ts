@@ -64,20 +64,18 @@ export class TakePaymentPage implements OnInit {
     });
   }
   getDebtorData() {
-    this.caseDetailsService.getDebtordata(this.caseId, this.debtorId).subscribe((res: any) => {
-      if (res) {
-        const debtorData = res.data.data.debtor_details[0];
-        console.log(debtorData);
-        this.paymentsForm.patchValue({
-          debtor_name: debtorData.debtor_name,
-          address_ln1: debtorData.addresses[0].address_ln1,
-          address_ln2: debtorData.addresses[0].address_ln2,
-          post_code: debtorData.addresses[0].address_postcode,
-          town: debtorData.addresses[0].address_town
-        });
+    if (localStorage.getItem('detais_case_data')) {
+      let currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
+      const debtorData = currentCaseData.debtor;
+      this.paymentsForm.patchValue({
+        debtor_name: debtorData.debtor_name,
+        address_ln1: debtorData.addresses[0].address_ln1,
+        address_ln2: debtorData.addresses[0].address_ln2,
+        post_code: debtorData.addresses[0].address_postcode,
+        town: debtorData.addresses[0].address_town
+      });
+    }
 
-      }
-    });
   }
   save() {
     if (this.paymentsForm.valid) {
@@ -103,20 +101,31 @@ export class TakePaymentPage implements OnInit {
         sent_at: date
       };
       // console.log(obj);
-      this.caseActionService.takePayment(obj).subscribe((res: any) => {
-        console.log(res);
-        if (res.status == 'Ok') {
-          this.storageService.set('is_case_updated', true);
-          this.commonService.showToast('Payment added successfully');
-          if (res.data.success) {
-            this.paymentsForm.reset();
-            this.dismiss();
-          }
-          // this.addPayment(res);
-        } else {
-          this.commonService.showToast('Error while creating payment');
-        }
-      });
+      // this.caseActionService.takePayment(obj).subscribe((res: any) => {
+      //   console.log(res);
+      //   if (res.status == 'Ok') {
+      //     this.storageService.set('is_case_updated', true);
+      //     this.commonService.showToast('Payment added successfully');
+      //     if (res.data.success) {
+      //       this.paymentsForm.reset();
+      //       this.dismiss();
+      //     }
+      //     // this.addPayment(res);
+      //   } else {
+      //     this.commonService.showToast('Error while creating payment');
+      //   }
+      // });
+      const api_data = [
+        { name: 'case_id', value: `${this.caseId}` },
+        { name: 'url', value: `b/payment/sage_pay_actions/take_app_payment?source=API` },
+        { name: 'type', value: `post` },
+        { name: 'data', value: `${encodeURI(JSON.stringify(obj))}` },
+        { name: 'is_sync', value: 0 },
+        { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+      ]
+      this.caseActionService.saveActionOffline('api_calls', api_data);
+      this.paymentsForm.reset();
+      this.dismiss();
     }
 
   }
