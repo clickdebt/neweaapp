@@ -8,6 +8,9 @@
 </ion-header>
 
 <ion-content class="ion-padding" *ngIf="currentCaseData">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-list lines="none">
     <!-- case Markers starts -->
     <div class="ion-margin-top">

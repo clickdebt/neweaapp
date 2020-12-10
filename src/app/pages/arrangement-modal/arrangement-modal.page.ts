@@ -156,12 +156,25 @@ export class ArrangementModalPage implements OnInit {
         type = 'group_arrangement';
       }
       if (this.isDetailsPage === true) {
-        this.caseActionService.createArrangement(this.arrangementObj, this.caseId, type)
-          .subscribe((response: any) => {
-            this.currArrangement = {};
-            this.commonService.showToast(response.data.message, 'success');
-            this.getActiveArrangements();
-          });
+        // this.caseActionService.createArrangement(this.arrangementObj, this.caseId, type)
+        //   .subscribe((response: any) => {
+        //     this.currArrangement = {};
+        //     this.commonService.showToast(response.data.message, 'success');
+        //     this.getActiveArrangements();
+        //   });
+        const api_data = [
+          { name: 'case_id', value: `${this.caseId}` },
+          { name: 'url', value: `b/clickdebt_panel_layout/arrangements/case_actions_panels/${type}/${this.caseId}?source=API` },
+          { name: 'type', value: `post` },
+          { name: 'data', value: `${encodeURI(JSON.stringify(this.arrangementObj))}` },
+          { name: 'is_sync', value: 0 },
+          { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+        ]
+        this.caseActionService.saveActionOffline('api_calls', api_data);
+        this.modalCtrl.dismiss({
+          saved: true,
+          arrangementObj: this.arrangementObj
+        });
       } else {
         this.modalCtrl.dismiss({
           saved: true,

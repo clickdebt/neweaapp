@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, ModalController, NavController } from '@ionic/angular';
 import * as moment from 'moment';
@@ -252,25 +252,25 @@ export class CaseDetailsPage implements OnInit {
               if (data.length > 0 && data[0] === 'linked_cases') {
                 linked = this.currentCaseData.linked_cases.map(ca => ca.id);
               }
-              if (this.networkService.getCurrentNetworkStatus() == 1) {
-                this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
-                  .subscribe((response) => {
-                    this.getCaseMarkers();
-                  });
-              } else {
-                const data = [{'name': 'linked', value: `'${linked}'` }];
-                const api_data = [
-                  { name: 'case_id', value: `'${this.caseId}'` },
-                  { name: 'url', value: `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${this.caseId}/${caseMarker.col}?source=API` },
-                  { name: 'type', value: `post` },
-                  { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
-                  { name: 'is_sync', value: 0 },
-                  { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
-                ]
-                this.caseActionService.saveActionOffline('api_calls', api_data);
-              }
+              // if (this.networkService.getCurrentNetworkStatus() == 1) {
+              //   this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
+              //     .subscribe((response) => {
+              //       this.getCaseMarkers();
+              //     });
+              // } else {
+              const data1 = [{ 'name': 'linked', value: `'${linked}'` }];
+              const api_data = [
+                { name: 'case_id', value: `${this.caseId}` },
+                { name: 'url', value: `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${this.caseId}/${caseMarker.col}?source=API` },
+                { name: 'type', value: `post` },
+                { name: 'data', value: `${encodeURI(JSON.stringify(data1))}` },
+                { name: 'is_sync', value: 0 },
+                { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+              ]
+              this.caseActionService.saveActionOffline('api_calls', api_data);
             }
           }
+          // }
         ]
       });
       await alert.present();
@@ -489,45 +489,45 @@ export class CaseDetailsPage implements OnInit {
             const data = {
               field_agent_id: -1
             };
-            if (this.networkService.getCurrentNetworkStatus() == 1) {
-              this.caseActionService.deAllocationCase(data, this.caseId).
-                subscribe(async (response) => {
-                  this.storageService.set('is_case_updated', true);
-                  // TODO
-                  // let cases = await this.storageService.get('cases');
-                  // console.log(cases);
-                  // cases = cases.filter((currentCase) => {
-                  //   if (currentCase.id === this.caseId) {
-                  //     return false;
-                  //   } else {
-                  //     if (currentCase.linked_cases) {
-                  //       currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
-                  //     }
-                  //     return true;
-                  //   }
-                  // });
-                  // this.storageService.set('cases', cases);
-                  // localStorage.removeItem('detais_case_data');
-                  // localStorage.setItem('detais_case_data_deallocated', 'true');
-                  this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
-                });
-            } else {
-                const api_data = [
-                  { name: 'case_id', value: `'${this.caseId}'` },
-                  { name: 'url', value: `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${this.caseId}?source=API` },
-                  { name: 'type', value: `post` },
-                  { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
-                  { name: 'is_sync', value: 0 },
-                  { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
-                ]
-                this.caseActionService.saveActionOffline('api_calls', api_data);
-          
-              this.storageService.set('is_case_updated', true);
-              this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
-            }
+            // if (this.networkService.getCurrentNetworkStatus() == 1) {
+            //   this.caseActionService.deAllocationCase(data, this.caseId).
+            //     subscribe(async (response) => {
+            //       this.storageService.set('is_case_updated', true);
+            //       // TODO
+            //       // let cases = await this.storageService.get('cases');
+            //       // console.log(cases);
+            //       // cases = cases.filter((currentCase) => {
+            //       //   if (currentCase.id === this.caseId) {
+            //       //     return false;
+            //       //   } else {
+            //       //     if (currentCase.linked_cases) {
+            //       //       currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
+            //       //     }
+            //       //     return true;
+            //       //   }
+            //       // });
+            //       // this.storageService.set('cases', cases);
+            //       // localStorage.removeItem('detais_case_data');
+            //       // localStorage.setItem('detais_case_data_deallocated', 'true');
+            //       this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
+            //     });
+            // } else {
+            const api_data = [
+              { name: 'case_id', value: `${this.caseId}` },
+              { name: 'url', value: `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${this.caseId}?source=API` },
+              { name: 'type', value: `post` },
+              { name: 'data', value: `${encodeURI(JSON.stringify(data))}` },
+              { name: 'is_sync', value: 0 },
+              { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+            ]
+            this.caseActionService.saveActionOffline('api_calls', api_data);
 
+            this.storageService.set('is_case_updated', true);
+            this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
           }
+
         }
+        // }
       ]
     });
     await alert.present();
@@ -582,6 +582,19 @@ export class CaseDetailsPage implements OnInit {
       this.storageService.remove('from_map_page');
     }
     this.navCtrl.back();
+  }
+
+  doRefresh(event) {
+    if (this.networkService.getCurrentNetworkStatus() === 1) {
+      this.caseService.getCaseDetailById(this.caseId).subscribe((data) => {
+        this.databaseService.setcaseDetails(data).then(() => {
+          this.loadInitData();
+          event.target.complete();
+        })
+      });
+    } else {
+      event.target.complete();
+    }
   }
 
   ionViewWillLeave() {

@@ -32,6 +32,7 @@ import { AES256 } from '@ionic-native/aes-256/ngx';
 import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { VisitDetailsModule } from './pages/visit-details/visit-details.module';
+import { LoaderPageModule } from './pages/loader/loader.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -52,7 +53,8 @@ import { VisitDetailsModule } from './pages/visit-details/visit-details.module';
     TakePaymentPageModule,
     AuthorizeCardPageModule,
     ArrangementModalPageModule,
-    VisitDetailsModule
+    VisitDetailsModule,
+    LoaderPageModule
   ],
   providers: [
     StatusBar,

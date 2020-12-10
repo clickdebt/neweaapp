@@ -6,6 +6,7 @@ import { StorageService } from './storage.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { browserDBInstance } from './browserdb';
+import { CaseService } from './case.service';
 declare var window: any;
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class DatabaseService {
     private http: HttpClient,
     private storageService: StorageService,
     public sqlitePorter: SQLitePorter,
+    private caseService: CaseService
   ) {
     this.databaseReady = new BehaviorSubject(false);
 
@@ -51,7 +53,7 @@ export class DatabaseService {
       this.isApiPending.subscribe(res => {
         this.savePendingApi(res);
       })
-      
+
     }).catch((error) => { });
   }
 
@@ -71,6 +73,9 @@ export class DatabaseService {
       client_id INTEGER,
       current_status_id INTEGER,
       current_stage_id INTEGER,
+      address_postcode Text,
+      enforcement_addresses_postcode Text,
+      debtor_name Text,
       data TEXT,
       case_markers TEXT,
       case_Summary TEXT,
@@ -94,6 +99,9 @@ export class DatabaseService {
       client_id INTEGER,
       current_status_id INTEGER,
       current_stage_id INTEGER,
+      address_postcode Text,
+      enforcement_addresses_postcode Text,
+      debtor_name Text,
       data TEXT,
       case_markers TEXT,
       case_Summary TEXT,
@@ -246,27 +254,35 @@ export class DatabaseService {
     const sqlStart = `insert or replace INTO rdebt_cases
     ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, data ) VALUES `;
+      client_id, current_status_id, current_stage_id, address_postcode,enforcement_addresses_postcode,
+      debtor_name, data ) VALUES `;
     data.forEach((values) => {
+      console.log(values);
+
       const v = encodeURI(JSON.stringify(values));
       sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
         "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
-         ${values.current_stage_id}, "${encodeURI(JSON.stringify(values))}")`);
+         ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
+         "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
+          "${encodeURI(JSON.stringify(values))}")`);
     });
 
     const sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
     ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, data ) VALUES `;
+      client_id, current_status_id, current_stage_id,address_postcode,enforcement_addresses_postcode,
+      debtor_name, data ) VALUES `;
     linked.forEach((values) => {
       const v = encodeURI(JSON.stringify(values));
       sqlLinked.push(`${sqlLinkedStart} (${values.id}, "${values.ref}", ${values.scheme_id}, ${values.debtor_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
         "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
-         ${values.current_stage_id}, "${encodeURI(JSON.stringify(values))}")`);
+         ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
+         "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
+          "${encodeURI(JSON.stringify(values))}")`);
     });
 
     const promiseArray = [];
@@ -388,7 +404,6 @@ export class DatabaseService {
 
     let result = await this.executeQuery(query);
     let finalResult = await this.extractResult(result);
-    console.log(finalResult);
 
     caseDetails.caseMarkers = this.getDecodeString(finalResult[0].case_markers);
     caseDetails.case_Summary = this.getDecodeString(finalResult[0].case_Summary);
@@ -432,7 +447,7 @@ export class DatabaseService {
   }
   checkApiPending() {
     this.getApiStored().then(data => {
-      if(data.rows.length > 0) {
+      if (data.rows.length > 0) {
         this.isApiPending.next(true);
       }
     })
@@ -455,14 +470,21 @@ export class DatabaseService {
             currentFormData = data.rows.item(i);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
             this.http.request(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data })
-            .subscribe((res) => {
-              if(res) {
-                this.markApiCallSuccess(currentFormData.id);
-              }
-            });
+              .subscribe((res) => {
+                if (res) {
+                  this.markApiCallSuccess(currentFormData.id);
+                  this.getcaseDetailsData(currentFormData.case_id)
+                }
+              });
           }
         }
       });
     }
+  }
+
+  getcaseDetailsData(case_id) {
+    this.caseService.getCaseDetailById(case_id).subscribe((data) => {
+      this.setcaseDetails(data);
+    })
   }
 }
