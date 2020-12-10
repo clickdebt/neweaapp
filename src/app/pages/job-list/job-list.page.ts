@@ -286,16 +286,19 @@ export class JobListPage implements OnInit {
           }
         }
       }
-      query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
+      query += ' LIMIT 50 OFFSET ' + (this.limit * (this.page - 1));
       console.log(query);
-      this.databaseService.executeQuery(query, p).then((data) => {
+      this.databaseService.executeQuery(query, p).then(async (data) => {
         const results: any[] = [];
         let item;
         for (let i = 0; i < data.rows.length; i++) {
           item = data.rows.item(i);
           item.data = JSON.parse(decodeURI(item.data));
-          item.data.linked_cases = this.getLinkedCasesSqlite(item.id,item.manual_link_id,item.data.debtor_id);
-          results.push(item.data);
+
+          let res = await this.getLinkedCasesSqlite(item);
+          // console.log(res);
+          if(res)
+            results.push(item.data);
         }
         console.log(results);
         if (data && data.rows.length > 0) {
@@ -311,21 +314,30 @@ export class JobListPage implements OnInit {
     }
 
   }
-  getLinkedCasesSqlite(id, manual_link_id, debtor_id) {
-    
+  async getLinkedCasesSqlite(item) {
+    if(!(this.linkedIds.indexOf("" + item.id) == -1)) {
+      return false;
+    }
+
     let query = 'select * from rdebt_linked_cases where (manual_link_id = ? or debtor_id = ? )and id != ?';
-    let p = [manual_link_id, debtor_id, id];
+    let p = [item.manual_link_id, item.data.debtor_id, item.id];
     const results: any[] = [];
-    this.databaseService.executeQuery(query, p).then((data) => {
-      
-      let item;
+    
+    await this.databaseService.executeQuery(query, p).then((data) => {
+      let link_item;      
       for (let i = 0; i < data.rows.length; i++) {
-        item = data.rows.item(i);
-        item.data = JSON.parse(decodeURI(item.data));
-        results.push(item.data);
+        link_item = data.rows.item(i);
+        link_item.data = JSON.parse(decodeURI(link_item.data));
+        this.linkedIds.push(link_item.data.id);
+        results.push(link_item.data);
       }
+      item.data.linked_cases = results;
+      item.data.linkedCasesTotalBalance = item.data.linked_cases.reduce((accumulator, currentValue) => {
+        return accumulator + parseFloat(currentValue.d_outstanding);
+      }, 0);
+      item.data.linkedCasesTotalBalance = item.data.linkedCasesTotalBalance.toFixed(2);
     });
-    return results;
+    return true;
   }
 
   goToVisitForm(visitCase) {
