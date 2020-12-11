@@ -257,7 +257,7 @@ export class DatabaseService {
       client_id, current_status_id, current_stage_id, address_postcode,enforcement_addresses_postcode,
       debtor_name, data ) VALUES `;
     data.forEach((values) => {
-      console.log(values);
+      // console.log(values);
 
       const v = encodeURI(JSON.stringify(values));
       sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},

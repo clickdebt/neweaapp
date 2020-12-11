@@ -86,27 +86,24 @@ export class HomePage implements OnInit {
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setvisitOutcomes(response.visitOutcomes.data);
           // await this.databaseService.setcaseDetails(response.caseDetails),
-          await this.databaseService.setFeeOptions(response.feeOptions.data),
-            await this.databaseService.setDownloadStatus({
-              status: true,
-              time: moment().format('YYYY-MM-DD hh:mm:ss')
-            });
+          await this.databaseService.setFeeOptions(response.feeOptions.data);
         });
         this.getcaseDetails();
       } else {
         if (downloadStatus) {
-          const diffMs = Math.floor((new Date().getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
+          const diffMs = Math.floor((new Date(moment().format('YYYY-MM-DD HH:mm:ss')).getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
           if (diffMs >= 5) {
             this.caseService.getCases({ last_update_date: downloadStatus.time }, 1).subscribe(async (response: any) => {
               if (response) {
                 await this.databaseService.setCases(response.data, response.linked);
                 this.caseService.getFilterMasterData().subscribe(async (data: any) => {
                   await this.databaseService.setFilterMasterData(data.data);
+                  await this.databaseService.setDownloadStatus({
+                    status: true,
+                    time: moment().format('YYYY-MM-DD HH:mm:ss')
+                  });
                 });
-                await this.databaseService.setDownloadStatus({
-                  status: true,
-                  time: moment().format('YYYY-MM-DD hh:mm:ss')
-                });
+
               }
             });
           }
@@ -121,21 +118,28 @@ export class HomePage implements OnInit {
   getcaseDetails() {
     let downloded = 0
     this.loaderService.show()
-    this.loaderService.displayText.next('cases Downloding')
-    this.caseService.getCaseDetails(1).subscribe((data) => {
+    this.loaderService.displayText.next('Downloding Cases')
+    this.caseService.getCaseDetails(1).subscribe((data: any) => {
       downloded += 50;
-      let total = 120;
+      let total = data.caseCountsVal;
       let page = 1
       this.databaseService.setcaseDetails(data);
       let count = Math.floor((total - downloded) / 50);
-      this.loaderService.displayText.next(`${downloded} cases Download`);
+      var msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
+
+      this.loaderService.displayText.next(msg);
       for (let i = 0; i <= count; i++) {
-        this.caseService.getCaseDetails(++page).subscribe((data) => {
+        this.caseService.getCaseDetails(++page).subscribe(async (data) => {
           downloded += 50;
-          this.loaderService.displayText.next(`${downloded} cases Download`);
+          msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
+          this.loaderService.displayText.next(msg);
           this.databaseService.setcaseDetails(data);
           if (downloded >= total) {
             this.loaderService.hide();
+            await this.databaseService.setDownloadStatus({
+              status: true,
+              time: moment().format('YYYY-MM-DD HH:mm:ss')
+            });
           }
         });
       }
