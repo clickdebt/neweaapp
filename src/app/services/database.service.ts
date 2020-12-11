@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
-import { Platform } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
-import { StorageService } from './storage.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
+import { SQLite } from '@ionic-native/sqlite/ngx';
+import { Platform } from '@ionic/angular';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { browserDBInstance } from './browserdb';
 import { CaseService } from './case.service';
+import { NetworkService } from './network.service';
+import { StorageService } from './storage.service';
 declare var window: any;
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,8 @@ export class DatabaseService {
     private http: HttpClient,
     private storageService: StorageService,
     public sqlitePorter: SQLitePorter,
-    private caseService: CaseService
+    private caseService: CaseService,
+    private networkService: NetworkService
   ) {
     this.databaseReady = new BehaviorSubject(false);
 
@@ -50,6 +52,13 @@ export class DatabaseService {
       } else {
         this.setUpDatabase();
       }
+      this.networkService.onNetworkChange().subscribe((response) => {
+        if (response === 1) {
+          this.isApiPending.subscribe(res => {
+            this.savePendingApi(res);
+          })
+        }
+      });
       this.isApiPending.subscribe(res => {
         this.savePendingApi(res);
       })
@@ -460,8 +469,8 @@ export class DatabaseService {
     const updateQuery = `update api_calls set is_sync = 1 where id = ${id}`;
     return this.executeQuery(updateQuery);
   }
-  savePendingApi(val) {
-    if (val) {
+  async savePendingApi(val) {
+    if (val && this.networkService.getCurrentNetworkStatus() === 1) {
       this.getApiStored().then(async (data) => {
         const arr = [];
         if (data) {
@@ -469,17 +478,19 @@ export class DatabaseService {
           for (let i = 0; i < data.rows.length; i++) {
             currentFormData = data.rows.item(i);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
-            this.http.request(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data })
-              .subscribe((res) => {
-                if (res) {
-                  this.markApiCallSuccess(currentFormData.id);
-                  this.getcaseDetailsData(currentFormData.case_id)
-                }
-              });
+            let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
+            if (callResponse) {
+              this.markApiCallSuccess(currentFormData.id);
+              this.getcaseDetailsData(currentFormData.case_id)
+            }
           }
         }
       });
     }
+  }
+
+  async callHttpApi(type, url, data) {
+    return await this.http.request(type, url, data).toPromise();
   }
 
   getcaseDetailsData(case_id) {
