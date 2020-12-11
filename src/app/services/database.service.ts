@@ -17,7 +17,7 @@ export class DatabaseService {
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
   linkedIds = [];
-
+  version = 2;
   constructor(
     private platform: Platform,
     private sqlite: SQLite,
@@ -46,7 +46,8 @@ export class DatabaseService {
         });
       }
       const value = await this.storageService.get('database_filled');
-      if (value) {
+      const storageVersion = await this.storageService.get('version');
+      if (value && storageVersion && storageVersion == this.version) {
         this.databaseReady.next(true);
         this.checkApiPending();
       } else {
@@ -179,6 +180,13 @@ export class DatabaseService {
     );`;
 
     // const sql = rdebCases + visitReports + history + payment + document;
+    const tables = ['rdebt_cases', 'rdebt_linked_cases', 'visit_reports', 'history', 'payment', 'fees', 'document', 'api_calls'];
+    tables.forEach(async element => {
+      const deleteQuery = 'DROP TABLE IF EXISTS ' + element + ';';
+      let a = await this.database.executeSql(deleteQuery);
+    });
+    // const sql = rdebCases + visitReports + history + payment + document;
+    await this.storageService.clearAll();
 
     await this.database.executeSql(rdebCases);
     await this.database.executeSql(rdebLinkedCases);
@@ -192,6 +200,7 @@ export class DatabaseService {
     // const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
+    await this.storageService.set('version', this.version)
     this.checkApiPending();
   }
 

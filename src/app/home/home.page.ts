@@ -113,15 +113,15 @@ export class HomePage implements OnInit {
     }
   }
 
-  getcaseDetails() {
+  async getcaseDetails() {
     let downloded = 0
     this.loaderService.show()
     this.loaderService.displayText.next('Downloding Cases')
-    this.caseService.getCaseDetails(1).subscribe((data: any) => {
+    this.caseService.getCaseDetails(1).subscribe(async (data: any) => {
       downloded += 50;
       let total = data.caseCountsVal;
       let page = 1
-      this.databaseService.setcaseDetails(data);
+      await this.databaseService.setcaseDetails(data);
       let count = Math.floor((total - downloded) / 50);
       var msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
 
@@ -131,7 +131,7 @@ export class HomePage implements OnInit {
           downloded += 50;
           msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
           this.loaderService.displayText.next(msg);
-          this.databaseService.setcaseDetails(data);
+          await this.databaseService.setcaseDetails(data);
           if (downloded >= total) {
             this.loaderService.hide();
             await this.databaseService.setDownloadStatus({
