@@ -153,7 +153,7 @@
           <ion-textarea formControlName="note" placeholder="note"></ion-textarea>
         </ion-item>
 
-        <ion-item>
+        <!-- <ion-item>
           <ion-checkbox slot="start" formControlName="repeatPayment" (ionChange)="repeatPaymentSelected($event)">
           </ion-checkbox>
           <ion-label>Repeat Payment</ion-label>
@@ -177,7 +177,7 @@
         </ion-item>
         <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
           <ion-button (click)="manageCards()">Manage Cards</ion-button>
-        </ion-item>
+        </ion-item> -->
       </ion-list>
       <div class="ion-padding">
         <ion-row>
@@ -194,7 +194,7 @@
     </form>
   </div>
 
-  <div class="ion-margin-top" [hidden]="!networkStatus" *ngIf="inActiveArrangements.data  && (inActiveArrangements.data).length">
+  <!-- <div class="ion-margin-top" [hidden]="!networkStatus" *ngIf="inActiveArrangements.data  && (inActiveArrangements.data).length">
     <ion-item class="bg-main" (click)="toggleShow(inActiveArrangements)" color="secondary" ng-class="{active: isShown(inActiveArrangements)}">
       <ion-label>
         <h2>Inactive arrangements</h2>
@@ -213,12 +213,6 @@
         <ion-col size="4">
           <span>Amount</span>
         </ion-col>
-        <!-- <ion-col size="3">
-          <span>Note</span>
-        </ion-col> -->
-        <!-- <ion-col size="1">
-          <ion-icon name="settings-outline"></ion-icon>
-        </ion-col> -->
       </ion-row>
       <ion-row *ngFor="let inActiveArrangement of inActiveArrangements.data,let i=index"
         [ngClass]="{'bg-row-dark':i%2==0}">
@@ -231,10 +225,7 @@
         <ion-col size="4" class="text-color-light">
           <span>{{inActiveArrangement.amount}}</span>
         </ion-col>
-        <!-- <ion-col size="1">
-          <ion-icon name="create-outline"></ion-icon>
-        </ion-col> -->
       </ion-row>
     </ion-grid>
-  </div>
+  </div> -->
 </ion-content>
