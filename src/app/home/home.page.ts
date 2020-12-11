@@ -10,6 +10,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { Network } from '@ionic-native/network/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { CaseActionService } from '../services/case-action.service';
+import { LoaderService } from '../services/loader.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -38,7 +39,8 @@ export class HomePage implements OnInit {
     private network: Network,
     private commonService: CommonService,
     private statusBar: StatusBar,
-    private caseActionService: CaseActionService
+    private caseActionService: CaseActionService,
+    private loaderService: LoaderService
   ) { }
 
   ngOnInit() {
@@ -75,42 +77,73 @@ export class HomePage implements OnInit {
           cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
-          visitOutcomes: this.caseService.getVisitOutcomes(0),
-          caseDetails: this.caseService.getCaseDetails(),
+          // caseDetails: this.caseService.getCaseDetails(),
           feeOptions: this.caseActionService.getFeeOptions(1)
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data, response.cases.linked);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
-          await this.databaseService.setvisitOutcomes(response.visitOutcomes.data);
-          await this.databaseService.setcaseDetails(response.caseDetails),
-            await this.databaseService.setFeeOptions(response.feeOptions.data),
-            await this.databaseService.setDownloadStatus({
-              status: true,
-              time: moment().format('YYYY-MM-DD hh:mm:ss')
-            });
+          // await this.databaseService.setcaseDetails(response.caseDetails),
+          await this.databaseService.setFeeOptions(response.feeOptions.data);
         });
+        this.getcaseDetails();
       } else {
         if (downloadStatus) {
-          const diffMs = Math.floor((new Date().getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
+          const diffMs = Math.floor((new Date(moment().format('YYYY-MM-DD HH:mm:ss')).getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
           if (diffMs >= 5) {
             this.caseService.getCases({ last_update_date: downloadStatus.time }, 1).subscribe(async (response: any) => {
               if (response) {
                 await this.databaseService.setCases(response.data, response.linked);
                 this.caseService.getFilterMasterData().subscribe(async (data: any) => {
                   await this.databaseService.setFilterMasterData(data.data);
+                  await this.databaseService.setDownloadStatus({
+                    status: true,
+                    time: moment().format('YYYY-MM-DD HH:mm:ss')
+                  });
                 });
-                await this.databaseService.setDownloadStatus({
-                  status: true,
-                  time: moment().format('YYYY-MM-DD hh:mm:ss')
-                });
+
               }
             });
+          }
+          if (new Date(downloadStatus.time).getDate() !== new Date().getDate()) {
+            this.getcaseDetails();
           }
         }
       }
     }
   }
+
+  getcaseDetails() {
+    let downloded = 0
+    this.loaderService.show()
+    this.loaderService.displayText.next('Downloding Cases')
+    this.caseService.getCaseDetails(1).subscribe((data: any) => {
+      downloded += 50;
+      let total = data.caseCountsVal;
+      let page = 1
+      this.databaseService.setcaseDetails(data);
+      let count = Math.floor((total - downloded) / 50);
+      var msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
+
+      this.loaderService.displayText.next(msg);
+      for (let i = 0; i <= count; i++) {
+        this.caseService.getCaseDetails(++page).subscribe(async (data) => {
+          downloded += 50;
+          msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
+          this.loaderService.displayText.next(msg);
+          this.databaseService.setcaseDetails(data);
+          if (downloded >= total) {
+            this.loaderService.hide();
+            await this.databaseService.setDownloadStatus({
+              status: true,
+              time: moment().format('YYYY-MM-DD HH:mm:ss')
+            });
+          }
+        });
+      }
+    });
+  }
+
   async confirmLogout() {
     const alert = await this.alertCtrl.create({
       header: 'Confirm Logout!',

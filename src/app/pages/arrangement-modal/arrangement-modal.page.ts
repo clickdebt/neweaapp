@@ -39,7 +39,8 @@ export class ArrangementModalPage implements OnInit {
   inActiveArrangements: any = {
     show: false
   };
-  frequencies;
+  frequencies = ['', '', 'One time final payment', 'Weekly by day of the week', 'Monthly by date', 'Monthly by day - e.g. "1st friday'
+    , 'Fortnightly', '4 weekly', 'Last day of the month', 'First day of the month', 'Last work day of the month', 'Last Friday of the month']
   updatedIndex = -1;
   networkStatus;
   isDetailsPage;
@@ -49,7 +50,7 @@ export class ArrangementModalPage implements OnInit {
   groupArrId;
   date;
   paymentGateways = [];
-
+  arranagement;
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -64,6 +65,7 @@ export class ArrangementModalPage implements OnInit {
     this.baseOutstanding = this.outstanding = navParams.get('outstanding');
     this.isDetailsPage = navParams.get('isDetailsPage');
     this.currentCase = navParams.get('currentCase');
+    this.arranagement = navParams.get('arranagement');
   }
 
   ngOnInit() {
@@ -156,12 +158,25 @@ export class ArrangementModalPage implements OnInit {
         type = 'group_arrangement';
       }
       if (this.isDetailsPage === true) {
-        this.caseActionService.createArrangement(this.arrangementObj, this.caseId, type)
-          .subscribe((response: any) => {
-            this.currArrangement = {};
-            this.commonService.showToast(response.data.message, 'success');
-            this.getActiveArrangements();
-          });
+        // this.caseActionService.createArrangement(this.arrangementObj, this.caseId, type)
+        //   .subscribe((response: any) => {
+        //     this.currArrangement = {};
+        //     this.commonService.showToast(response.data.message, 'success');
+        //     this.getActiveArrangements();
+        //   });
+        const api_data = [
+          { name: 'case_id', value: `${this.caseId}` },
+          { name: 'url', value: `b/clickdebt_panel_layout/arrangements/case_actions_panels/${type}/${this.caseId}?source=API` },
+          { name: 'type', value: `post` },
+          { name: 'data', value: `${encodeURI(JSON.stringify(this.arrangementObj))}` },
+          { name: 'is_sync', value: 0 },
+          { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+        ]
+        this.caseActionService.saveActionOffline('api_calls', api_data);
+        this.modalCtrl.dismiss({
+          saved: true,
+          arrangementObj: this.arrangementObj
+        });
       } else {
         this.modalCtrl.dismiss({
           saved: true,
@@ -239,32 +254,33 @@ export class ArrangementModalPage implements OnInit {
     return object.show;
   }
   getActiveArrangements() {
-    this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
-      this.currArrangement = Object.values(response.current_arrangement);
-      if (response.case.debtorid) {
-        this.debtorId = response.case.debtorid;
-        console.log(this.debtorId);
-      }
-      this.paymentGateways = response.paymentGatewayList;
-      if (this.currentCase.linked_cases && this.currArrangement == '' && response.group_arrangement) {
-        this.groupArrId = response.group_arrangement.case_id;
-        this.currArrangement = response.group_arrangement;
-        if (this.currArrangement && this.currArrangement.length) {
-          console.log('==innnn-====', this.currArrangement);
-          this.isGroupArrangement = true;
-        }
-      }
-      this.currArrangement = this.currArrangement.find(data => data.active == 1);
-      this.getInactiveArrangements();
-      if (this.currArrangement) {
-        this.arrangementMode = 'archive_make';
-        if (this.isGroupArrangement) {
-          this.activeArrangements.scheduleArrangements.data = Object.values(response.group_schedules);
-        } else {
-          this.activeArrangements.scheduleArrangements.data = Object.values(response.arrangement_schedule).reverse();
-        }
-      }
-    });
+    // this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
+    this.currArrangement = Object.values(this.arranagement.current_arrangement);
+    if (this.currentCase.debtorid) {
+      this.debtorId = this.currentCase.debtorid;
+      console.log(this.debtorId);
+    }
+    this.paymentGateways = this.arranagement.paymentGatewayList;
+    // if (this.currentCase.linked_cases && this.currArrangement == '' && response.group_arrangement) {
+    //   this.groupArrId = response.group_arrangement.case_id;
+    //   this.currArrangement = response.group_arrangement;
+    //   if (this.currArrangement && this.currArrangement.length) {
+    //     console.log('==innnn-====', this.currArrangement);
+    //     this.isGroupArrangement = true;
+    //   }
+    // }
+    this.currArrangement = this.currArrangement.find(data => data.active == 1);
+    // this.getInactiveArrangements();
+    this.makeCurrentArrangementString();
+    if (this.currArrangement) {
+      this.arrangementMode = 'archive_make';
+      // if (this.isGroupArrangement) {
+      //   this.activeArrangements.scheduleArrangements.data = Object.values(response.group_schedules);
+      // } else {
+      this.activeArrangements.scheduleArrangements.data = Object.values(this.arranagement.arrangement_schedule).reverse();
+      // }
+    }
+    // });
   }
   makeCurrentArrangementString() {
     this.currentArrangementString = '';

@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core';
-import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
-import { Platform } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
-import { StorageService } from './storage.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
+import { SQLite } from '@ionic-native/sqlite/ngx';
+import { Platform } from '@ionic/angular';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { browserDBInstance } from './browserdb';
+import { CaseService } from './case.service';
+import { NetworkService } from './network.service';
+import { StorageService } from './storage.service';
 declare var window: any;
 @Injectable({
   providedIn: 'root'
@@ -22,6 +24,8 @@ export class DatabaseService {
     private http: HttpClient,
     private storageService: StorageService,
     public sqlitePorter: SQLitePorter,
+    private caseService: CaseService,
+    private networkService: NetworkService
   ) {
     this.databaseReady = new BehaviorSubject(false);
 
@@ -48,10 +52,17 @@ export class DatabaseService {
       } else {
         this.setUpDatabase();
       }
+      this.networkService.onNetworkChange().subscribe((response) => {
+        if (response === 1) {
+          this.isApiPending.subscribe(res => {
+            this.savePendingApi(res);
+          })
+        }
+      });
       this.isApiPending.subscribe(res => {
         this.savePendingApi(res);
       })
-      
+
     }).catch((error) => { });
   }
 
@@ -71,11 +82,15 @@ export class DatabaseService {
       client_id INTEGER,
       current_status_id INTEGER,
       current_stage_id INTEGER,
+      address_postcode Text,
+      enforcement_addresses_postcode Text,
+      debtor_name Text,
       data TEXT,
       case_markers TEXT,
       case_Summary TEXT,
       Financials TEXT,
-      case_details TEXT
+      case_details TEXT,
+      arranagement TEXT
     );`;
 
     const rdebLinkedCases = `CREATE TABLE IF NOT EXISTS rdebt_linked_cases(
@@ -94,11 +109,15 @@ export class DatabaseService {
       client_id INTEGER,
       current_status_id INTEGER,
       current_stage_id INTEGER,
+      address_postcode Text,
+      enforcement_addresses_postcode Text,
+      debtor_name Text,
       data TEXT,
       case_markers TEXT,
       case_Summary TEXT,
       Financials TEXT,
-      case_details TEXT
+      case_details TEXT,
+      arranagement TEXT
     );`;
 
     const visitReports = `CREATE TABLE IF NOT EXISTS visit_reports(
@@ -246,27 +265,34 @@ export class DatabaseService {
     const sqlStart = `insert or replace INTO rdebt_cases
     ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, data ) VALUES `;
+      client_id, current_status_id, current_stage_id, address_postcode,enforcement_addresses_postcode,
+      debtor_name, data ) VALUES `;
     data.forEach((values) => {
+
       const v = encodeURI(JSON.stringify(values));
       sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
         "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
-         ${values.current_stage_id}, "${encodeURI(JSON.stringify(values))}")`);
+         ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
+         "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
+          "${encodeURI(JSON.stringify(values))}")`);
     });
 
     const sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
     ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, data ) VALUES `;
+      client_id, current_status_id, current_stage_id,address_postcode,enforcement_addresses_postcode,
+      debtor_name, data ) VALUES `;
     linked.forEach((values) => {
       const v = encodeURI(JSON.stringify(values));
       sqlLinked.push(`${sqlLinkedStart} (${values.id}, "${values.ref}", ${values.scheme_id}, ${values.debtor_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
         "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
-         ${values.current_stage_id}, "${encodeURI(JSON.stringify(values))}")`);
+         ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
+         "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
+          "${encodeURI(JSON.stringify(values))}")`);
     });
 
     const promiseArray = [];
@@ -323,7 +349,9 @@ export class DatabaseService {
         const sqlStart = `UPDATE rdebt_cases SET case_markers="${this.getEncodeString(currentCase.markers_data)}",
         case_Summary="${this.getEncodeString(caseSummary)}",
         Financials="${this.getEncodeString(currentCase.case_financials)}",
-        case_details="${this.getEncodeString(currentCase.scheme_panel_data)}" WHERE id = ${currentCase.id}`;
+        case_details="${this.getEncodeString(currentCase.scheme_panel_data)}",
+        arranagement="${this.getEncodeString(currentCase.arranagement)}" 
+        WHERE id = ${currentCase.id}`;
         promiseArray.push(this.executeQuery(sqlStart));
       }
 
@@ -331,7 +359,7 @@ export class DatabaseService {
       await this.storeToSqlite('payment', data.payments);
       await this.storeToSqlite('document', data.documents);
       await this.storeToSqlite('fees', data.fees);
-
+      this.setvisitOutcomes(data.exitCodeData);
       await Promise.all(promiseArray)
         .then((res: any) => {
           console.log(res);
@@ -384,16 +412,16 @@ export class DatabaseService {
   async getOfflinecaseDetails(id) {
     const caseDetails: any = {
     };
-    let query = `select case_markers,case_Summary,Financials,case_details from rdebt_cases where id = ${id}`;
+    let query = `select case_markers,case_Summary,Financials,case_details,arranagement from rdebt_cases where id = ${id}`;
 
     let result = await this.executeQuery(query);
     let finalResult = await this.extractResult(result);
-    console.log(finalResult);
 
     caseDetails.caseMarkers = this.getDecodeString(finalResult[0].case_markers);
     caseDetails.case_Summary = this.getDecodeString(finalResult[0].case_Summary);
     caseDetails.Financials = this.getDecodeString(finalResult[0].Financials);
     caseDetails.case_details = this.getDecodeString(finalResult[0].case_details);
+    caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
 
     query = `select * from history where caseid = ${id}`;
     result = await this.executeQuery(query);
@@ -432,7 +460,7 @@ export class DatabaseService {
   }
   checkApiPending() {
     this.getApiStored().then(data => {
-      if(data.rows.length > 0) {
+      if (data.rows.length > 0) {
         this.isApiPending.next(true);
       }
     })
@@ -445,8 +473,8 @@ export class DatabaseService {
     const updateQuery = `update api_calls set is_sync = 1 where id = ${id}`;
     return this.executeQuery(updateQuery);
   }
-  savePendingApi(val) {
-    if (val) {
+  async savePendingApi(val) {
+    if (val && this.networkService.getCurrentNetworkStatus() === 1) {
       this.getApiStored().then(async (data) => {
         const arr = [];
         if (data) {
@@ -454,15 +482,24 @@ export class DatabaseService {
           for (let i = 0; i < data.rows.length; i++) {
             currentFormData = data.rows.item(i);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
-            this.http.request(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data })
-            .subscribe((res) => {
-              if(res) {
-                this.markApiCallSuccess(currentFormData.id);
-              }
-            });
+            let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
+            if (callResponse) {
+              this.markApiCallSuccess(currentFormData.id);
+              this.getcaseDetailsData(currentFormData.case_id)
+            }
           }
         }
       });
     }
+  }
+
+  async callHttpApi(type, url, data) {
+    return await this.http.request(type, url, data).toPromise();
+  }
+
+  getcaseDetailsData(case_id) {
+    this.caseService.getCaseDetailById(case_id).subscribe((data) => {
+      this.setcaseDetails(data);
+    })
   }
 }
