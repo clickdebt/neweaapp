@@ -80,7 +80,8 @@ export class DatabaseService {
       case_markers TEXT,
       case_Summary TEXT,
       Financials TEXT,
-      case_details TEXT
+      case_details TEXT,
+      arranagement TEXT
     );`;
 
     const rdebLinkedCases = `CREATE TABLE IF NOT EXISTS rdebt_linked_cases(
@@ -106,7 +107,8 @@ export class DatabaseService {
       case_markers TEXT,
       case_Summary TEXT,
       Financials TEXT,
-      case_details TEXT
+      case_details TEXT,
+      arranagement TEXT
     );`;
 
     const visitReports = `CREATE TABLE IF NOT EXISTS visit_reports(
@@ -257,7 +259,6 @@ export class DatabaseService {
       client_id, current_status_id, current_stage_id, address_postcode,enforcement_addresses_postcode,
       debtor_name, data ) VALUES `;
     data.forEach((values) => {
-      // console.log(values);
 
       const v = encodeURI(JSON.stringify(values));
       sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
@@ -339,7 +340,9 @@ export class DatabaseService {
         const sqlStart = `UPDATE rdebt_cases SET case_markers="${this.getEncodeString(currentCase.markers_data)}",
         case_Summary="${this.getEncodeString(caseSummary)}",
         Financials="${this.getEncodeString(currentCase.case_financials)}",
-        case_details="${this.getEncodeString(currentCase.scheme_panel_data)}" WHERE id = ${currentCase.id}`;
+        case_details="${this.getEncodeString(currentCase.scheme_panel_data)}",
+        arranagement="${this.getEncodeString(currentCase.arranagement)}" 
+        WHERE id = ${currentCase.id}`;
         promiseArray.push(this.executeQuery(sqlStart));
       }
 
@@ -347,7 +350,7 @@ export class DatabaseService {
       await this.storeToSqlite('payment', data.payments);
       await this.storeToSqlite('document', data.documents);
       await this.storeToSqlite('fees', data.fees);
-
+      this.setvisitOutcomes(data.exitCodeData);
       await Promise.all(promiseArray)
         .then((res: any) => {
           console.log(res);
@@ -400,7 +403,7 @@ export class DatabaseService {
   async getOfflinecaseDetails(id) {
     const caseDetails: any = {
     };
-    let query = `select case_markers,case_Summary,Financials,case_details from rdebt_cases where id = ${id}`;
+    let query = `select case_markers,case_Summary,Financials,case_details,arranagement from rdebt_cases where id = ${id}`;
 
     let result = await this.executeQuery(query);
     let finalResult = await this.extractResult(result);
@@ -409,6 +412,7 @@ export class DatabaseService {
     caseDetails.case_Summary = this.getDecodeString(finalResult[0].case_Summary);
     caseDetails.Financials = this.getDecodeString(finalResult[0].Financials);
     caseDetails.case_details = this.getDecodeString(finalResult[0].case_details);
+    caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
 
     query = `select * from history where caseid = ${id}`;
     result = await this.executeQuery(query);

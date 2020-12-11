@@ -60,6 +60,7 @@ export class CaseDetailsPage implements OnInit {
   SelectedAction = '';
   caseDocuments = [];
   linkedTotal = 0;
+  arranagement;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -157,6 +158,7 @@ export class CaseDetailsPage implements OnInit {
     this.caseDocuments = result.caseDocuments;
     this.getCaseSchemeSpecificDetail = true;
     this.getCaseSchemeSpecificData = result.case_details;
+    this.arranagement = result.arranagement;
 
     this.caseDetails.payments.paymentData.sort((a, b) => {
       if (new Date(a.date) > new Date(b.date)) {
@@ -562,7 +564,8 @@ export class CaseDetailsPage implements OnInit {
         caseId: this.caseId,
         d_outstanding: this.currentCaseData.d_outstanding,
         isDetailsPage: true,
-        currentCase: this.currentCaseData
+        currentCase: this.currentCaseData,
+        arranagement: this.arranagement
       }
     });
     await AddArrangementModal.present();

@@ -77,14 +77,12 @@ export class HomePage implements OnInit {
           cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
-          visitOutcomes: this.caseService.getVisitOutcomes(0),
           // caseDetails: this.caseService.getCaseDetails(),
           feeOptions: this.caseActionService.getFeeOptions(1)
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data, response.cases.linked);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
-          await this.databaseService.setvisitOutcomes(response.visitOutcomes.data);
           // await this.databaseService.setcaseDetails(response.caseDetails),
           await this.databaseService.setFeeOptions(response.feeOptions.data);
         });
