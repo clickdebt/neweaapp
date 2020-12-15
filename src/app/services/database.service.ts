@@ -18,6 +18,7 @@ export class DatabaseService {
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
   linkedIds = [];
   version = 2;
+  tables = ['rdebt_cases', 'rdebt_linked_cases', 'visit_reports', 'history', 'payment', 'fees', 'document', 'api_calls'];
   constructor(
     private platform: Platform,
     private sqlite: SQLite,
@@ -180,8 +181,8 @@ export class DatabaseService {
     );`;
 
     // const sql = rdebCases + visitReports + history + payment + document;
-    const tables = ['rdebt_cases', 'rdebt_linked_cases', 'visit_reports', 'history', 'payment', 'fees', 'document', 'api_calls'];
-    tables.forEach(async element => {
+
+    this.tables.forEach(async element => {
       const deleteQuery = 'DROP TABLE IF EXISTS ' + element + ';';
       let a = await this.database.executeSql(deleteQuery);
     });
@@ -510,5 +511,12 @@ export class DatabaseService {
     this.caseService.getCaseDetailById(case_id).subscribe((data) => {
       this.setcaseDetails(data);
     })
+  }
+
+  clearData() {
+    this.tables.forEach(async element => {
+      const deleteQuery = 'delete from ' + element + ';';
+      let a = await this.database.executeSql(deleteQuery);
+    });
   }
 }

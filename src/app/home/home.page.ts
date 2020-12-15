@@ -116,7 +116,7 @@ export class HomePage implements OnInit {
   async getcaseDetails() {
     let downloded = 0
     this.loaderService.show()
-    this.loaderService.displayText.next('Downloding Cases')
+    this.loaderService.displayText.next('Downloding Cases');
     this.caseService.getCaseDetails(1).subscribe(async (data: any) => {
       downloded += 50;
       let total = data.caseCountsVal;
@@ -129,6 +129,9 @@ export class HomePage implements OnInit {
       for (let i = 0; i <= count; i++) {
         this.caseService.getCaseDetails(++page).subscribe(async (data) => {
           downloded += 50;
+          if (downloded > total) {
+            downloded = total;
+          }
           msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
           this.loaderService.displayText.next(msg);
           await this.databaseService.setcaseDetails(data);
@@ -169,7 +172,19 @@ export class HomePage implements OnInit {
   async logout() {
     localStorage.removeItem('remote_token');
     localStorage.removeItem('userdata');
-    await this.storageService.clearAll();
+    await this.storageService.remove('database_filled');
+    await this.storageService.remove('permissionArray');
+    await this.storageService.remove('isVisitFormSync');
+    await this.storageService.remove('fields');
+    await this.storageService.remove('timeSettings');
+    await this.storageService.remove('visit_form');
+    await this.storageService.remove('filters');
+    await this.storageService.remove('fee_options');
+    await this.storageService.remove('visitOutcomes');
+    await this.storageService.remove('downloadStatus');
+    await this.storageService.remove('not_reload_map');
+    await this.storageService.remove('permissionAsked');
+    this.databaseService.clearData();
     this.router.navigate(['/login']);
   }
   async openPanicModal() {
