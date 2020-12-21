@@ -20,9 +20,7 @@ export class HttpInterceptorService implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         let newHeaders = req.headers;
-        if (req.url.includes('downaloading')) {
-            this.loaderText = 'Downloading Data';
-        }
+       
         if (!req.url.includes(this.noHeaderRequest)) {
             const token = localStorage.getItem('remote_token');
 
@@ -35,15 +33,16 @@ export class HttpInterceptorService implements HttpInterceptor {
         const authReq = req.clone({ headers: newHeaders });
         this.reqCount++;
         if (this.reqCount === 1 && !req.url.includes('nonblocking') && !req.url.includes('getCaseDetailsData')) {
-            this.commonService.showLoader();
+            // this.commonService.showLoader();
         }
         return next.handle(authReq).pipe(
             map((event: HttpEvent<any>) => {
                 return event;
             }),
             catchError(error => {
-                this.commonService.showToast(error.error.message);
-                this.commonService.dismissLoader();
+                if(error.error.message)
+                    this.commonService.showToast(error.error.message);
+                // this.commonService.dismissLoader();
                 if (error.status === 401 && !req.url.includes('login')) {
                     localStorage.removeItem('remote_token');
                     localStorage.removeItem('userdata');
@@ -54,7 +53,7 @@ export class HttpInterceptorService implements HttpInterceptor {
             finalize(() => {
                 this.reqCount--;
                 if (this.reqCount === 0) {
-                    this.commonService.dismissLoader();
+                    // this.commonService.dismissLoader();
                 }
             })
         );

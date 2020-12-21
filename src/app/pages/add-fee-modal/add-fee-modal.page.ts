@@ -60,14 +60,15 @@ export class AddFeeModalPage implements OnInit {
     }
   }
   async getFeeActions() {
-    let query = 'select * from fees where caseid = ?';
-    let p = [this.caseId];
-    const result = await this.databaseService.executeQuery(query, p);
-    this.feeActions = await this.databaseService.extractResult(result);
+    // let query = 'select * from fees where caseid = ?';
+    // let p = [this.caseId];
+    // const result = await this.databaseService.executeQuery(query, p);
+    // this.feeActions = await this.databaseService.extractResult(result);
     
-    // this.caseActionService.getFeeActions(this.caseId).subscribe((response: any) => {
-    //   console.log(response.data.data);
-    // });
+    this.caseActionService.getFeeActions(this.caseId).subscribe((response: any) => {
+      console.log(response.data.data);
+      this.feeActions = response.data.data;
+    });
   }
   async dismiss() {
     this.modalCtrl.dismiss({

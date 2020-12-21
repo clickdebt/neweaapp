@@ -18,7 +18,7 @@ export class DatabaseService {
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
   linkedIds = [];
   version = 2;
-  tables = ['rdebt_cases', 'rdebt_linked_cases', 'visit_reports', 'history', 'payment', 'fees', 'document', 'api_calls'];
+  tables = ['rdebt_cases', 'rdebt_linked_cases', 'history', 'api_calls'];
   constructor(
     private platform: Platform,
     private sqlite: SQLite,
@@ -73,6 +73,7 @@ export class DatabaseService {
       id INTEGER PRIMARY KEY,
       ref TEXT,
       scheme_id INTEGER,
+      debtor_id INTEGER,
       date DATE,
       d_outstanding DOUBLE INT,
       visitcount_total INTEGER,
@@ -85,13 +86,9 @@ export class DatabaseService {
       current_status_id INTEGER,
       current_stage_id INTEGER,
       address_postcode Text,
-      enforcement_addresses_postcode Text,
+      enforcement_addresses_postcode TEXT,
       debtor_name Text,
       data TEXT,
-      case_markers TEXT,
-      case_Summary TEXT,
-      Financials TEXT,
-      case_details TEXT,
       arranagement TEXT
     );`;
 
@@ -115,20 +112,7 @@ export class DatabaseService {
       enforcement_addresses_postcode Text,
       debtor_name Text,
       data TEXT,
-      case_markers TEXT,
-      case_Summary TEXT,
-      Financials TEXT,
-      case_details TEXT,
       arranagement TEXT
-    );`;
-
-    const visitReports = `CREATE TABLE IF NOT EXISTS visit_reports(
-      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-      case_id INTEGER,
-      form_data TEXT,
-      created_at DATETIME,
-      is_sync INTEGER,
-      visit_form_data_id INTEGER
     );`;
 
     const history = `CREATE TABLE IF NOT EXISTS history(
@@ -138,35 +122,8 @@ export class DatabaseService {
       action TEXT,
       attachment TEXT,
       name TEXT,
+      type TEXT,
       note TEXT,
-      time DATETIME
-    );`;
-
-    const payment = `CREATE TABLE IF NOT EXISTS payment(
-      id INTEGER PRIMARY KEY ,
-      caseid INTEGER,
-      amount INTEGER,
-      payment_type TEXT,
-      source_name TEXT,
-      date DATETIME
-    );`;
-
-    const fees = `CREATE TABLE IF NOT EXISTS fees(
-      id INTEGER PRIMARY KEY,
-      cf_id INTEGER,
-      caseid INTEGER,
-      amount INTEGER,
-      vat TEXT,
-      fee_name TEXT,
-      date DATETIME
-    );`;
-
-    const document = `CREATE TABLE IF NOT EXISTS document(
-      id INTEGER PRIMARY KEY ,
-      case_id INTEGER,
-      label TEXT,
-      action TEXT,
-      attachment TEXT,
       time DATETIME
     );`;
 
@@ -177,28 +134,23 @@ export class DatabaseService {
       type TEXT,
       data TEXT,
       is_sync INTEGER,
-      created_at DATETIME
+      response_id INTEGER,
+      response_data TEXT,
+      created_at DATETIME,
+      updated_at DATETIME
     );`;
-
-    // const sql = rdebCases + visitReports + history + payment + document;
 
     this.tables.forEach(async element => {
       const deleteQuery = 'DROP TABLE IF EXISTS ' + element + ';';
       let a = await this.database.executeSql(deleteQuery);
     });
-    // const sql = rdebCases + visitReports + history + payment + document;
     await this.storageService.clearAll();
 
     await this.database.executeSql(rdebCases);
     await this.database.executeSql(rdebLinkedCases);
-    await this.database.executeSql(visitReports);
     await this.database.executeSql(history);
-    await this.database.executeSql(payment);
-    await this.database.executeSql(document);
     await this.database.executeSql(api_calls);
-    await this.database.executeSql(fees);
 
-    // const data = await this.sqlitePorter.importSqlToDb(this.database, sql);
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
     await this.storageService.set('version', this.version)
@@ -222,6 +174,7 @@ export class DatabaseService {
     const query = `INSERT OR REPLACE INTO ${tableName} (${fields.join(', ')}) VALUES (${values.join(', ')})`;
     return await this.executeQuery(query);
   }
+
   async updateVisitForm(is_sync, visit_form_data_id, form_id) {
     const updateQuery = `update visit_reports set is_sync = ${is_sync} and
     visit_form_data_id=${visit_form_data_id} where id = ${form_id}`;
@@ -232,68 +185,35 @@ export class DatabaseService {
     return this.executeQuery(query);
   }
 
-  parseCaseData(caseData, linkedCases) {
-    caseData.forEach((elem) => {
-      if (this.linkedIds.indexOf(elem.id) == -1) {
-        // console.log(elem.id);
-        elem.linkedCasesTotalBalance = 0;
-        // if (elem.debtor_linked_cases != undefined && (elem.linked_cases != '' || elem.debtor_linked_cases != '') {
-        elem.linked_cases_group = linkedCases.filter(linked => (
-          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
-          && (this.linkedIds.indexOf(linked.id) == -1)
-        ));
-        elem.linked_cases = linkedCases.filter(linked => (
-          ((linked.manual_link_id === elem.manual_link_id && linked.manual_link_id !== null) || linked.debtorid === elem.debtorid)
-          && linked.id !== elem.id && (this.linkedIds.indexOf(linked.id) == -1)
-        ));
-        if (elem.linked_cases != '') {
-          (elem.linked_cases).forEach(l => {
-            l.parent_case_id = elem.id;
-            this.linkedIds.push(l.id);
-          });
-          const linked = elem.linked_cases.map(l => l.id);
-          caseData = caseData.filter(c => {
-            return (linked.indexOf(c.id) == -1);
-          });
-          elem.linked_cases = Object.values(elem.linked_cases);
-          elem.linkedCasesTotalBalance = parseFloat(elem.d_outstanding) + elem.linked_cases.reduce((accumulator, currentValue) => {
-            return accumulator + parseFloat(currentValue.d_outstanding);
-          }, 0);
-          elem.linkedCasesTotalBalance = (elem.linkedCasesTotalBalance).toFixed(2);
-        }
-      } else {
-        caseData = caseData.filter(cd => cd.id != elem.id);
-      }
-    });
-    return caseData;
-  }
-
   async setCases(data, linked) {
     // const cases = this.parseCaseData(data, linked);
     const sql = [];
     const sqlLinked = [];
     const sqlStart = `insert or replace INTO rdebt_cases
-    ( id, ref, scheme_id, date, d_outstanding, visitcount_total,
+    ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, address_postcode,enforcement_addresses_postcode,
-      debtor_name, data ) VALUES `;
+      client_id, current_status_id, current_stage_id, address_postcode,
+      enforcement_addresses_postcode, debtor_name,  data ) VALUES `;
     data.forEach((values) => {
 
       const v = encodeURI(JSON.stringify(values));
-      sql.push(`${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},
-        "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
-        "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
-        "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
-         ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
-         "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
-          "${encodeURI(JSON.stringify(values))}")`);
+      const query = `${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},  ${values.debtor_id},
+          "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
+          "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
+          "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
+          ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
+          "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
+            "${encodeURI(JSON.stringify(values))}")`;
+      sql.push(query);
+      this.executeQuery(query);
+
     });
 
     const sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
     ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id,address_postcode,enforcement_addresses_postcode,
-      debtor_name, data ) VALUES `;
+      client_id, current_status_id, current_stage_id, address_postcode,
+      enforcement_addresses_postcode, debtor_name, data ) VALUES `;
     linked.forEach((values) => {
       const v = encodeURI(JSON.stringify(values));
       sqlLinked.push(`${sqlLinkedStart} (${values.id}, "${values.ref}", ${values.scheme_id}, ${values.debtor_id},
@@ -306,7 +226,7 @@ export class DatabaseService {
     });
 
     const promiseArray = [];
-    sql.forEach(async (query) => promiseArray.push(this.executeQuery(query)));
+    // sql.forEach(async (query) => promiseArray.push(this.executeQuery(query)));
     sqlLinked.forEach(async (query) => promiseArray.push(this.executeQuery(query)));
     await Promise.all(promiseArray)
       .then((res: any) => {
@@ -344,32 +264,19 @@ export class DatabaseService {
   }
   async setcaseDetails(data) {
     try {
+      console.log(data);
+
       const promiseArray = [];
       for (const currentCase of data.cases) {
         // console.log(currentCase);
-
-        const caseSummary = {
-          clientRef: currentCase.ref,
-          clientName: currentCase.client____title,
-          scheme: currentCase.scheme____title,
-          stage: currentCase.stage____name,
-          status: currentCase.current_status____status_name,
-          lastVisitDate: currentCase.last_visit_date ? currentCase.last_visit_date : '-'
-        };
-        const sqlStart = `UPDATE rdebt_cases SET case_markers="${this.getEncodeString(currentCase.markers_data)}",
-        case_Summary="${this.getEncodeString(caseSummary)}",
-        Financials="${this.getEncodeString(currentCase.case_financials)}",
-        case_details="${this.getEncodeString(currentCase.scheme_panel_data)}",
+        const sqlStart = `UPDATE rdebt_cases SET 
         arranagement="${this.getEncodeString(currentCase.arranagement)}" 
         WHERE id = ${currentCase.id}`;
         promiseArray.push(this.executeQuery(sqlStart));
       }
 
       await this.storeToSqlite('history', data.history);
-      await this.storeToSqlite('payment', data.payments);
-      await this.storeToSqlite('document', data.documents);
-      await this.storeToSqlite('fees', data.fees);
-      this.setvisitOutcomes(data.exitCodeData);
+      await this.setvisitOutcomes(data.exitCodeData);
       await Promise.all(promiseArray)
         .then((res: any) => {
           console.log(res);
@@ -380,7 +287,6 @@ export class DatabaseService {
         });
     } catch (r) {
       console.log(r);
-
     }
   }
 
@@ -415,38 +321,31 @@ export class DatabaseService {
   async setDownloadStatus(data) {
     await this.storageService.set('downloadStatus', data);
   }
+  async setHistoryDownloadStatus(data) {
+    await this.storageService.set('historyDownloadStatus', data);
+  }
   async getDownloadStatus() {
     return await this.storageService.get('downloadStatus');
+  }
+  async getHistoryDownloadStatus() {
+    return await this.storageService.get('historyDownloadStatus');
   }
 
   async getOfflinecaseDetails(id) {
     const caseDetails: any = {
     };
-    let query = `select case_markers,case_Summary,Financials,case_details,arranagement from rdebt_cases where id = ${id}`;
+    let query = `select * from rdebt_cases where id = ${id}`;
 
     let result = await this.executeQuery(query);
     let finalResult = await this.extractResult(result);
 
-    caseDetails.caseMarkers = this.getDecodeString(finalResult[0].case_markers);
-    caseDetails.case_Summary = this.getDecodeString(finalResult[0].case_Summary);
-    caseDetails.Financials = this.getDecodeString(finalResult[0].Financials);
-    caseDetails.case_details = this.getDecodeString(finalResult[0].case_details);
+    caseDetails.data = this.getDecodeString(finalResult[0].data);
     caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
 
-    query = `select * from history where caseid = ${id}`;
+    query = `select * from history where caseid = ${id} order by id desc`;
     result = await this.executeQuery(query);
     finalResult = await this.extractResult(result);
     caseDetails.history = finalResult;
-
-    query = `select * from payment where caseid = ${id}`;
-    result = await this.executeQuery(query);
-    finalResult = await this.extractResult(result);
-    caseDetails.paymentData = finalResult;
-
-    query = `select * from document where case_id = ${id}`;
-    result = await this.executeQuery(query);
-    finalResult = await this.extractResult(result);
-    caseDetails.caseDocuments = finalResult;
 
     return caseDetails;
   }
@@ -515,7 +414,11 @@ export class DatabaseService {
 
   clearData() {
     this.tables.forEach(async element => {
-      const deleteQuery = 'delete from ' + element + ';';
+      let checkSync = ' ;';
+      if (element == 'visit_reports' || element == 'api_calls') {
+        checkSync = 'where is_sync=1';
+      }
+      const deleteQuery = 'delete from ' + element + checkSync;
       let a = await this.database.executeSql(deleteQuery);
     });
   }

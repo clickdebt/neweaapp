@@ -25,6 +25,8 @@ export class HomePage implements OnInit {
   bgSubscription;
   hasVRMpermission = false;
   bgNetworkSubscription;
+  limit = 50;
+  downloading = false;
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -65,32 +67,36 @@ export class HomePage implements OnInit {
     this.hasVRMpermission = await this.commonService.hasPermission(this.commonService.permissionSlug.VRM);
   }
   async ionViewDidEnter() {
-    this.caseService.getCaseSettings().subscribe(async (response: any) => {
-      await this.storageService.set('fields', response.data.fields);
-      this.saveTimeSettings(response.data.time);
-    });
-    if ((1 || this.platform.is('android') || this.platform.is('ios'))
-      && this.networkService.getCurrentNetworkStatus() === 1) {
+    if (this.networkService.getCurrentNetworkStatus() === 1) {
+      this.caseService.getCaseSettings().subscribe(async (response: any) => {
+        await this.storageService.set('fields', response.data.fields);
+        this.saveTimeSettings(response.data.time);
+      });
       const downloadStatus = await this.databaseService.getDownloadStatus();
       if (!downloadStatus || !downloadStatus.status) {
+        this.loaderService.show();
+        this.loaderService.displayText.next('Downloading Cases');
         forkJoin({
           cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
-          // caseDetails: this.caseService.getCaseDetails(),
           feeOptions: this.caseActionService.getFeeOptions(1)
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data, response.cases.linked);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
-          // await this.databaseService.setcaseDetails(response.caseDetails),
           await this.databaseService.setFeeOptions(response.feeOptions.data);
+          await this.databaseService.setDownloadStatus({
+            status: true,
+            time: moment().format('YYYY-MM-DD HH:mm:ss')
+          });
+          this.loaderService.hide();
+          await this.getcaseDetails();
         });
-        this.getcaseDetails();
       } else {
         if (downloadStatus) {
           const diffMs = Math.floor((new Date(moment().format('YYYY-MM-DD HH:mm:ss')).getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
-          if (diffMs >= 5) {
+          if (diffMs >= 60) {
             this.caseService.getCases({ last_update_date: downloadStatus.time }, 1).subscribe(async (response: any) => {
               if (response) {
                 await this.databaseService.setCases(response.data, response.linked);
@@ -101,12 +107,9 @@ export class HomePage implements OnInit {
                     time: moment().format('YYYY-MM-DD HH:mm:ss')
                   });
                 });
-
+                await this.getcaseDetails();
               }
             });
-          }
-          if (new Date(downloadStatus.time).getDate() !== new Date().getDate()) {
-            this.getcaseDetails();
           }
         }
       }
@@ -114,36 +117,44 @@ export class HomePage implements OnInit {
   }
 
   async getcaseDetails() {
-    let downloded = 0
-    this.loaderService.show()
-    this.loaderService.displayText.next('Downloding Cases');
-    this.caseService.getCaseDetails(1).subscribe(async (data: any) => {
-      downloded += 50;
+    let downloded = 0;
+    this.downloading = true;
+    this.caseService.getCaseDetails(1, this.limit).subscribe(async (data: any) => {
       let total = data.caseCountsVal;
+      downloded = (data.caseCountsVal >= this.limit) ? this.limit : data.caseCountsVal;
       let page = 1
       await this.databaseService.setcaseDetails(data);
-      let count = Math.floor((total - downloded) / 50);
-      var msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
-
-      this.loaderService.displayText.next(msg);
-      for (let i = 0; i <= count; i++) {
-        this.caseService.getCaseDetails(++page).subscribe(async (data) => {
-          downloded += 50;
-          if (downloded > total) {
-            downloded = total;
-          }
-          msg = "Downloding Cases " + '\n\n' + `${downloded}/${total}`;
-          this.loaderService.displayText.next(msg);
-          await this.databaseService.setcaseDetails(data);
-          if (downloded >= total) {
-            this.loaderService.hide();
-            await this.databaseService.setDownloadStatus({
-              status: true,
-              time: moment().format('YYYY-MM-DD HH:mm:ss')
-            });
-          }
-        });
+      let count = Math.floor((total - downloded) / this.limit);
+      if (count > 0) {
+        for (let i = 0; i <= count; i++) {
+          this.caseService.getCaseDetails(++page, this.limit).subscribe(async (data) => {
+            downloded += this.limit;
+            if (downloded > total) {
+              downloded = total;
+            }
+            await this.databaseService.setcaseDetails(data);
+            if (downloded >= total) {
+              await this.setHistoryDownloadStatus();
+            }
+          }, (err) => {
+            console.log(err);
+            this.setHistoryDownloadStatus(false);
+          });
+        }
+      } else {
+        await this.setHistoryDownloadStatus();
       }
+    }, (err) => {
+      console.log(err);
+      this.setHistoryDownloadStatus(false);
+    });
+  }
+
+  async setHistoryDownloadStatus(status = true) {
+    this.downloading = false;
+    await this.databaseService.setHistoryDownloadStatus({
+      status: status,
+      time: moment().format('YYYY-MM-DD HH:mm:ss')
     });
   }
 
@@ -223,17 +234,18 @@ export class HomePage implements OnInit {
 
   async saveUnsyncVisitForms() {
     if (!await this.storageService.get('isVisitFormSync')) {
-      this.databaseService.getUnsyncVisitForms().then(async (data) => {
+      this.databaseService.getApiStored().then(async (data) => {
         if (data) {
-          let currentFormData;
+          var currentFormData;
           for (let i = 0; i < data.rows.length; i++) {
             currentFormData = data.rows.item(i);
-            currentFormData.form_data = JSON.parse(decodeURI(currentFormData.form_data));
-            this.visitService.saveForm(currentFormData.form_data).subscribe(async (res: any) => {
-              await this.databaseService.updateVisitForm(1, res.data.id, currentFormData.id);
-            });
+            let form_data = JSON.parse(decodeURI(currentFormData.data));
+            let callResponse = await this.databaseService.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
+            if (callResponse) {
+              this.databaseService.markApiCallSuccess(currentFormData.id);
+              this.databaseService.getcaseDetailsData(currentFormData.case_id)
+            }
           }
-          await this.storageService.set('isVisitFormSync', true);
         }
       });
     }
