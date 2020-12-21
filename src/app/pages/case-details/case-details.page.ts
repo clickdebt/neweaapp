@@ -272,7 +272,7 @@ export class CaseDetailsPage implements OnInit {
     if (this.historyName) {
       query += ` and (note like '%${this.historyName}%' or  name like '%${this.historyName}%')`;
     }
-    query += 'order by id desc';
+    query += ' order by id desc';
     console.log(query);
 
     let result = await this.databaseService.executeQuery(query);

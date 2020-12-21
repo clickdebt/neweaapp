@@ -17,7 +17,7 @@ export class DatabaseService {
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
   linkedIds = [];
-  version = 2;
+  version = 3;
   tables = ['rdebt_cases', 'rdebt_linked_cases', 'history', 'api_calls'];
   constructor(
     private platform: Platform,
