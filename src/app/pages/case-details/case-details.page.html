@@ -4,664 +4,252 @@
       <ion-icon size="large" name="arrow-back-outline"></ion-icon>
     </ion-buttons>
     <ion-title>#{{currentCaseData.id}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentActionSheet()">
+        <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" *ngIf="currentCaseData">
+<ion-content class="ion-padding" *ngIf="currentCaseData && dataReady">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-list lines="none">
-    <!-- case Markers starts -->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(caseDetails.caseMarkers)"
-        ng-class="{active: isShown(caseDetails.caseMarkers)}">
-        <ion-label>
-          <h2>Case Markers</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(caseDetails.caseMarkers) ? 'chevron-up-outline':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <ion-list class="ion-no-border detial-cover ion-margin-start" [hidden]="!isShown(caseDetails.caseMarkers)">
-        <ion-button (click)="onCaseMarkerClick(caseMarker)" size="default" [color]="colorCondition(caseMarker.value)"
-          *ngFor="let caseMarker of caseDetails.caseMarkers.fields">
-          {{caseMarker.label}}
-        </ion-button>
-      </ion-list>
-    </div>
-    <!-- case Markers ends-->
-
-    <!-- Debtor starts -->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(currentCaseData)" ng-class="{active: isShown(currentCaseData)}">
-        <ion-label>
-          <h2>Debtor</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(currentCaseData) ? 'chevron-up-sharp':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <ion-grid class="ion-no-border detial-cover ion-margin-start" [hidden]="!isShown(currentCaseData)">
-        <ion-row>
-          <ion-col>
-            <span>Debtor Name:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{currentCaseData.debtor?.debtor_name}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row *ngFor="let address of currentCaseData.debtor?.addresses,let i=index">
-          <ion-col>
-            <span>Address: </span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>
-              {{address.address_ln1}}
-              {{address.address_ln2 ? ', ' +address.address_ln2 : ''}}
-              {{address.address_ln3 ? ', ' +address.address_ln3 : ''}}
-              {{address.address_town ? ', ' +address.address_town : ''}}
-              {{address.address_postcode ? ', ' +address.address_postcode : ''}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <span>Contact</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{currentCaseData.debtor?.debtor_mobile}}</span>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-    <!-- Debtor ends -->
-
-    <!-- case Summary starts-->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(caseDetails.caseSummary)"
-        ng-class="{active: isShown(caseDetails.caseSummary)}">
-        <ion-label>
-          <h2>Case Summary</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(caseDetails.caseSummary) ? 'chevron-up-sharp':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <ion-grid class="ion-no-border detial-cover ion-margin-start" [hidden]="!isShown(caseDetails.caseSummary)">
-        <ion-row>
-          <ion-col>
-            <span>Client Reference:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.clientRef}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <span>Client Name:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.clientName}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <span>Scheme:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.scheme}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <span>Stage:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.stage}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <span>Status:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.status}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <span>Last visit date:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.lastVisitDate ? caseDetails.caseSummary.lastVisitDate: '-'}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-row *ngIf="fromVrmSearch">
-          <ion-col>
-            <span>Agent Name:</span>
-          </ion-col>
-          <ion-col class="text-color-light">
-            <span>{{caseDetails.caseSummary.officer?.name}}</span>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-    <!-- case Summary ends-->
-
-    <!-- case financial Details starts -->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(caseDetails.financialDetails)"
-        ng-class="{active: isShown(caseDetails.financialDetails)}">
-        <ion-label>
-          <h2>Financials</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(caseDetails.financialDetails) ? 'chevron-up-outline':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <ion-grid class="ion-no-border detial-cover" [hidden]="!isShown(caseDetails.financialDetails)">
-        <ion-row>
-          <ion-col size-md="3">
-            <ion-card>
-              <!-- Client  Data Start  -->
-              <ion-item class="card-title-bg">
-                <ion-card-title>Client Balance</ion-card-title>
-              </ion-item>
-
-              <ion-card-content>
-                <ion-item>
-                  <ion-label>Amount Due:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.client?.total | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Amount Collected:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.client?.paid | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Amount Cleared:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.client?.cleared | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Amount Paid Out:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.client?.paidout | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Amount Outstanding:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.client?.current_outstanding | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-          <!-- Client Data End -->
-          <!-- Fee Data Start-->
-          <ion-col size-md="3">
-            <ion-card>
-              <ion-item class="card-title-bg">
-                <ion-card-title>Fees Net</ion-card-title>
-              </ion-item>
-
-              <ion-card-content>
-                <ion-item>
-                  <ion-label>Amount Due:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.fees?.total | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Fees Collected :</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.fees?.paid | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Fees Cleared:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.fees?.cleared | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Fees Paid Out :</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.fees?.paidout | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Fee outstanding:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.fees?.current_outstanding | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-          <!-- Fee Data End -->
-          <!-- Total Data Start-->
-          <ion-col size-md="3">
-            <ion-card>
-              <ion-item class="card-title-bg">
-                <ion-card-title>Grand Total</ion-card-title>
-              </ion-item>
-
-              <ion-card-content>
-                <ion-item>
-                  <ion-label>Amount Due:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.totals?.total | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Amount Collected:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.totals?.paid | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Amount Cleared:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.totals?.cleared | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Amount Paid Out :</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.totals?.paidout | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-                <ion-item>
-                  <ion-label>Current outstanding:</ion-label>
-                  <span class="text-color-light">
-                    {{caseDetails.financialDetails.totals?.current_outstanding | number:'0.2-2'}}
-                  </span>
-                </ion-item>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-          <!-- Total Data End -->
-          <!-- Linked Case Data  -->
-          <ion-col size-md="3" *ngIf="currentCaseData.linked_cases && currentCaseData.linked_cases.length">
-            <ion-card>
-              <ion-item class="card-title-bg">
-                <ion-card-title>Linked Cases</ion-card-title>
-              </ion-item>
-
-              <ion-card-content>
-                <div class="d-flex ion-justify-content-between">
-                  <ion-item>
-                    <span>Case Id</span>
-                  </ion-item>
-                  <ion-item>
-                    <span>Outstanding</span>
-                  </ion-item>
-                </div>
-                <div class="d-flex ion-justify-content-between"
-                  *ngFor="let linked_case of currentCaseData.linked_cases">
-                  <ion-item>
-                    <span class="text-color-light">
-                      {{linked_case.id}}
-                    </span>
-                  </ion-item>
-                  <ion-item>
-                    <span class="text-color-light">
-                      {{linked_case.d_outstanding | number:'0.2-2'}}
-                    </span>
-                  </ion-item>
-                </div>
-                <div class="d-flex ion-justify-content-between">
-                  <ion-item>
-                    <span class="text-color-light">
-                      Total
-                    </span>
-                  </ion-item>
-                  <ion-item>
-                    <span class="text-color-light">
-                      {{linkedTotal | number:'0.2-2'}}
-                    </span>
-                  </ion-item>
-                </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-    <!-- case financial Details ends -->
-
-    <!-- case payment Details ends -->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(caseDetails.payments)"
-        ng-class="{active: isShown(caseDetails.payments)}">
-        <ion-label>
-          <h2>Payments</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(caseDetails.payments) ? 'chevron-up-outline':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <ion-grid class="ion-no-border detial-cover ion-margin-bottom" [hidden]="!isShown(caseDetails.payments)">
-        <ion-row *ngIf="!caseDetails.payments?.paymentData?.length">
-          <ion-col class="text-color-light ion-text-center">
-            <span>No Payments Found </span>
-          </ion-col>
-        </ion-row>
-        <ion-row class="history-bg mt-1 pt-1 pl-1" *ngFor="let payment of caseDetails.payments.paymentData">
-          <ion-col size-md="8" size="12">
-            <ion-label>Date & Time:</ion-label>
-            <span class="text-color-light ion-margin-start">{{payment.date}}</span>
-          </ion-col>
-          <ion-col size-md="4" size="12">
-            <ion-label>Amount:</ion-label>
-            <span class="text-color-light ion-margin-start">{{payment.amount}}</span>
-          </ion-col>
-          <ion-col size-md="8" size="12">
-            <ion-label>Payment Type:</ion-label>
-            <span class="text-color-light ion-margin-start">{{payment.payment_type?.name}}</span>
-          </ion-col>
-          <ion-col size-md="4" size="12">
-            <ion-label>Payment Source:</ion-label>
-            <span class="text-color-light ion-margin-start">{{payment.payment_source?.name}}</span>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-    <!-- case payment Details ends -->
-
-    <!-- other case Details starts -->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(caseDetails.caseDetail)"
-        ng-class="{active: isShown(caseDetails.caseDetail)}">
-        <ion-label>
-          <h2>Case Details</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(caseDetails.caseDetail) ? 'chevron-up-outline':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <div class="detial-cover" [hidden]="!isShown(caseDetails.caseDetail)">
-        <ion-grid class="ion-no-border" *ngIf="getCaseSchemeSpecificDetail">
-          <ion-row *ngFor="let data of getCaseSchemeSpecificData">
-            <ion-col>{{data.label}}:</ion-col>
-            <ion-col class="text-color-light">{{data.value}}</ion-col>
-          </ion-row>
-        </ion-grid>
-        <ion-grid class="ion-no-border" *ngIf="!getCaseSchemeSpecificDetail">
-          <ion-row>
-            <ion-col size-md="6" size="12">
-              <ion-card>
-                <ion-item class="card-title-bg">
-                  <ion-card-title>Court Detail</ion-card-title>
-                </ion-item>
-
-                <ion-card-content>
-                  <ion-grid>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Statutory Demand Issued:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class="text-color-light">
-                          {{caseDetails.caseDetail.case_data?.custom_date3}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Charging Order Hearing Date:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class="text-color-light">
-                          {{caseDetails.caseDetail.case_data?.custom_field__case_data__co_hearing_date}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Charging Order Reminder Date:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.custom_field__case_data__chargingorder_reminder_date}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Committal to Prison Hearing Date:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.ustom_field__case_data__committal_hearing_date}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Committal to Prison 2nd Hearing Date:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.custom_field__case_data__2nd_hearing_date}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Committal to Prison 3rd Hearing Date:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.custom_field__case_data__3rd_hearing_date}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-            <ion-col size-md="6" size="12">
-              <ion-card>
-                <ion-item class="card-title-bg">
-                  <ion-card-title>Liable Property</ion-card-title>
-                </ion-item>
-
-                <ion-card-content>
-                  <ion-grid>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Liable Address Line 1:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.offense_add1}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Liable Address Line 2</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.offense_add2}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Liable Address Line 3:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.offense_add3}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Liable Address Line 4:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.offense_add4}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Liable Address Postcode:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.offense_postcode}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Charge Start Date:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.offense_date_from}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                    <ion-row>
-                      <ion-col>
-                        <ion-label class="medium-contrast">Charge End Date:</ion-label>
-                      </ion-col>
-                      <ion-col>
-                        <span class=" text-color-light">
-                          {{caseDetails.caseDetail.case_data?.offense_date_to}}
-                        </span>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </div>
-
-    </div>
-    <!-- other case Details end -->
-
-    <!-- case documents ends -->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(caseDetails.documents)"
-        ng-class="{active: isShown(caseDetails.documents)}">
-        <ion-label>
-          <h2>Documents</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(caseDetails.documents) ? 'chevron-up-outline':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <ion-grid class="ion-no-border detial-cover ion-margin-bottom"
-        [hidden]="!isShown(caseDetails.documents)">
-        <ion-row *ngIf="!caseDocuments.length">
-          <ion-col class="text-color-light ion-text-center">
-            <span>No Documents Found </span>
-          </ion-col>
-        </ion-row>
-        <ion-row class="history-bg ion-margin-top pt-1 pl-1" *ngFor="let document of caseDocuments">
-          <ion-col size-md="4" size="12">
-            <ion-label>Name:</ion-label>
-            <span
-              class="text-color-light ion-margin-start">{{document.label ? document.label : document.action}}</span>
-          </ion-col>
-          <ion-col size-md="4" size="12">
-            <ion-label>Date:</ion-label>
-            <span class="text-color-light ion-margin-start">{{document.time}}</span>
-          </ion-col>
-          <ion-col size-md="4" size="12">
-            <ion-label>Link:</ion-label>
-            <span><a [href]="document.attachment" target="_blank">Download</a></span>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-    <!-- case documents ends -->
-
-    <!-- case history starts -->
-    <div class="ion-margin-top">
-      <ion-item class="bg-main" (click)="toggleShow(caseDetails.history)"
-        ng-class="{active: isShown(caseDetails.history)}">
-        <ion-label>
-          <h2>History</h2>
-        </ion-label>
-        <ion-icon slot="end" [name]="isShown(caseDetails.history) ? 'chevron-up-outline':'chevron-down-sharp'">
-        </ion-icon>
-      </ion-item>
-      <ion-grid class="ion-no-border detial-cover ion-margin-bottom " [hidden]="!isShown(caseDetails.history)">
-        <ion-row class="ion-justify-content-end">
-          <ion-col size-md="4">
-            <ion-item lines="none">
-              <ion-searchbar class="p-y-0 p-x-0" [value]="searchBarValue" (input)="onInput($event)"
-                placeholder="Search..">
-              </ion-searchbar>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-        <ion-row class="history-bg mt-1 pt-1 pl-1" *ngFor="let history of historyFilterData">
-          <ion-col size-md="8" size="12">
-            <ion-label>Action:</ion-label>
-            <span class="text-color-light ion-margin-start"
-              [innerHTML]="history.action | highlight:searchBarValue"></span>
-          </ion-col>
-          <ion-col class="d-flex" size-md="4" size="12">
-            <ion-label>Date:</ion-label>
-            <div class="text-color-light ion-margin-start" [innerHTML]="history.time | highlight:searchBarValue">
-            </div>
-          </ion-col>
-          <ion-col size-md="8" size="12" *ngIf="history.note">
-            <ion-label>Note:</ion-label>
-            <span class="text-color-light ion-margin-start"
-              [innerHTML]="history.note | highlight:searchBarValue"></span>
-          </ion-col>
-          <ion-col size-md="4" size="12" *ngIf="history.attachment">
-            <ion-label>Attachment:</ion-label>
-            <span class="text-color-light ion-margin-start">
-              <a [href]="history.attachment" target="_blank">Download</a></span>
-          </ion-col>
-          <ion-col size-md="4" size="12" *ngIf="history.type == 'EA Added Visit Form' && history.document_id > 0">
-            <ion-label>Details:</ion-label>
-            <span class="text-color-light ion-margin-start">
-              <ion-button size="small" color="secondary" (click)='showVisitDetails(history)'>Details</ion-button>
-            </span>
-          </ion-col>
-          <ion-col size-md="12" size="12" *ngIf="history.user?.name">
-            <ion-label>Name:</ion-label>
-            <span class="text-color-light ion-margin-start">{{history.user?.name}}</span>
-          </ion-col>
-        </ion-row>
-        <ion-infinite-scroll threshold="100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
-          <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
-          </ion-infinite-scroll-content>
-        </ion-infinite-scroll>
-      </ion-grid>
-    </div>
-    <!-- case history ends -->
-  </ion-list>
-</ion-content>
-
-<ion-footer>
   <ion-grid>
-    <ion-row class="ion-justify-content-center">
-      <ion-col size-md="3">
-        <ion-item *ngIf="!fromVrmSearch">
-          <ion-select [(ngModel)]="SelectedAction" (ionFocus)="onSelectChange($event)" value="" okText="Okay"
-            cancelText="Dismiss">
-            <ion-select-option disabled="true" value="">Select an Action</ion-select-option>
-            <ion-select-option [value]="action" *ngFor="let action of actions">{{action}}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
+    <ion-row>
+      <ion-col size-md="8" size-sm="12" size-xs="12">
+        <ion-card class="m-0 h-100">
+          <ion-card-header>
+            <ion-card-subtitle><b>QUICK INFO</b></ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col size-sm="6" size-xs="12">
+                  <span class="d-block dark"><b>Debtor Details</b></span>
+                  <span class="d-block color-primary">Debtor Name</span>
+                  <span class="d-block"><b>{{currentCaseData.debtor?.debtor_name}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Address</span>
+                  <span *ngFor="let address of currentCaseData.debtor?.addresses,let i=index">
+                    <span class="d-block"><b>{{address.address_ln1}}
+                        {{address.address_ln2 ? ', ' +address.address_ln2 : ''}}
+                        {{address.address_ln3 ? ', ' +address.address_ln3 : ''}}
+                        {{address.address_town ? ', ' +address.address_town : ''}}
+                        {{address.address_postcode ? ', ' +address.address_postcode : ''}}</b>
+                    </span>
+                  </span>
+                  <hr>
+                  <span class="d-block color-primary">Contact</span>
+                  <span class="d-block"
+                    *ngIf="currentCaseData.debtor?.debtor_mobile"><b>{{currentCaseData.debtor?.debtor_mobile}}</b></span>
+                  <span class="d-block"
+                    *ngIf="currentCaseData.debtor?.debtor_phone"><b>{{currentCaseData.debtor?.debtor_phone}}</b></span>
+                  <hr>
+                  <span class="d-block dark mt-15"><b>Offense Details</b></span>
+                  <ng-container *ngFor="let data of getCaseSchemeSpecificData">
+                    <span class="d-block color-primary">{{data.label}}</span>
+                    <span class="d-block"><b>{{data.value ? data.value : '-'}}</b></span>
+                    <hr>
+                  </ng-container>
+                </ion-col>
+                <ion-col size-sm="6" size-xs="12">
+                  <span class="d-block dark"><b>Case Details</b></span>
+                  <span class="d-block color-primary">Client Reference</span>
+                  <span class="d-block"><b>{{caseDetails.data.ref}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Client Name</span>
+                  <span class="d-block"><b>{{caseDetails.data.client_name}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Scheme</span>
+                  <span class="d-block"><b>{{caseDetails.data.scheme_name}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Stage</span>
+                  <span class="d-block"><b>{{caseDetails.data.stage_name}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Status</span>
+                  <span class="d-block"><b>{{caseDetails.data.status_name}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Last visit date</span>
+                  <span class="d-block"><b>{{caseDetails.data.last_visit_date}}</b></span>
+                  <hr>
+                  <ng-template *ngIf="fromVrmSearch">
+                    <span class="d-block color-primary">Agent Name</span>
+                    <span class="d-block"><b>{{caseDetails.caseSummary.officer?.name}}</b></span>
+                    <hr>
+                  </ng-template>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size-md="4" size-sm="12" size-xs="12">
+        <ion-card class="m-0 h-100">
+          <ion-card-header>
+            <ion-card-subtitle><b>FINANCIALS</b></ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <span class="d-block dark"><b>Client</b></span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Due</span>
+                    <span><b>{{caseDetails.data.d_total_client_owed | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Collected</span>
+                    <span><b>{{caseDetails.data.d_client_paid | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Cleared</span>
+                    <span><b>{{caseDetails.data.d_client_cleared | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Paid Out</span>
+                    <span><b>{{caseDetails.data.d_client_received | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Outstanding</span>
+                    <span><b>{{caseDetails.data.d_clientbalance | number:'0.2-2'}}</b></span>
+                  </span>
+                  <!-- ------------------------------------------------------------------------------------------------------------- -->
+                  <hr>
+                  <span class="d-block dark mt-15"><b>Fees (inc. vat)</b></span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Due</span>
+                    <span><b>{{caseDetails.data.d_total_fees_owed | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Fees Collected </span>
+                    <span><b>{{caseDetails.data.d_fees_paid | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Fees Cleared</span>
+                    <span><b>{{caseDetails.data.d_fees_cleared | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Fees Paid Out </span>
+                    <span><b>{{caseDetails.data.d_fees_received | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Fee outstanding</span>
+                    <span><b>{{caseDetails.data.d_feesbalance | number:'0.2-2'}}</b></span>
+                  </span>
+                  <hr>
+                  <!-- ------------------------------------------------------------------------------------------------------------- -->
+                  <span class="d-block dark mt-15"><b>Total (inc. client, fees and vat)</b></span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Due</span>
+                    <span><b>{{sum(caseDetails.data.d_total_client_owed, caseDetails.data.d_total_fees_owed) |
+                        number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Collected</span>
+                    <span><b>{{sum(caseDetails.data.d_client_paid, caseDetails.data.d_fees_paid) |
+                        number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Cleared</span>
+                    <span><b>{{sum(caseDetails.data.d_client_cleared, caseDetails.data.d_fees_cleared) |
+                        number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Amount Paid Out </span>
+                    <span><b>{{sum(caseDetails.data.d_client_cleared, caseDetails.data.d_fees_cleared) |
+                        number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">Current outstanding</span>
+                    <span><b>{{sum(caseDetails.data.d_clientbalance, caseDetails.data.d_feesbalance) |
+                        number:'0.2-2'}}</b></span>
+                  </span>
+                  <!-- ------------------------------------------------------------------------------------------------------------- -->
+                  <ng-container *ngIf="currentCaseData.linked_cases && currentCaseData.linked_cases.length">
+                    <hr>
+                    <span class="d-block dark mt-15"><b>Linked Cases</b></span>
+                    <span class="list-item-inline">
+                      <span>Case Id</span>
+                      <span>Outstanding</span>
+                    </span>
+                    <span class="list-item-inline" *ngFor="let linked_case of currentCaseData.linked_cases">
+                      <span class="color-primary">{{linked_case.id}}</span>
+                      <span><b>
+                          {{linked_case.d_outstanding | number:'0.2-2'}}
+                        </b></span>
+                    </span>
+                  </ng-container>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size-md="12">
+        <ion-card class="m-0 h-100">
+          <ion-card-header>
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col class="ion-no-padding">
+                  <ion-card-subtitle><b>HISTORY</b></ion-card-subtitle>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-no-padding" size-md="4" size="12">
+                  <ion-searchbar class="p-y-0 p-x-0" [value]="searchBarValue" [(ngModel)]="historyName"
+                    placeholder="Search note, name..">
+                  </ion-searchbar>
+                </ion-col>
+                <ion-col class="ion-no-padding" size-md="4" size="12">
+                  <ion-item>
+                    <ion-label>Action</ion-label>
+                    <ion-select multiple="true" cancelText="Cancel" okText="Okay" placeholder="Action"
+                      [(ngModel)]="historyAction">
+                      <ion-select-option *ngFor="let historyType of historyTypes" [value]="historyType">
+                        {{historyType}}
+                      </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+                <ion-col class="ion-no-padding ion-text-end" size-md="4" size="12">
+                  <ion-button size="small" color="secondary" (click)="filterHistory()">Search</ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid class="ion-no-padding">
+              <ion-row class="border-bottom" *ngFor="let history of historyFilterData">
+                <ion-col size-md="8" size="12">
+                  <span class="d-block color-primary">{{history.action}}</span>
+                </ion-col>
+                <ion-col size-md="4" size="12">
+                  <span class="d-block d-block-right">{{history.time}}</span>
+                </ion-col>
+                <ion-col size-md="12" size="12" *ngIf="history.name && history.name != 'null'">
+                  <span class="d-block d-block-right">{{history.name}}</span>
+                </ion-col>
+                <ion-col size-md="12" size="12" *ngIf="history.note">
+                  <span [innerHtml]="history.note"></span>
+                </ion-col>
+                <ion-col size-md="12" size="12"
+                  *ngIf="history.attachment || (history.type == 'EA Added Visit Form' && history.document_id > 0)">
+                  <ion-button *ngIf="history.attachment" size="small" color="secondary">
+                    <a [href]="history.attachment" target="_blank" class="white-link">Download Attachment</a>
+                  </ion-button>
+                  <ion-button *ngIf="history.type == 'EA Added Visit Form' && history.document_id > 0" size="small"
+                    color="secondary" (click)='showVisitDetails(history)'>Visit Details</ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+            <ion-infinite-scroll threshold="100px" id="infinite-scroll" (ionInfinite)="loadData($event)">
+              <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+              </ion-infinite-scroll-content>
+            </ion-infinite-scroll>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>
 
-</ion-footer>
+</ion-content>
+<ion-content class="ion-padding" *ngIf="!currentCaseData || !dataReady">
+  <ion-card>
+    <img src="assets/image/wait.jpg" />
+    <ion-card-header>
+      <ion-card-subtitle>Downloading Data</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Data is being Downloaded in background.
+
+      Please check after some time.
+    </ion-card-content>
+  </ion-card>
+</ion-content>

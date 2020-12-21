@@ -79,25 +79,16 @@ export class VisitFormPage implements OnInit {
     this.getLocation();
   }
   async getVisitFormAndOutcome() {
-    if (this.networkService.getCurrentNetworkStatus() === 1) {
-      this.visitService.getVisitForm().subscribe(res => {
-        this.caseService.getVisitOutcomes(this.caseId).subscribe(response => {
-          this.addVisitOutcomeField(response['data'], res);
-        }, err => {
-          console.log(err);
-        });
-      }, err => {
-        console.log(err);
-      });
-    } else {
-      const visitFrom: any = {};
-      visitFrom.data = await this.storageService.get('visit_form');
-      this.visitOutcome = await this.storageService.get('visitOutcomes');
-      if (!this.visitOutcome) {
-        this.visitOutcome = [];
-      }
-      this.addVisitOutcomeField(this.visitOutcome, visitFrom);
+    const visitFrom: any = {};
+    visitFrom.data = await this.storageService.get('visit_form');
+    this.visitOutcome = await this.storageService.get('visitOutcomes');
+    this.visitOutcome = Object.values(this.visitOutcome);
+    console.log(this.visitOutcome);
+
+    if (!this.visitOutcome) {
+      this.visitOutcome = [];
     }
+    this.addVisitOutcomeField(this.visitOutcome, visitFrom);
   }
   getGeocodesLatLongs(obj) {
     if (this.networkService.getCurrentNetworkStatus() == 1 && this.isNewlyn) {
@@ -380,29 +371,21 @@ export class VisitFormPage implements OnInit {
     console.log(form_data);
     const visitFormData = [
       { name: 'case_id', value: this.caseId },
-      { name: 'form_data', value: `'${encodeURI(JSON.stringify(form_data))}'` },
+      { name: 'url', value: '' },
+      { name: 'data', value: `'${encodeURI(JSON.stringify(form_data))}'` },
       { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
     ];
-    if (this.networkService.getCurrentNetworkStatus() == 1) {
-      this.visitService.saveForm(form_data).subscribe((res: any) => {
-        visitFormData.push({ name: 'is_sync', value: 1 });
-        visitFormData.push({ name: 'visit_form_data_id', value: res.data.id });
-        this.databaseService.insert('visit_reports', visitFormData);
-        this.commonService.showToast('Data Saved Successfully.');
-        this.router.navigate(['/home/job-list']);
-      }, () => {
-        this.commonService.showToast('Something went wrong.');
-      });
-    } else {
-      visitFormData.push({ name: 'is_sync', value: 0 });
-      this.databaseService.insert('visit_reports', visitFormData).then(async (data) => {
-        await this.storageService.set('isVisitFormSync', false);
-        this.commonService.showToast('Data Saved Locally.');
-        this.router.navigate(['/home/job-list']);
-      }, (error) => {
-      });
 
-    }
+    visitFormData.push({ name: 'is_sync', value: 0 });
+    this.databaseService.insert('api_calls', visitFormData).then(async (data) => {
+      await this.storageService.set('isVisitFormSync', false);
+      this.commonService.showToast('Data Saved Locally.');
+      this.router.navigate(['/home/job-list']);
+    }, (error) => {
+      console.log(error);
+      
+    });
+
   }
   ionViewWillLeave() {
     this.storageService.remove('caseId');

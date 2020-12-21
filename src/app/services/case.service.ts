@@ -28,12 +28,12 @@ export class CaseService {
     return this.http.get(apiURL);
   }
 
-  getCaseDetails(page) {
-    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/getCaseDetailsData?1=1&limit=50&page=' + page;
+  getCaseDetails(page, limit) {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_case_details?nonblocking=1&limit=' + limit + '&page=' + page;
     return this.http.get(apiURL);
   }
   getCaseDetailById(caseId) {
-    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/getCaseDetailsData?1=1&case_id=' + caseId;
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_case_details?nonblocking=1&case_id=' + caseId;
     return this.http.get(apiURL);
   }
   getFilterMasterData() {

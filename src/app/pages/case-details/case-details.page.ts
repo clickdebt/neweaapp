@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, ModalController, NavController } from '@ionic/angular';
+import { ActionSheetController, AlertController, ModalController, NavController } from '@ionic/angular';
 import * as moment from 'moment';
 import { CaseService, CommonService, DatabaseService, StorageService } from 'src/app/services';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { NetworkService } from 'src/app/services/network.service';
+import { isArray } from 'util';
 import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
 import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
@@ -24,43 +25,68 @@ export class CaseDetailsPage implements OnInit {
   caseId;
   fromVrmSearch: any = false;
   currentCaseData: any = {};
+  historyName;
+  historyAction;
   caseDetails: any = {
-    caseMarkers: {
-      show: false,
-      fields: []
-    },
-    caseSummary: {
-      show: false
-    },
-    client: {},
-    financialDetails: {
-      show: false
-    },
-    caseDetail: {
-      show: false
-    },
-    history: {
-      show: false,
-      history_data: []
-    },
-    payments: {
-      show: false
-    },
-    documents: {
-      show: false
-    }
+    history: {},
+    data: {},
+    case_custom_data: {}
   };
-  getCaseSchemeSpecificDetail = false;
+  historyTypes = [];
   getCaseSchemeSpecificData = [];
   historyData: any[] = [];
   historyDataIndex = 10;
   searchBarValue = '';
   historyFilterData: any[] = [];
   actions: string[];
-  SelectedAction = '';
-  caseDocuments = [];
   linkedTotal = 0;
   arranagement;
+  actionListArray: any = {
+    'add_note': {
+      text: 'Add Note',
+      handler: () => {
+        this.addNote();
+      }
+    },
+    'add_fee': {
+      text: 'Add Fee',
+      handler: () => {
+        this.addFee();
+      }
+    },
+    'visit_case': {
+      text: 'Visit Case',
+      handler: () => {
+        this.visitCase();
+      }
+    },
+    'arrangement': {
+      text: 'Arrangement',
+      handler: () => {
+        this.addArrangement();
+      }
+    },
+    'deallocate_case': {
+      text: 'Deallocate case',
+      handler: () => {
+        this.deallocateCase();
+      }
+    },
+    'upload_document': {
+      text: 'Upload Document',
+      handler: () => {
+        this.uploadDocument();
+      }
+    },
+    'take_payment': {
+      text: 'Take Payment',
+      handler: () => {
+        this.takePayment();
+      }
+    },
+
+  };
+  dataReady = false;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -75,6 +101,7 @@ export class CaseDetailsPage implements OnInit {
     private modalController: ModalController,
     private databaseService: DatabaseService,
     private networkService: NetworkService,
+    private actionSheetController: ActionSheetController
   ) { }
 
   ngOnInit() {
@@ -83,40 +110,66 @@ export class CaseDetailsPage implements OnInit {
   async ionViewWillEnter() {
     this.caseId = this.route.snapshot.params.id;
     this.fromVrmSearch = localStorage.getItem('from_vrm');
-    this.loadInitData();
-    this.actionList();
-  }
+    const downloadStatus = await this.databaseService.getHistoryDownloadStatus();
+    if (downloadStatus && downloadStatus.status) {
+      this.dataReady = true;
 
-  async actionList() {
+      this.loadInitData();
+    } else {
+      this.dataReady = false;
+      this.commonService.showToast('Data not downaloaded yet, please try after sometime.')
+    }
+
+    // this.actionList();
+  }
+  async presentActionSheet() {
+    let buttons = [{
+      text: 'Cancel',
+      role: 'cancel',
+      handler: () => {
+        console.log('Delete clicked');
+      }
+    }];
     const isNewlyn = this.commonService.isClient('newlyn');
     if (isNewlyn) {
-      this.actions = ['Add Note', 'Add Fee'];
+      buttons.push(this.actionListArray['add_note']);
+      buttons.push(this.actionListArray['add_fee']);
+
       if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
-        this.actions.push('Visit Case');
+        buttons.push(this.actionListArray['visit_case']);
       }
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddArrangement)) {
-        this.actions.push('Arrangement');
+        buttons.push(this.actionListArray['arrangement']);
       }
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.DeAllocate)) {
-        this.actions.push('Deallocate case');
+        buttons.push(this.actionListArray['deallocate_case']);
       }
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.Document)) {
-        this.actions.push('Upload Document');
+        buttons.push(this.actionListArray['upload_document']);
       }
-      // if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
-      //   this.actions.push('Add Payment');
-      // }
       if (1 || await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
-        this.actions.push('Take Payment');
+        buttons.push(this.actionListArray['take_payment']);
       }
     } else {
-      this.actions = ['Add Note', 'Add Fee', 'Deallocate case'
-        , 'Arrangement', 'Upload Document'];
+      buttons.push(this.actionListArray['add_note']);
+      buttons.push(this.actionListArray['add_fee']);
+      buttons.push(this.actionListArray['arrangement']);
+      buttons.push(this.actionListArray['deallocate_case']);
+      buttons.push(this.actionListArray['upload_document']);
+
       if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
-        this.actions.push('Visit Case');
+        buttons.push(this.actionListArray['visit_case'])
       }
+
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Actions',
+        cssClass: 'my-custom-class',
+        buttons: buttons
+      });
+      await actionSheet.present();
     }
   }
+
   async loadInitData() {
 
     if (localStorage.getItem('detais_case_data')) {
@@ -129,15 +182,6 @@ export class CaseDetailsPage implements OnInit {
         this.linkedTotal = linkedCasesTotalBalance;
       }
       this.getOfflinecaseDetails();
-      // this.getCaseMarkers();
-      // this.getSummary();
-      // this.getClient();
-      // this.getfinancialDetails();
-      // this.getCaseDetails();
-      // this.getCaseSchemeSpecificDetails();
-      // this.getHistory();
-      // this.getPayments();
-      // this.getCaseDocuments();
 
     } else {
       this.router.navigate(['/home/job-list']);
@@ -145,30 +189,39 @@ export class CaseDetailsPage implements OnInit {
     this.currentCaseData.show = false;
   }
 
+  sum(a, b) {
+    return parseFloat(a) + parseFloat(b);
+  }
+
   async getOfflinecaseDetails() {
 
     const result = await this.databaseService.getOfflinecaseDetails(this.currentCaseData.id);
     console.log(result);
 
-    this.caseDetails.caseMarkers.fields = result.caseMarkers;
-    this.caseDetails.caseSummary = result.case_Summary;
-    this.caseDetails.financialDetails = result.Financials;
-    this.caseDetails.payments.paymentData = result.paymentData;
     this.caseDetails.history = result.history;
-    this.caseDocuments = result.caseDocuments;
-    this.getCaseSchemeSpecificDetail = true;
-    this.getCaseSchemeSpecificData = result.case_details;
-    this.arranagement = result.arranagement;
+    let custom_data = JSON.parse(result.data.custom_data);
+    let custArr: any = [];
+    custom_data = Object.values(custom_data);
 
-    this.caseDetails.payments.paymentData.sort((a, b) => {
-      if (new Date(a.date) > new Date(b.date)) {
-        return -1;
-      } else if (new Date(a.date) < new Date(b.date)) {
-        return 1;
+    custom_data.forEach(element => {
+      if (!isArray(element)) {
+        custArr[element.field_name] = element.field_value
       }
-      return 0;
     });
+    this.caseDetails.case_custom_data = custArr;
+    this.caseDetails.data = result.data;
 
+    this.getCaseSchemeSpecificData = [
+      { 'label': 'Offence Description', 'value': result.data.offense },
+      { 'label': 'Offence Time', 'value': custArr.offense_time },
+      { 'label': 'Offence Date', 'value': result.data.offense_date },
+      { 'label': 'Offence Code', 'value': custArr.offense_code },
+      { 'label': 'Offence Location', 'value': result.data.offense_add1 },
+      { 'label': 'Offence Address Line2', 'value': result.data.offense_add2 },
+      { 'label': 'Offence Address Line 3', 'value': result.data.offense_add3 },
+      { 'label': 'Offence Line 4', 'value': result.data.offense_add4 },
+      { 'label': 'Offense Postcode', 'value': result.data.offense_postcode },
+    ]
     this.caseDetails.history.sort((a, b) => {
       if (new Date(a.time) > new Date(b.time)) {
         return -1;
@@ -178,39 +231,14 @@ export class CaseDetailsPage implements OnInit {
       return 0;
     });
     this.historyData = this.caseDetails.history;
+    let actionArr = this.historyData.map(x => x.type)
+    this.historyTypes = [...new Set(actionArr)];
+
     this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
+    console.log(this.caseDetails);
+
   }
 
-  onSelectChange(event) {
-    if (this.SelectedAction === 'Add Note') {
-      this.addNote();
-    } else if (this.SelectedAction === 'Deallocate case') {
-      this.deallocateCase();
-    } else if (this.SelectedAction === 'Add Fee') {
-      this.addFee();
-    } else if (this.SelectedAction === 'Add Payment') {
-      this.addPayment();
-    } else if (this.SelectedAction === 'Take Payment') {
-      this.takePayment();
-    } else if (this.SelectedAction === 'Arrangement') {
-      this.addArrangement();
-    } else if (this.SelectedAction === 'Upload Document') {
-      this.uploadDocument();
-    } else if (this.SelectedAction === 'Visit Case') {
-      localStorage.setItem('visit_case_data', JSON.stringify(this.currentCaseData));
-      this.storageService.set('caseId', this.currentCaseData.id);
-      this.router.navigate([`/home/visit-form/${this.caseId}`]);
-    }
-    this.SelectedAction = '';
-  }
-
-  toggleShow(object) {
-    object.show = !object.show;
-  }
-
-  isShown(object) {
-    return object.show;
-  }
   async showVisitDetails(history) {
     const modal = await this.modalController.create({
       component: VisitDetailsPage, componentProps: {
@@ -220,169 +248,37 @@ export class CaseDetailsPage implements OnInit {
     });
     return await modal.present();
   }
-  getCaseMarkers() {
-    this.caseDetailsService.getCaseMarkers(this.caseId).subscribe((response: any) => {
-      this.caseDetails.caseMarkers.fields = response.data.fields;
-    });
-  }
-  async onCaseMarkerClick(caseMarker) {
-    if (caseMarker.shortcode === 'hold') {
-      this.onHold(caseMarker);
-    } else {
-      const alert = await this.alertCtrl.create({
-        header: 'Update a CaseMarker',
-        message: `Are you sure you want to change <strong>${caseMarker.label}</strong> marker?`,
-        inputs: [
-          {
-            name: 'linked_cases',
-            type: 'checkbox',
-            value: 'linked_cases',
-            label: 'Add for linked cases?'
-          }
-        ],
-        buttons: [
-          {
-            text: 'No',
-            role: 'cancel',
-            handler: () => {
-            }
-          },
-          {
-            text: 'Yes',
-            handler: data => {
-              let linked = [];
-              if (data.length > 0 && data[0] === 'linked_cases') {
-                linked = this.currentCaseData.linked_cases.map(ca => ca.id);
-              }
-              // if (this.networkService.getCurrentNetworkStatus() == 1) {
-              //   this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
-              //     .subscribe((response) => {
-              //       this.getCaseMarkers();
-              //     });
-              // } else {
-              const data1 = [{ 'name': 'linked', value: `'${linked}'` }];
-              const api_data = [
-                { name: 'case_id', value: `${this.caseId}` },
-                { name: 'url', value: `b/clickdebt_panel_layout/case_markers/panels/update_case_marker/${this.caseId}/${caseMarker.col}?source=API` },
-                { name: 'type', value: `post` },
-                { name: 'data', value: `${encodeURI(JSON.stringify(data1))}` },
-                { name: 'is_sync', value: 0 },
-                { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
-              ]
-              this.caseActionService.saveActionOffline('api_calls', api_data);
-            }
-          }
-          // }
-        ]
-      });
-      await alert.present();
-    }
 
-
-
-  }
-
-  colorCondition(index) {
-    if (parseInt(index, 10) === 0) {
-      return 'light';
-    } else if (parseInt(index, 10) === 1) {
-      return 'success';
-    } else {
-      return 'danger';
-    }
-  }
-
-  getSummary() {
-    this.caseDetailsService.getSummary(this.caseId).subscribe((response: any) => {
-      this.caseDetails.caseSummary = Object.assign(this.caseDetails.caseSummary, response.case_summary);
-    });
-  }
-  getClient() {
-    this.caseDetailsService.getClient(this.caseId).subscribe((response: any) => {
-      this.caseDetails.client = response.case_participants.client;
-    });
-  }
-
-  getfinancialDetails() {
-    this.caseDetailsService.getfinancialSummary(this.caseId).subscribe((response: any) => {
-      this.caseDetails.financialDetails = Object.assign(this.caseDetails.financialDetails,
-        response.case_financials);
-    });
-  }
-  getCaseDetails() {
-    this.caseDetailsService.getCaseDetails(this.caseId).subscribe((response) => {
-      this.caseDetails.caseDetail = Object.assign(this.caseDetails.caseDetail, response);
-    });
-  }
-  getCaseSchemeSpecificDetails() {
-    this.caseDetailsService.getSchemeSpecificDetails(this.caseId).subscribe((response: any) => {
-      if (response && response.prepare_array) {
-        this.getCaseSchemeSpecificDetail = true;
-        this.getCaseSchemeSpecificData = response.prepare_array;
-      }
-    });
-  }
-  getHistory() {
-    this.caseDetailsService.getHistory(this.caseId).subscribe((response) => {
-      this.caseDetails.history = Object.assign(this.caseDetails.history, response);
-      this.caseDetails.history.history_data.sort((a, b) => {
-        if (new Date(a.time) > new Date(b.time)) {
-          return -1;
-        } else if (new Date(a.time) < new Date(b.time)) {
-          return 1;
-        }
-        return 0;
-      });
-      this.historyData = this.caseDetails.history.history_data;
-      this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
-    });
-  }
 
   loadData(infiniteScrollEvent) {
     this.historyFilterData = this.historyFilterData.concat(this.historyData.slice(this.historyDataIndex, this.historyDataIndex + 10));
     this.historyDataIndex += 10;
     infiniteScrollEvent.target.complete();
   }
-  onInput(event) {
-    this.searchBarValue = event.target.value.toLowerCase();
-    this.historyFilterData = [];
 
-    if (this.searchBarValue) {
-      this.historyData = this.caseDetails.history.history_data.filter((history) => {
-        if (history.time.toLowerCase().includes(this.searchBarValue)) {
-          return true;
-        } else if (history.note.toLowerCase().includes(this.searchBarValue)) {
-          return true;
-        } else {
-          return history.action.toLowerCase().includes(this.searchBarValue);
-        }
-      });
-    } else {
-      this.historyData = this.caseDetails.history.history_data;
-    }
+  async filterHistory() {
     this.historyDataIndex = 10;
-    this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
-  }
 
-  getPayments() {
-    this.caseDetailsService.getPayments(this.caseId).subscribe((response: any) => {
-      this.caseDetails.payments.paymentData = response.payment_data;
-      this.caseDetails.payments.paymentData.sort((a, b) => {
-        if (new Date(a.date) > new Date(b.date)) {
-          return -1;
-        } else if (new Date(a.date) < new Date(b.date)) {
-          return 1;
-        }
-        return 0;
+    let query = `select * from history  where caseid = ${this.caseId}`;
+    if (this.historyAction.length) {
+      let actions: any = [];
+      this.historyAction.forEach(element => {
+        actions.push("'" + element + "'");
+
       });
-    });
-  }
-  getCaseDocuments() {
-    this.caseActionService.getCaseDocuments(this.caseId).subscribe((response: any) => {
-      if (response) {
-        this.caseDocuments = Object.values(response.documents);
-      }
-    });
+      actions = actions.join(',');
+      query += ` and type in (${actions})`;
+    }
+    if (this.historyName) {
+      query += ` and (note like '%${this.historyName}%' or  name like '%${this.historyName}%')`;
+    }
+    query += 'order by id desc';
+    console.log(query);
+
+    let result = await this.databaseService.executeQuery(query);
+    let finalResult = await this.databaseService.extractResult(result);
+    this.historyData = finalResult;
+    this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
   }
 
   async addNote() {
@@ -446,24 +342,6 @@ export class CaseDetailsPage implements OnInit {
     await alert.present();
   }
 
-  async onHold(caseMarker) {
-    const onHoldModal = await this.modalCtrl.create({
-      component: OnHoldModalPage,
-      componentProps: {
-        caseId: this.caseId,
-        // tslint:disable-next-line: object-literal-shorthand
-        caseMarker: caseMarker,
-        case: this.currentCaseData
-      }
-    });
-    onHoldModal.onDidDismiss().then(async (response) => {
-      if (response.data && response.data.saved) {
-        this.getCaseMarkers();
-        this.storageService.set('is_case_updated', true);
-      }
-    });
-    await onHoldModal.present();
-  }
   async addFee() {
     const AddFeeModal = await this.modalCtrl.create({
       component: AddFeeModalPage,
@@ -569,6 +447,11 @@ export class CaseDetailsPage implements OnInit {
       }
     });
     await AddArrangementModal.present();
+  }
+  async visitCase() {
+    localStorage.setItem('visit_case_data', JSON.stringify(this.currentCaseData));
+    this.storageService.set('caseId', this.currentCaseData.id);
+    this.router.navigate([`/home/visit-form/${this.caseId}`]);
   }
   async uploadDocument() {
     const uploadDocument = await this.modalCtrl.create({

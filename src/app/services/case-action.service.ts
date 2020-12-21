@@ -127,29 +127,12 @@ export class CaseActionService {
   }
 
   saveActionOffline(table, data) {
-
-    // this.storageService.get('case_details_action').then((caseDetailsActions) => {
-    //   if (!caseDetailsActions) {
-    //     caseDetailsActions = [];
-    //   }
-      // const req = [
-      //   { name: 'case_id', value: `'${case_id}'` },
-      //   { name: 'url', value: `'${url}'` },
-      //   { name: 'type', value: `'${type}'` },
-      //   { name: 'data', value: `'${encodeURI(JSON.stringify(data))}'` },
-      //   { name: 'is_sync', value: 0 },
-      //   { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
-      // ];
-
-      // caseDetailsActions.push(req);
-      // this.storageService.set('case_details_action', caseDetailsActions);
-      // this.commonService.showToast('Your Response is Saved will affect when you come online', 'success');
-      this.databaseService.insert(table, data).then(async (data) => {
-        // await this.storageService.set('isVisitFormSync', false);
-        this.databaseService.changeIsApiPending(true);
-        this.commonService.showToast('Data Saved Locally.');
-      }, (error) => {
-      // });
+    this.databaseService.insert(table, data).then(async (data) => {
+      this.databaseService.changeIsApiPending(true);
+      this.commonService.showToast('Data Saved Locally.');
+    }, (error) => {
+      console.log(error);
+      this.commonService.showToast(error);
     });
   }
 }

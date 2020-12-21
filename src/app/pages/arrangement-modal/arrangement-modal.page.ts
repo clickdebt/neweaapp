@@ -7,7 +7,7 @@ import { UpdateArrangementModalPage } from '../update-arrangement-modal/update-a
 import { AuthorizeCardPage } from '../authorize-card/authorize-card.page';
 import { NetworkService } from 'src/app/services/network.service';
 import * as moment from 'moment';
-import { CommonService, StorageService } from 'src/app/services';
+import { CommonService, DatabaseService, StorageService } from 'src/app/services';
 import { CalendarModal, CalendarModalOptions } from 'ion2-calendar';
 
 @Component({
@@ -50,7 +50,6 @@ export class ArrangementModalPage implements OnInit {
   groupArrId;
   date;
   paymentGateways = [];
-  arranagement;
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -60,25 +59,18 @@ export class ArrangementModalPage implements OnInit {
     private networkService: NetworkService,
     private commonService: CommonService,
     private storageService: StorageService,
+    private databaseService: DatabaseService
   ) {
     this.caseId = navParams.get('caseId');
-    this.baseOutstanding = this.outstanding = navParams.get('outstanding');
     this.isDetailsPage = navParams.get('isDetailsPage');
     this.currentCase = navParams.get('currentCase');
-    this.arranagement = navParams.get('arranagement');
   }
 
   ngOnInit() {
     this.initForm();
-
   }
   async ionViewWillEnter() {
-    this.networkStatus = await this.networkService.getCurrentNetworkStatus();
-    if (this.networkStatus) {
-      this.getActiveArrangements();
-    } else {
-      this.arrangementObj.show = true;
-    }
+    this.getActiveArrangements();
   }
 
   dismiss() {
@@ -158,12 +150,6 @@ export class ArrangementModalPage implements OnInit {
         type = 'group_arrangement';
       }
       if (this.isDetailsPage === true) {
-        // this.caseActionService.createArrangement(this.arrangementObj, this.caseId, type)
-        //   .subscribe((response: any) => {
-        //     this.currArrangement = {};
-        //     this.commonService.showToast(response.data.message, 'success');
-        //     this.getActiveArrangements();
-        //   });
         const api_data = [
           { name: 'case_id', value: `${this.caseId}` },
           { name: 'url', value: `b/clickdebt_panel_layout/arrangements/case_actions_panels/${type}/${this.caseId}?source=API` },
@@ -253,31 +239,33 @@ export class ArrangementModalPage implements OnInit {
   isShown(object) {
     return object.show;
   }
-  getActiveArrangements() {
-    // this.caseActionService.getActiveArrangements(this.caseId).subscribe((response: any) => {
-    this.currArrangement = Object.values(this.arranagement.current_arrangement);
-    if (this.currentCase.debtorid) {
-      this.debtorId = this.currentCase.debtorid;
-      console.log(this.debtorId);
+  async getActiveArrangements() {
+    let query = `select * from rdebt_cases  where id = ${this.caseId}`;
+    let result = await this.databaseService.executeQuery(query);
+    let finalResult: any = await this.databaseService.extractResult(result);
+    finalResult = finalResult[0];
+    finalResult.data = this.databaseService.getDecodeString(finalResult.data);
+    finalResult.arranagement = this.databaseService.getDecodeString(finalResult.arranagement);
+    this.outstanding = finalResult.d_outstanding;
+    console.log(this.outstanding);
+    
+    console.log(finalResult);
+
+    this.currArrangement = finalResult.arranagement.current_arrangement;
+    if (finalResult.debtor_id) {
+      this.debtorId = finalResult.debtor_id;
     }
-    this.paymentGateways = this.arranagement.paymentGatewayList;
-    // if (this.currentCase.linked_cases && this.currArrangement == '' && response.group_arrangement) {
-    //   this.groupArrId = response.group_arrangement.case_id;
-    //   this.currArrangement = response.group_arrangement;
-    //   if (this.currArrangement && this.currArrangement.length) {
-    //     console.log('==innnn-====', this.currArrangement);
-    //     this.isGroupArrangement = true;
-    //   }
-    // }
+    this.paymentGateways = [];
+  
     this.currArrangement = this.currArrangement.find(data => data.active == 1);
-    // this.getInactiveArrangements();
+    
     this.makeCurrentArrangementString();
     if (this.currArrangement) {
       this.arrangementMode = 'archive_make';
       // if (this.isGroupArrangement) {
       //   this.activeArrangements.scheduleArrangements.data = Object.values(response.group_schedules);
       // } else {
-      this.activeArrangements.scheduleArrangements.data = Object.values(this.arranagement.arrangement_schedule).reverse();
+      this.activeArrangements.scheduleArrangements.data = (finalResult.arranagement.arrangement_schedule).reverse();
       // }
     }
     // });

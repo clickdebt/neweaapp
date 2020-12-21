@@ -10,7 +10,7 @@
 </ion-header>
 <ion-content class="ion-padding">
 
-  <div class="ion-margin-top " [hidden]="!networkStatus">
+  <div class="ion-margin-top ">
     <ion-item color="secondary" class="bg-main" (click)="toggleShow(activeArrangements?.currentArrangements)"
       ng-class="{active: isShown(activeArrangements?.currentArrangements)}">
       <ion-label>
@@ -27,7 +27,7 @@
     </ion-grid>
   </div>
 
-  <div class=" ion-margin-top" [hidden]="!networkStatus" *ngIf="activeArrangements.scheduleArrangements.data">
+  <div class=" ion-margin-top" *ngIf="activeArrangements.scheduleArrangements.data">
     <ion-item  color="secondary" class="bg-main" (click)="toggleShow(activeArrangements?.scheduleArrangements)"
       ng-class="{active: isShown(activeArrangements?.scheduleArrangements)}">
       <ion-label>
