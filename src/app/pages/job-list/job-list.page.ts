@@ -103,15 +103,14 @@ export class JobListPage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.caseFields = await this.storageService.get('fields');
-    if (this.caseFields) {
+    this.caseFields = ["current_status.status_name", "ref", "d_outstanding", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode"];
+    const caseFields = await this.storageService.get('fields');
+    if (caseFields) {
       this.caseFields = this.totalFields.filter((c) => {
-        if (this.caseFields.includes(c.field)) {
+        if (caseFields.includes(c.field)) {
           return true;
         }
       });
-    } else {
-      this.caseFields = ["current_status.status_name", "ref", "d_outstanding", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode"];
     }
     this.colspanLength = 6 + this.caseFields.length;
     this.isMobile = this.platform.is('mobile');
@@ -219,19 +218,19 @@ export class JobListPage implements OnInit {
     });
     //not take case from api, take from sqlite/websql
     if (0 && this.networkService.getCurrentNetworkStatus() == 1) {
-      if (!this.busy) {
-        this.busy = true;
-        this.caseService.getCases(params).subscribe((res: any) => {
-          this.busy = false;
-          if (infiniteScrollEvent) {
-            infiniteScrollEvent.target.complete();
-          }
-          if (res.result) {
-            this.page++;
-            this.parseCaseData(res.data, res.linked);
-          }
-        });
-      }
+      // if (!this.busy) {
+      //   this.busy = true;
+      //   this.caseService.getCases(params).subscribe((res: any) => {
+      //     this.busy = false;
+      //     if (infiniteScrollEvent) {
+      //       infiniteScrollEvent.target.complete();
+      //     }
+      //     if (res.result) {
+      //       this.page++;
+      //       this.parseCaseData(res.data, res.linked);
+      //     }
+      //   });
+      // }
     } else {
       let query = 'select * from rdebt_cases where 1 = 1';
       let p = [];
@@ -304,7 +303,7 @@ export class JobListPage implements OnInit {
 
           let res = await this.getLinkedCasesSqlite(item);
           // console.log(res);
-          if(res)
+          if (res)
             results.push(item.data);
         }
         // console.log(results);
@@ -322,16 +321,16 @@ export class JobListPage implements OnInit {
 
   }
   async getLinkedCasesSqlite(item) {
-    if(!(this.linkedIds.indexOf("" + item.id) == -1)) {
+    if (!(this.linkedIds.indexOf("" + item.id) == -1)) {
       return false;
     }
 
     let query = 'select * from rdebt_linked_cases where (manual_link_id = ? or debtor_id = ? )and id != ?';
     let p = [item.manual_link_id, item.data.debtor_id, item.id];
     const results: any[] = [];
-    
+
     await this.databaseService.executeQuery(query, p).then((data) => {
-      let link_item;      
+      let link_item;
       for (let i = 0; i < data.rows.length; i++) {
         link_item = data.rows.item(i);
         link_item.data = JSON.parse(decodeURI(link_item.data));
@@ -409,10 +408,10 @@ export class JobListPage implements OnInit {
     //     console.log(err);
     //   });
     // } else {
-      const filters = await this.storageService.get('filters');
-      if (filters) {
-        this.filterMaster = filters;
-      }
+    const filters = await this.storageService.get('filters');
+    if (filters) {
+      this.filterMaster = filters;
+    }
     // }
   }
 
@@ -494,7 +493,7 @@ export class JobListPage implements OnInit {
     const res = caseField.split('.');
     res.forEach((r) => {
       let r1 = r.split('[');
-      if(r1.length > 1) {
+      if (r1.length > 1) {
         value = value[r1[0]][0];
       } else {
         value = value[r];

@@ -113,12 +113,15 @@ export class CaseDetailsPage implements OnInit {
     const downloadStatus = await this.databaseService.getHistoryDownloadStatus();
     if (downloadStatus && downloadStatus.status) {
       this.dataReady = true;
-
-      this.loadInitData();
     } else {
-      this.dataReady = false;
-      this.commonService.showToast('Data not downaloaded yet, please try after sometime.')
+      this.databaseService.getDetailsDownloadState().subscribe(res => {
+        if(res) {
+          this.dataReady = true;
+          this.loadInitData();
+        }
+      })
     }
+    this.loadInitData();
 
     // this.actionList();
   }
@@ -196,7 +199,6 @@ export class CaseDetailsPage implements OnInit {
   async getOfflinecaseDetails() {
 
     const result = await this.databaseService.getOfflinecaseDetails(this.currentCaseData.id);
-    console.log(result);
 
     this.caseDetails.history = result.history;
     let custom_data = JSON.parse(result.data.custom_data);
@@ -235,8 +237,6 @@ export class CaseDetailsPage implements OnInit {
     this.historyTypes = [...new Set(actionArr)];
 
     this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
-    console.log(this.caseDetails);
-
   }
 
   async showVisitDetails(history) {

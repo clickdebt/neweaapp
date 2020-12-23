@@ -5,14 +5,14 @@
     </ion-buttons>
     <ion-title>#{{currentCaseData.id}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="presentActionSheet()">
-        <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+      <ion-button size="small" color="secondary" (click)="presentActionSheet()">
+        Actions
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" *ngIf="currentCaseData && dataReady">
+<ion-content class="ion-padding">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -204,7 +204,10 @@
               </ion-row>
             </ion-grid>
           </ion-card-header>
-          <ion-card-content>
+          <ion-card-content *ngIf="!dataReady">
+            Downloading History Data
+          </ion-card-content>
+          <ion-card-content *ngIf="dataReady">
             <ion-grid class="ion-no-padding">
               <ion-row class="border-bottom" *ngFor="let history of historyFilterData">
                 <ion-col size-md="8" size="12">
@@ -239,17 +242,4 @@
     </ion-row>
   </ion-grid>
 
-</ion-content>
-<ion-content class="ion-padding" *ngIf="!currentCaseData || !dataReady">
-  <ion-card>
-    <img src="assets/image/wait.jpg" />
-    <ion-card-header>
-      <ion-card-subtitle>Downloading Data</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      Data is being Downloaded in background.
-
-      Please check after some time.
-    </ion-card-content>
-  </ion-card>
 </ion-content>

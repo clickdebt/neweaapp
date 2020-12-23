@@ -152,12 +152,13 @@ export class HomePage implements OnInit {
 
   async setHistoryDownloadStatus(status = true) {
     this.downloading = false;
+    this.databaseService.setDetailsDownloadState(true);
     await this.databaseService.setHistoryDownloadStatus({
       status: status,
       time: moment().format('YYYY-MM-DD HH:mm:ss')
     });
   }
-
+  
   async confirmLogout() {
     const alert = await this.alertCtrl.create({
       header: 'Confirm Logout!',
@@ -183,6 +184,8 @@ export class HomePage implements OnInit {
   async logout() {
     localStorage.removeItem('remote_token');
     localStorage.removeItem('userdata');
+    localStorage.removeItem('visit_case_data');
+    localStorage.removeItem('detais_case_data')
     await this.storageService.remove('database_filled');
     await this.storageService.remove('permissionArray');
     await this.storageService.remove('isVisitFormSync');
@@ -193,6 +196,8 @@ export class HomePage implements OnInit {
     await this.storageService.remove('fee_options');
     await this.storageService.remove('visitOutcomes');
     await this.storageService.remove('downloadStatus');
+    await this.storageService.remove('historyDownloadStatus');
+    await this.storageService.remove('caseId');
     await this.storageService.remove('not_reload_map');
     await this.storageService.remove('permissionAsked');
     this.databaseService.clearData();
