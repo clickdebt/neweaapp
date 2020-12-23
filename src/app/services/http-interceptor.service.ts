@@ -4,6 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError, finalize, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { CommonService } from './common.service';
+import { LoaderService } from './loader.service';
+import { DatabaseService } from './database.service';
 
 @Injectable({
     providedIn: 'root'
@@ -15,7 +17,9 @@ export class HttpInterceptorService implements HttpInterceptor {
     loaderText = '';
     constructor(
         private router: Router,
-        private commonService: CommonService
+        private commonService: CommonService,
+        private loaderService: LoaderService,
+        private databaseService: DatabaseService
     ) { }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -40,12 +44,14 @@ export class HttpInterceptorService implements HttpInterceptor {
                 return event;
             }),
             catchError(error => {
+                this.loaderService.hide();
                 if(error.error.message)
                     this.commonService.showToast(error.error.message);
                 // this.commonService.dismissLoader();
                 if (error.status === 401 && !req.url.includes('login')) {
                     localStorage.removeItem('remote_token');
                     localStorage.removeItem('userdata');
+                    this.databaseService.clearData();
                     this.router.navigate(['/login']);
                 }
                 return throwError(error.error.message || 'server error.');
