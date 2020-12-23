@@ -8,6 +8,7 @@ import { browserDBInstance } from './browserdb';
 import { CaseService } from './case.service';
 import { NetworkService } from './network.service';
 import { StorageService } from './storage.service';
+import * as moment from 'moment';
 declare var window: any;
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,9 @@ export class DatabaseService {
   private database: any;
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private detailsReady: BehaviorSubject<boolean>;
   linkedIds = [];
-  version = 3;
+  version = 4;
   tables = ['rdebt_cases', 'rdebt_linked_cases', 'history', 'api_calls'];
   constructor(
     private platform: Platform,
@@ -29,6 +31,7 @@ export class DatabaseService {
     private networkService: NetworkService
   ) {
     this.databaseReady = new BehaviorSubject(false);
+    this.detailsReady = new BehaviorSubject(false);
 
     this.platform.ready().then(async () => {
 
@@ -189,15 +192,21 @@ export class DatabaseService {
     // const cases = this.parseCaseData(data, linked);
     const sql = [];
     const sqlLinked = [];
-    const sqlStart = `insert or replace INTO rdebt_cases
+    let sqlStart = `insert or replace INTO rdebt_cases
     ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
       client_id, current_status_id, current_stage_id, address_postcode,
       enforcement_addresses_postcode, debtor_name,  data ) VALUES `;
+
+    let sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
+    ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
+      last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
+      client_id, current_status_id, current_stage_id, address_postcode,
+      enforcement_addresses_postcode, debtor_name, data ) VALUES `;
+
     data.forEach((values) => {
 
-      const v = encodeURI(JSON.stringify(values));
-      const query = `${sqlStart} (${values.id}, "${values.ref}", ${values.scheme_id},  ${values.debtor_id},
+      const query = `(${values.id}, "${values.ref}", ${values.scheme_id},  ${values.debtor_id},
           "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
           "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
           "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
@@ -205,18 +214,14 @@ export class DatabaseService {
           "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
             "${encodeURI(JSON.stringify(values))}")`;
       sql.push(query);
-      this.executeQuery(query);
+      // this.executeQuery(query);
 
     });
+    sqlStart += sql.join(',');
 
-    const sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
-    ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
-      last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, address_postcode,
-      enforcement_addresses_postcode, debtor_name, data ) VALUES `;
     linked.forEach((values) => {
-      const v = encodeURI(JSON.stringify(values));
-      sqlLinked.push(`${sqlLinkedStart} (${values.id}, "${values.ref}", ${values.scheme_id}, ${values.debtor_id},
+      
+      sqlLinked.push(`(${values.id}, "${values.ref}", ${values.scheme_id}, ${values.debtor_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
         "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
@@ -224,12 +229,14 @@ export class DatabaseService {
          "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
           "${encodeURI(JSON.stringify(values))}")`);
     });
+    sqlLinkedStart += sqlLinked.join(',');
 
     const promiseArray = [];
-    // sql.forEach(async (query) => promiseArray.push(this.executeQuery(query)));
-    sqlLinked.forEach(async (query) => promiseArray.push(this.executeQuery(query)));
+    promiseArray.push(this.executeQuery(sqlStart));
+    promiseArray.push(this.executeQuery(sqlLinkedStart));
     await Promise.all(promiseArray)
       .then((res: any) => {
+        console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
         // console.log(res);
       })
       .catch((error) => { });
@@ -238,19 +245,31 @@ export class DatabaseService {
   async storeToSqlite(tableName, entries) {
     try {
       const promiseArray = [];
+      let q = `INSERT OR REPLACE INTO ${tableName} `;
+      var i = 1;
       for (const entrie of entries) {
-        const params = Object.entries(entrie).map(([name, value]) => {
+        const params = [];
+        Object.entries(entrie).map(([name, value]) => {
           if (typeof value === 'object') {
             value = JSON.stringify(value);
           }
           if (typeof value === 'string' && value.includes(`'`)) {
             value = value.replace(/'/g, `''`);
           }
-          return ({ name, value });
+          params.push({ name, value });
         });
-        promiseArray.push(this.insert(tableName, params));
+        if (i == 1) {
+          i = 0;
+          const fields = params.map(item => `'${item.name}'`);
+          q += ` (${fields.join(', ')}) values `
+          const values = params.map(item => `'${item.value}'`);
+          q += ` (${values.join(', ')})`
+        } else {
+          const values = params.map(item => `'${item.value}'`);
+          q += ` , (${values.join(', ')})`
+        }
       }
-      return await Promise.all(promiseArray);
+      return await this.executeQuery(q);
     } catch (e) {
       console.log(e);
     }
@@ -279,7 +298,7 @@ export class DatabaseService {
       await this.setvisitOutcomes(data.exitCodeData);
       await Promise.all(promiseArray)
         .then((res: any) => {
-          console.log(res);
+          // console.log(res);
         })
         .catch((error) => {
           console.log(error);
@@ -315,6 +334,13 @@ export class DatabaseService {
   getDatabaseState() {
     return this.databaseReady.asObservable();
   }
+  setDetailsDownloadState(val) {
+    return this.detailsReady.next(val);
+  }
+  getDetailsDownloadState() {
+    return this.detailsReady.asObservable();
+  }
+
   public getStoredApiStatus(): Observable<boolean> {
     return this.isApiPending.asObservable();
   }
