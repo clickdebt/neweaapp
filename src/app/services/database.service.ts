@@ -438,7 +438,25 @@ export class DatabaseService {
     })
   }
 
-  clearData() {
+  async clearData() {
+    localStorage.removeItem('remote_token');
+    localStorage.removeItem('userdata');
+    localStorage.removeItem('visit_case_data');
+    localStorage.removeItem('detais_case_data')
+    await this.storageService.remove('database_filled');
+    await this.storageService.remove('permissionArray');
+    await this.storageService.remove('isVisitFormSync');
+    await this.storageService.remove('fields');
+    await this.storageService.remove('timeSettings');
+    await this.storageService.remove('visit_form');
+    await this.storageService.remove('filters');
+    await this.storageService.remove('fee_options');
+    await this.storageService.remove('visitOutcomes');
+    await this.storageService.remove('downloadStatus');
+    await this.storageService.remove('historyDownloadStatus');
+    await this.storageService.remove('caseId');
+    await this.storageService.remove('not_reload_map');
+    await this.storageService.remove('permissionAsked');
     this.tables.forEach(async element => {
       let checkSync = ' ;';
       if (element == 'visit_reports' || element == 'api_calls') {

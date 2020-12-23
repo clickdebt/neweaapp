@@ -68,12 +68,12 @@ export class HomePage implements OnInit {
   }
   async ionViewDidEnter() {
     if (this.networkService.getCurrentNetworkStatus() === 1) {
-      this.caseService.getCaseSettings().subscribe(async (response: any) => {
-        await this.storageService.set('fields', response.data.fields);
-        this.saveTimeSettings(response.data.time);
-      });
       const downloadStatus = await this.databaseService.getDownloadStatus();
       if (!downloadStatus || !downloadStatus.status) {
+        this.caseService.getCaseSettings().subscribe(async (response: any) => {
+          await this.storageService.set('fields', response.data.fields);
+          this.saveTimeSettings(response.data.time);
+        });
         this.loaderService.show();
         this.loaderService.displayText.next('Downloading Cases');
         forkJoin({
@@ -182,24 +182,7 @@ export class HomePage implements OnInit {
   }
 
   async logout() {
-    localStorage.removeItem('remote_token');
-    localStorage.removeItem('userdata');
-    localStorage.removeItem('visit_case_data');
-    localStorage.removeItem('detais_case_data')
-    await this.storageService.remove('database_filled');
-    await this.storageService.remove('permissionArray');
-    await this.storageService.remove('isVisitFormSync');
-    await this.storageService.remove('fields');
-    await this.storageService.remove('timeSettings');
-    await this.storageService.remove('visit_form');
-    await this.storageService.remove('filters');
-    await this.storageService.remove('fee_options');
-    await this.storageService.remove('visitOutcomes');
-    await this.storageService.remove('downloadStatus');
-    await this.storageService.remove('historyDownloadStatus');
-    await this.storageService.remove('caseId');
-    await this.storageService.remove('not_reload_map');
-    await this.storageService.remove('permissionAsked');
+    
     this.databaseService.clearData();
     this.router.navigate(['/login']);
   }
