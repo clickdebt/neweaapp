@@ -5,6 +5,9 @@
     </ion-buttons>
     <ion-title>#{{currentCaseData.id}}</ion-title>
     <ion-buttons slot="end">
+      <ion-button size="small" color="secondary" (click)="doRefresh()">
+        <ion-icon size="large" name="refresh-circle-outline"></ion-icon>
+      </ion-button>
       <ion-button size="small" color="secondary" (click)="presentActionSheet()">
         Actions
       </ion-button>

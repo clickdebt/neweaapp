@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite } from '@ionic-native/sqlite/ngx';
 import { Platform } from '@ionic/angular';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
 import { browserDBInstance } from './browserdb';
 import { CaseService } from './case.service';
 import { NetworkService } from './network.service';
@@ -188,7 +188,7 @@ export class DatabaseService {
     return this.executeQuery(query);
   }
 
-  async setCases(data, linked) {
+  async setCases(data, linked, allCases) {
     // const cases = this.parseCaseData(data, linked);
     const sql = [];
     const sqlLinked = [];
@@ -220,7 +220,7 @@ export class DatabaseService {
     sqlStart += sql.join(',');
 
     linked.forEach((values) => {
-      
+
       sqlLinked.push(`(${values.id}, "${values.ref}", ${values.scheme_id}, ${values.debtor_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
@@ -230,10 +230,21 @@ export class DatabaseService {
           "${encodeURI(JSON.stringify(values))}")`);
     });
     sqlLinkedStart += sqlLinked.join(',');
-
     const promiseArray = [];
-    promiseArray.push(this.executeQuery(sqlStart));
-    promiseArray.push(this.executeQuery(sqlLinkedStart));
+
+    if (allCases) {
+      const delQuery = 'delete from rdebt_cases where id not in (' + allCases.join(',') + ')';
+      promiseArray.push(this.executeQuery(delQuery));
+      const delHistoryQuery = 'delete from history where caseid not in (' + allCases.join(',') + ')';
+      promiseArray.push(this.executeQuery(delHistoryQuery));
+    }
+
+    if (data.length) {
+      promiseArray.push(this.executeQuery(sqlStart));
+    }
+    if (linked.length) {
+      promiseArray.push(this.executeQuery(sqlLinkedStart));
+    }
     await Promise.all(promiseArray)
       .then((res: any) => {
         console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
@@ -293,9 +304,12 @@ export class DatabaseService {
         WHERE id = ${currentCase.id}`;
         promiseArray.push(this.executeQuery(sqlStart));
       }
-
-      await this.storeToSqlite('history', data.history);
-      await this.setvisitOutcomes(data.exitCodeData);
+      if (data.history && (data.history).length) {
+        await this.storeToSqlite('history', data.history);
+      }
+      if (data.exitCodeData) {
+        await this.setvisitOutcomes(data.exitCodeData);
+      }
       await Promise.all(promiseArray)
         .then((res: any) => {
           // console.log(res);
@@ -357,6 +371,21 @@ export class DatabaseService {
     return await this.storageService.get('historyDownloadStatus');
   }
 
+  async refreshData(params) {
+    return new Promise((resolve, reject) => {
+      forkJoin({
+        cases: this.caseService.getCases(params, 1),
+        caseDetails: this.caseService.getCaseDetails(params)
+      }).subscribe(async (response: any) => {
+        await this.setCases(response.cases.data, response.cases.linked, response.cases.allCases);
+        await this.setcaseDetails(response.caseDetails);
+        resolve(response);
+      }, (error) => {
+        reject(error)
+      });
+    });
+  }
+
   async getOfflinecaseDetails(id) {
     const caseDetails: any = {
     };
@@ -364,14 +393,18 @@ export class DatabaseService {
 
     let result = await this.executeQuery(query);
     let finalResult = await this.extractResult(result);
+    if (finalResult && finalResult.length) {
+      caseDetails.data = this.getDecodeString(finalResult[0].data);
+      caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
 
-    caseDetails.data = this.getDecodeString(finalResult[0].data);
-    caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
+      query = `select * from history where caseid = ${id} order by id desc`;
+      result = await this.executeQuery(query);
+      finalResult = await this.extractResult(result);
+      caseDetails.history = finalResult;
+    } else {
+      caseDetails.deleted = true;
+    }
 
-    query = `select * from history where caseid = ${id} order by id desc`;
-    result = await this.executeQuery(query);
-    finalResult = await this.extractResult(result);
-    caseDetails.history = finalResult;
 
     return caseDetails;
   }
@@ -433,7 +466,7 @@ export class DatabaseService {
   }
 
   getcaseDetailsData(case_id) {
-    this.caseService.getCaseDetailById(case_id).subscribe((data) => {
+    this.caseService.getCaseDetails({ case_id: case_id }).subscribe((data) => {
       this.setcaseDetails(data);
     })
   }
