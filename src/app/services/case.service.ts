@@ -28,14 +28,16 @@ export class CaseService {
     return this.http.get(apiURL);
   }
 
-  getCaseDetails(page, limit) {
-    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_case_details?nonblocking=1&limit=' + limit + '&page=' + page;
+  getCaseDetails(params) {
+    let apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_case_details?nonblocking=1';
+    for (let key in params) {
+      if (params.hasOwnProperty(key) && params[key] !== '') {
+        apiURL += '&' + key + '=' + params[key];
+      }
+    }
     return this.http.get(apiURL);
   }
-  getCaseDetailById(caseId) {
-    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_case_details?nonblocking=1&case_id=' + caseId;
-    return this.http.get(apiURL);
-  }
+
   getFilterMasterData() {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/filter';
     return this.http.get(apiURL);

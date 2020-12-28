@@ -465,7 +465,7 @@ export class JobListPage implements OnInit {
       if (response) {
         console.log(response);
 
-        await this.databaseService.setCases(response.data, response.linked);
+        await this.databaseService.setCases(response.data, response.linked, response.allCases);
         this.caseService.getFilterMasterData().subscribe(async (data: any) => {
           await this.databaseService.setFilterMasterData(data.data);
         });
@@ -475,6 +475,19 @@ export class JobListPage implements OnInit {
         });
       }
     });
+  }
+  async doRefresh(event: any = '') {
+    const downloadStatus = await this.databaseService.getDownloadStatus();
+    if (downloadStatus) {
+      const params = { last_update_date: downloadStatus.time };
+      this.databaseService.refreshData(params).then((res: any) => {
+        console.log('res');
+        this.filterCases();
+        if (event)
+          event.target.complete();
+
+      })
+    }
   }
   async openPanicModal() {
     const selectedCase = this.cases.filter((c) => c.id === this.selectedCaseIds[0]);

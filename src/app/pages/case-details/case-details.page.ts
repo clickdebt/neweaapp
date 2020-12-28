@@ -115,7 +115,7 @@ export class CaseDetailsPage implements OnInit {
       this.dataReady = true;
     } else {
       this.databaseService.getDetailsDownloadState().subscribe(res => {
-        if(res) {
+        if (res) {
           this.dataReady = true;
           this.loadInitData();
         }
@@ -199,44 +199,48 @@ export class CaseDetailsPage implements OnInit {
   async getOfflinecaseDetails() {
 
     const result = await this.databaseService.getOfflinecaseDetails(this.currentCaseData.id);
+    if (result.deleted) {
+      this.commonService.showToast('Case no longer allocated to you.');
+      this.router.navigate(['/home/job-list']);
+    } else {
+      this.caseDetails.history = result.history;
+      let custom_data = JSON.parse(result.data.custom_data);
+      let custArr: any = [];
+      custom_data = Object.values(custom_data);
 
-    this.caseDetails.history = result.history;
-    let custom_data = JSON.parse(result.data.custom_data);
-    let custArr: any = [];
-    custom_data = Object.values(custom_data);
+      custom_data.forEach(element => {
+        if (!isArray(element)) {
+          custArr[element.field_name] = element.field_value
+        }
+      });
+      this.caseDetails.case_custom_data = custArr;
+      this.caseDetails.data = result.data;
 
-    custom_data.forEach(element => {
-      if (!isArray(element)) {
-        custArr[element.field_name] = element.field_value
-      }
-    });
-    this.caseDetails.case_custom_data = custArr;
-    this.caseDetails.data = result.data;
+      this.getCaseSchemeSpecificData = [
+        { 'label': 'Offence Description', 'value': result.data.offense },
+        { 'label': 'Offence Time', 'value': custArr.offense_time },
+        { 'label': 'Offence Date', 'value': result.data.offense_date },
+        { 'label': 'Offence Code', 'value': custArr.offense_code },
+        { 'label': 'Offence Location', 'value': result.data.offense_add1 },
+        { 'label': 'Offence Address Line2', 'value': result.data.offense_add2 },
+        { 'label': 'Offence Address Line 3', 'value': result.data.offense_add3 },
+        { 'label': 'Offence Line 4', 'value': result.data.offense_add4 },
+        { 'label': 'Offense Postcode', 'value': result.data.offense_postcode },
+      ]
+      this.caseDetails.history.sort((a, b) => {
+        if (new Date(a.time) > new Date(b.time)) {
+          return -1;
+        } else if (new Date(a.time) < new Date(b.time)) {
+          return 1;
+        }
+        return 0;
+      });
+      this.historyData = this.caseDetails.history;
+      let actionArr = this.historyData.map(x => x.type)
+      this.historyTypes = [...new Set(actionArr)];
 
-    this.getCaseSchemeSpecificData = [
-      { 'label': 'Offence Description', 'value': result.data.offense },
-      { 'label': 'Offence Time', 'value': custArr.offense_time },
-      { 'label': 'Offence Date', 'value': result.data.offense_date },
-      { 'label': 'Offence Code', 'value': custArr.offense_code },
-      { 'label': 'Offence Location', 'value': result.data.offense_add1 },
-      { 'label': 'Offence Address Line2', 'value': result.data.offense_add2 },
-      { 'label': 'Offence Address Line 3', 'value': result.data.offense_add3 },
-      { 'label': 'Offence Line 4', 'value': result.data.offense_add4 },
-      { 'label': 'Offense Postcode', 'value': result.data.offense_postcode },
-    ]
-    this.caseDetails.history.sort((a, b) => {
-      if (new Date(a.time) > new Date(b.time)) {
-        return -1;
-      } else if (new Date(a.time) < new Date(b.time)) {
-        return 1;
-      }
-      return 0;
-    });
-    this.historyData = this.caseDetails.history;
-    let actionArr = this.historyData.map(x => x.type)
-    this.historyTypes = [...new Set(actionArr)];
-
-    this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
+      this.historyFilterData = this.historyData.slice(0, this.historyDataIndex);
+    }
   }
 
   async showVisitDetails(history) {
@@ -470,17 +474,15 @@ export class CaseDetailsPage implements OnInit {
     this.navCtrl.back();
   }
 
-  doRefresh(event) {
-    if (this.networkService.getCurrentNetworkStatus() === 1) {
-      this.caseService.getCaseDetailById(this.caseId).subscribe((data) => {
-        this.databaseService.setcaseDetails(data).then(() => {
-          this.loadInitData();
-          event.target.complete();
-        })
-      });
-    } else {
-      event.target.complete();
-    }
+  doRefresh(event: any = '') {
+    this.databaseService.refreshData({ 'cases': this.caseId }).then((res: any) => {
+      console.log('res');
+
+      this.loadInitData();
+      if (event)
+        event.target.complete();
+
+    })
   }
 
   ionViewWillLeave() {
