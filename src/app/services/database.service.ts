@@ -18,6 +18,7 @@ export class DatabaseService {
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private detailsReady: BehaviorSubject<boolean>;
+  public lastUpdateTime: BehaviorSubject<any> = new BehaviorSubject(false);
   linkedIds = [];
   version = 4;
   tables = ['rdebt_cases', 'rdebt_linked_cases', 'history', 'api_calls'];
@@ -36,13 +37,9 @@ export class DatabaseService {
     this.platform.ready().then(async () => {
 
       if (!this.platform.is('android') || !this.platform.is('ios')) {
-        console.log('window');
-
         let db = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
         this.database = browserDBInstance(db);
       } else {
-        console.log('app');
-
         this.database = await this.sqlite.create({
           name: 'fieldAgentV3.db',
           location: 'default',
@@ -64,9 +61,6 @@ export class DatabaseService {
           })
         }
       });
-      this.isApiPending.subscribe(res => {
-        this.savePendingApi(res);
-      })
 
     }).catch((error) => { });
   }
@@ -247,7 +241,6 @@ export class DatabaseService {
     }
     await Promise.all(promiseArray)
       .then((res: any) => {
-        console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
         // console.log(res);
       })
       .catch((error) => { });
@@ -294,8 +287,6 @@ export class DatabaseService {
   }
   async setcaseDetails(data) {
     try {
-      console.log(data);
-
       const promiseArray = [];
       for (const currentCase of data.cases) {
         // console.log(currentCase);
@@ -312,6 +303,7 @@ export class DatabaseService {
       }
       await Promise.all(promiseArray)
         .then((res: any) => {
+          return res;
           // console.log(res);
         })
         .catch((error) => {
@@ -354,7 +346,9 @@ export class DatabaseService {
   getDetailsDownloadState() {
     return this.detailsReady.asObservable();
   }
-
+  setlastUpdateTime(val) {
+    return this.lastUpdateTime.next(val);
+  }
   public getStoredApiStatus(): Observable<boolean> {
     return this.isApiPending.asObservable();
   }
@@ -379,11 +373,25 @@ export class DatabaseService {
       }).subscribe(async (response: any) => {
         await this.setCases(response.cases.data, response.cases.linked, response.cases.allCases);
         await this.setcaseDetails(response.caseDetails);
+        await this.updateLastUpdatedDates();
         resolve(response);
       }, (error) => {
         reject(error)
       });
     });
+  }
+
+  async updateLastUpdatedDates() {
+    const time = moment().format('YYYY-MM-DD HH:mm:ss');
+    await this.setDownloadStatus({
+      status: true,
+      time: time
+    });
+    await this.setHistoryDownloadStatus({
+      status: true,
+      time: time
+    });
+    await this.setlastUpdateTime(time);
   }
 
   async getOfflinecaseDetails(id) {
@@ -422,14 +430,12 @@ export class DatabaseService {
   }
 
   changeIsApiPending(val) {
-    console.log('va', val);
-
     this.isApiPending.next(val);
   }
   checkApiPending() {
     this.getApiStored().then(data => {
       if (data.rows.length > 0) {
-        this.isApiPending.next(true);
+        this.changeIsApiPending(true);
       }
     })
   }
@@ -446,14 +452,13 @@ export class DatabaseService {
       this.getApiStored().then(async (data) => {
         const arr = [];
         if (data) {
-          var currentFormData;
           for (let i = 0; i < data.rows.length; i++) {
-            currentFormData = data.rows.item(i);
+            const currentFormData = data.rows.item(i);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
             let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
             if (callResponse) {
               this.markApiCallSuccess(currentFormData.id);
-              this.getcaseDetailsData(currentFormData.case_id)
+              this.refreshData({ 'cases': currentFormData.case_id })
             }
           }
         }
@@ -463,12 +468,6 @@ export class DatabaseService {
 
   async callHttpApi(type, url, data) {
     return await this.http.request(type, url, data).toPromise();
-  }
-
-  getcaseDetailsData(case_id) {
-    this.caseService.getCaseDetails({ case_id: case_id }).subscribe((data) => {
-      this.setcaseDetails(data);
-    })
   }
 
   async clearData() {
@@ -493,7 +492,7 @@ export class DatabaseService {
     this.tables.forEach(async element => {
       let checkSync = ' ;';
       if (element == 'visit_reports' || element == 'api_calls') {
-        checkSync = 'where is_sync=1';
+        checkSync = ' where is_sync=1';
       }
       const deleteQuery = 'delete from ' + element + checkSync;
       let a = await this.database.executeSql(deleteQuery);

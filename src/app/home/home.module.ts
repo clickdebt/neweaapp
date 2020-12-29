@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { HomePageRoutingModule } from './home-routing.module';
 
 import { HomePage } from './home.page';
-import { DatabaseService } from '../services';
+// import { DatabaseService } from '../services';
 import { PanicModalPageModule } from '../pages/panic-modal/panic-modal.module';
 import { TimerPageModule } from '../pages/timer/timer.module';
 import { VisitFormPageModule } from '../pages/visit-form/visit-form.module';
@@ -23,6 +23,6 @@ import { VisitFormPageModule } from '../pages/visit-form/visit-form.module';
     TimerPageModule
   ],
   declarations: [HomePage],
-  providers: [DatabaseService]
+  providers: []
 })
 export class HomePageModule { }

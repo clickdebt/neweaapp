@@ -10,6 +10,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import * as moment from 'moment';
 declare var google;
 import { NetworkService } from 'src/app/services/network.service';
+import { CaseActionService } from 'src/app/services/case-action.service';
 @Component({
   selector: 'app-visit-form',
   templateUrl: './visit-form.page.html',
@@ -56,6 +57,7 @@ export class VisitFormPage implements OnInit {
     private networkService: NetworkService,
     private alertCtrl: AlertController,
     private navCtrl: NavController,
+    private caseActionService: CaseActionService
   ) { }
 
   ngOnInit() {
@@ -295,7 +297,7 @@ export class VisitFormPage implements OnInit {
   }
   async onSubmit(event) {
 
-
+    this.linked = [];
     if (this.visitCaseData.linked_cases && this.visitCaseData.linked_cases.length) {
       this.visitCaseData.linked_cases.forEach(element => {
         this.linked.push({
@@ -352,7 +354,6 @@ export class VisitFormPage implements OnInit {
       console.log(visit_outcome);
       event.data.visit_outcome = visit_outcome.name;
     }
-
     const visit_report_data = {
       form_data: event.data,
       payment_data: this.paymentInfo,
@@ -371,21 +372,15 @@ export class VisitFormPage implements OnInit {
     console.log(form_data);
     const visitFormData = [
       { name: 'case_id', value: this.caseId },
-      { name: 'url', value: '' },
-      { name: 'data', value: `'${encodeURI(JSON.stringify(form_data))}'` },
-      { name: 'created_at', value: `'${moment().format('YYYY-MM-DD hh:mm:ss')}'` },
+      { name: 'url', value: 'b/system/v3/forms/create' },
+      { name: 'type', value: `post` },
+      { name: 'data', value: `${encodeURI(JSON.stringify(form_data))}` },
+      { name: 'is_sync', value: 0 },
+      { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
     ];
 
-    visitFormData.push({ name: 'is_sync', value: 0 });
-    this.databaseService.insert('api_calls', visitFormData).then(async (data) => {
-      await this.storageService.set('isVisitFormSync', false);
-      this.commonService.showToast('Data Saved Locally.');
-      this.router.navigate(['/home/job-list']);
-    }, (error) => {
-      console.log(error);
-      
-    });
-
+    this.caseActionService.saveActionOffline('api_calls', visitFormData);
+    this.router.navigate(['/home/job-list']);
   }
   ionViewWillLeave() {
     this.storageService.remove('caseId');

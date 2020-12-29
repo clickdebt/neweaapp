@@ -476,8 +476,6 @@ export class CaseDetailsPage implements OnInit {
 
   doRefresh(event: any = '') {
     this.databaseService.refreshData({ 'cases': this.caseId }).then((res: any) => {
-      console.log('res');
-
       this.loadInitData();
       if (event)
         event.target.complete();
