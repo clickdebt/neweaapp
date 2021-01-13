@@ -33,6 +33,8 @@ import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { VisitDetailsModule } from './pages/visit-details/visit-details.module';
 import { LoaderPageModule } from './pages/loader/loader.module';
+import { CaseDetailsPageModule } from './pages/case-details/case-details.module';
+import { FeeCalculatorPageModule } from './pages/fee-calculator/fee-calculator.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -53,6 +55,8 @@ import { LoaderPageModule } from './pages/loader/loader.module';
     TakePaymentPageModule,
     AuthorizeCardPageModule,
     ArrangementModalPageModule,
+    FeeCalculatorPageModule,
+    CaseDetailsPageModule,
     VisitDetailsModule,
     LoaderPageModule
   ],

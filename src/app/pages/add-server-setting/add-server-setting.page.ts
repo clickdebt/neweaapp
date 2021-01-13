@@ -35,7 +35,9 @@ export class AddServerSettingPage implements OnInit {
     this.url_array = [];
     this.submitted = true;
     if (this.settingForm.controls['company_code'].valid) {
+      this.commonService.showLoader();
       this.settingsService.loadServerSettings(this.settingForm.controls['company_code'].value).subscribe(res => {
+        this.commonService.dismissLoader();
         if (res['data'] && res['data'].length) {
           const settings = JSON.parse(res['data'][0].server_settings);
           for (let key in settings) {
@@ -47,6 +49,7 @@ export class AddServerSettingPage implements OnInit {
             }
           }
         } else {
+          this.commonService.dismissLoader();
           this.commonService.showToast('Invalid company code', 'danger');
         }
       });

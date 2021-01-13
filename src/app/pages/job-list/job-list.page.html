@@ -6,7 +6,7 @@
           (keyup.enter)="filterCases()" (ionCancel)="filterCases()" placeholder="Search ID, ref, postcode, name">
         </ion-searchbar>
       </ion-col>
-      <ion-col size-xs="4" *ngIf="isMobile" >
+      <ion-col size-xs="4" *ngIf="isMobile">
         <ion-button color="secondary" size="small" (click)="filterCases()">
           Search
         </ion-button>
@@ -17,7 +17,7 @@
           </ion-checkbox>
           <ion-label class="ion-margin-horizontal"> All</ion-label>
         </ion-button>
-        <ion-button *ngIf="!isMobile"  color="secondary" size="small" (click)="filterCases()">
+        <ion-button *ngIf="!isMobile" color="secondary" size="small" (click)="filterCases()">
           Search
         </ion-button>
         <ion-button color="secondary" size="small" (click)="showFilterDiv()">
@@ -360,10 +360,9 @@
         <ion-grid class="m-t-10">
           <ion-row>
             <ion-col *ngFor="let caseField of caseFields" size="6">
-              <span *ngIf="getCaseFieldValue(case,caseField.field)">
-                <span class="font-weight-bold font-16 text-nowrap">{{caseField.label}} :</span>
-                <span class="font-16 text-color-light text-nowrap"
-                  [innerHTML]="getCaseFieldValue(case,caseField.field)"></span>
+              <span *ngIf="getCaseFieldValue(case,caseField.field) != undefined">
+                <span class="d-block color-primary">{{caseField.label}}</span>
+                <span class="d-block" [innerHTML]="getCaseFieldValue(case,caseField.field)"></span>
               </span>
             </ion-col>
             <!-- <ion-col size="6">
@@ -428,10 +427,14 @@
               <ion-grid class="m-t-10">
                 <ion-row>
                   <ion-col *ngFor="let caseField of caseFields" size="6">
-                    <span *ngIf="getLinkedCaseFieldValue(link_case,caseField.field)">
+                    <!-- <span *ngIf="getLinkedCaseFieldValue(link_case,caseField.field)">
                       <span class="font-weight-bold font-16 text-nowrap"> {{caseField.label}} :</span>
                       <span class="font-16 text-color-light text-nowrap"
                         [innerHTML]="getLinkedCaseFieldValue(link_case,caseField.field)"></span>
+                    </span> -->
+                    <span *ngIf="getLinkedCaseFieldValue(link_case,caseField.field) != undefined">
+                      <span class="d-block color-primary">{{caseField.label}}</span>
+                      <span class="d-block" [innerHTML]="getLinkedCaseFieldValue(link_case,caseField.field)"></span>
                     </span>
                   </ion-col>
                   <!-- <ion-col size="6">

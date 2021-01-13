@@ -28,6 +28,7 @@ export class HomePage implements OnInit {
   limit = 50;
   downloading = false;
   last_updated_date = '';
+  showRefreshingData = false;
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -51,7 +52,10 @@ export class HomePage implements OnInit {
     this.startBackgroundEvent();
     this.databaseService.lastUpdateTime.subscribe(date => {
       this.last_updated_date = date;
-    })
+    });
+    this.databaseService.refreshingData.subscribe(refreshingData => {
+      this.showRefreshingData = refreshingData;
+    });
   }
 
   ionViewWillEnter() {

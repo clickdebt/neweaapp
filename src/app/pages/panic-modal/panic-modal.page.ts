@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { CommonService, StorageService } from 'src/app/services';
+import { CommonService, DatabaseService, StorageService } from 'src/app/services';
 import { SosService } from 'src/app/services/sos.service';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Router } from '@angular/router';
@@ -38,7 +38,8 @@ export class PanicModalPage implements OnInit, OnDestroy {
     private sosService: SosService,
     private geolocation: Geolocation,
     private storageService: StorageService,
-    private router: Router
+    private router: Router,
+    private databaseService: DatabaseService
   ) {
   }
 
@@ -55,7 +56,8 @@ export class PanicModalPage implements OnInit, OnDestroy {
       this.getTimerDetails();
     }
     if (!this.selectedCase && this.router.routerState.snapshot.url.includes('case-details')) {
-      this.selectedCase = JSON.parse(localStorage.getItem('detais_case_data'));
+      // this.selectedCase = JSON.parse(localStorage.getItem('detais_case_data'));
+      this.selectedCase = await this.databaseService.getCaseInfo(this.selectedCase.id);
     }
     if (this.selectedCase) {
       this.setCaseDetails();

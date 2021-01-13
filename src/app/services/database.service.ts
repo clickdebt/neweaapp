@@ -17,6 +17,7 @@ export class DatabaseService {
   private database: any;
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public refreshingData: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private detailsReady: BehaviorSubject<boolean>;
   public lastUpdateTime: BehaviorSubject<any> = new BehaviorSubject(false);
   linkedIds = [];
@@ -163,6 +164,41 @@ export class DatabaseService {
     } catch (error) {
       // console.log('error', error, query);
     }
+  }
+
+  async getCaseInfo(id) {
+    let query = `select * from rdebt_cases where id = ${id} and 1=1`;
+    let result = await this.executeQuery(query);
+    result = await this.extractResult(result);
+    if (result) {
+      let finalData = result[0];
+      finalData = JSON.parse(decodeURI(finalData.data));
+      finalData = await this.getLinkedCases(finalData);
+      return finalData;
+    } else {
+      return '';
+    }
+  }
+  async getLinkedCases(item) {
+    let query = 'select * from rdebt_linked_cases where (manual_link_id = ? or debtor_id = ? )and id != ?';
+    let p = [item.manual_link_id, item.debtor_id, item.id];
+    const results: any[] = [];
+
+    await this.executeQuery(query, p).then((data) => {
+      let link_item;
+      for (let i = 0; i < data.rows.length; i++) {
+        link_item = data.rows.item(i);
+        link_item.data = JSON.parse(decodeURI(link_item.data));
+        this.linkedIds.push(link_item.data.id);
+        results.push(link_item.data);
+      }
+      item.linked_cases = results;
+      item.linkedCasesTotalBalance = item.linked_cases.reduce((accumulator, currentValue) => {
+        return accumulator + parseFloat(currentValue.d_outstanding);
+      }, 0);
+      item.linkedCasesTotalBalance = item.linkedCasesTotalBalance.toFixed(2);
+    });
+    return item;
   }
 
   async insert(tableName, params = []) {
@@ -367,6 +403,7 @@ export class DatabaseService {
 
   async refreshData(params) {
     return new Promise((resolve, reject) => {
+      this.refreshingData.next(true);
       forkJoin({
         cases: this.caseService.getCases(params, 1),
         caseDetails: this.caseService.getCaseDetails(params)
@@ -392,6 +429,7 @@ export class DatabaseService {
       time: time
     });
     await this.setlastUpdateTime(time);
+    await this.refreshingData.next(false);
   }
 
   async getOfflinecaseDetails(id) {
@@ -405,7 +443,7 @@ export class DatabaseService {
       caseDetails.data = this.getDecodeString(finalResult[0].data);
       caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
 
-      query = `select * from history where caseid = ${id} order by id desc`;
+      query = `select * from history where caseid = ${id} order by time desc`;
       result = await this.executeQuery(query);
       finalResult = await this.extractResult(result);
       caseDetails.history = finalResult;
@@ -443,8 +481,8 @@ export class DatabaseService {
     const query = "select * from api_calls where is_sync = 0"
     return this.executeQuery(query, []);
   }
-  markApiCallSuccess(id) {
-    const updateQuery = `update api_calls set is_sync = 1 where id = ${id}`;
+  changeApiCallStatus(id, status = 1) {
+    const updateQuery = `update api_calls set is_sync = ${status} where id = ${id}`;
     return this.executeQuery(updateQuery);
   }
   async savePendingApi(val) {
@@ -454,11 +492,16 @@ export class DatabaseService {
         if (data) {
           for (let i = 0; i < data.rows.length; i++) {
             const currentFormData = data.rows.item(i);
+            this.changeApiCallStatus(currentFormData.id, 2);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
             let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
+            console.log(callResponse);
+
             if (callResponse) {
-              this.markApiCallSuccess(currentFormData.id);
+              this.changeApiCallStatus(currentFormData.id, 1);
               this.refreshData({ 'cases': currentFormData.case_id })
+            } else {
+              this.changeApiCallStatus(currentFormData.id, 0);
             }
           }
         }

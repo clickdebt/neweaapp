@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { NetworkService } from 'src/app/services/network.service';
 import { CaseActionService } from 'src/app/services/case-action.service';
-import { StorageService, CommonService } from 'src/app/services';
+import { StorageService, CommonService, DatabaseService } from 'src/app/services';
 import * as moment from 'moment';
 @Component({
   selector: 'app-take-payment',
@@ -29,7 +29,7 @@ export class TakePaymentPage implements OnInit {
     private caseDetailsService: CaseDetailsService,
     private networkService: NetworkService,
     private caseActionService: CaseActionService,
-    private storageService: StorageService
+    private databaseService: DatabaseService
   ) {
     this.caseId = navParams.get('caseId');
     this.debtorId = navParams.get('debtorId');
@@ -63,9 +63,10 @@ export class TakePaymentPage implements OnInit {
       town: ['', [Validators.required]]
     });
   }
-  getDebtorData() {
-    if (localStorage.getItem('detais_case_data')) {
-      let currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
+  async getDebtorData() {
+    const data = await this.databaseService.getCaseInfo(this.caseId);
+    if (data) {
+      let currentCaseData = data;
       const debtorData = currentCaseData.debtor;
       this.paymentsForm.patchValue({
         debtor_name: debtorData.debtor_name,

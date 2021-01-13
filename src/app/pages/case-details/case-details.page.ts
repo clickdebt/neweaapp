@@ -87,6 +87,7 @@ export class CaseDetailsPage implements OnInit {
 
   };
   dataReady = false;
+  fromVisit = false;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -104,11 +105,24 @@ export class CaseDetailsPage implements OnInit {
     private actionSheetController: ActionSheetController
   ) { }
 
-  ngOnInit() {
-  }
-
-  async ionViewWillEnter() {
+  async ngOnInit() {
     this.caseId = this.route.snapshot.params.id;
+    this.fromVisit = false;
+    if (this.caseId == undefined) {
+      this.caseId = await this.storageService.get('caseId');
+      this.storageService.remove('caseId')
+      if(this.caseId)
+        this.fromVisit = true;
+    }
+    
+    this.databaseService.lastUpdateTime.subscribe(date => {
+      this.loadInitData();
+    })
+  }
+  dismiss() {
+    this.modalCtrl.dismiss();
+  }
+  async ionViewWillEnter() {
     this.fromVrmSearch = localStorage.getItem('from_vrm');
     const downloadStatus = await this.databaseService.getHistoryDownloadStatus();
     if (downloadStatus && downloadStatus.status) {
@@ -121,7 +135,7 @@ export class CaseDetailsPage implements OnInit {
         }
       })
     }
-    this.loadInitData();
+    // this.loadInitData();
 
     // this.actionList();
   }
@@ -175,8 +189,9 @@ export class CaseDetailsPage implements OnInit {
 
   async loadInitData() {
 
-    if (localStorage.getItem('detais_case_data')) {
-      this.currentCaseData = JSON.parse(localStorage.getItem('detais_case_data'));
+    const data = await this.databaseService.getCaseInfo(this.caseId);
+    if (data) {
+      this.currentCaseData = data;
       if (this.currentCaseData.linked_cases && this.currentCaseData.linked_cases.length) {
         const linkedCasesTotalBalance = parseFloat(this.currentCaseData.d_outstanding)
           + this.currentCaseData.linked_cases.reduce((accumulator, currentValue) => {
@@ -215,13 +230,14 @@ export class CaseDetailsPage implements OnInit {
       });
       this.caseDetails.case_custom_data = custArr;
       this.caseDetails.data = result.data;
+console.log(this.caseDetails);
 
       this.getCaseSchemeSpecificData = [
         { 'label': 'Offence Description', 'value': result.data.offense },
         { 'label': 'Offence Time', 'value': custArr.offense_time },
         { 'label': 'Offence Date', 'value': result.data.offense_date },
         { 'label': 'Offence Code', 'value': custArr.offense_code },
-        { 'label': 'Offence Location', 'value': result.data.offense_add1 },
+        { 'label': 'Offence Location', 'value': this.caseDetails.case_custom_data.offence_location ? this.caseDetails.case_custom_data.offence_location : result.data.offense_add1 },
         { 'label': 'Offence Address Line2', 'value': result.data.offense_add2 },
         { 'label': 'Offence Address Line 3', 'value': result.data.offense_add3 },
         { 'label': 'Offence Line 4', 'value': result.data.offense_add4 },

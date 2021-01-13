@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { VisitService, CaseService, DatabaseService } from 'src/app/services';
 import { StorageService } from 'src/app/services/storage.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, AlertController, NavController } from '@ionic/angular';
+import { ModalController, AlertController, NavController, ActionSheetController } from '@ionic/angular';
 import { CommonService } from 'src/app/services';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
@@ -11,6 +11,12 @@ import * as moment from 'moment';
 declare var google;
 import { NetworkService } from 'src/app/services/network.service';
 import { CaseActionService } from 'src/app/services/case-action.service';
+import { AddNoteModalPage } from '../add-note-modal/add-note-modal.page';
+import { AddFeeModalPage } from '../add-fee-modal/add-fee-modal.page';
+import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
+import { TakePaymentPage } from '../take-payment/take-payment.page';
+import { CaseDetailsPage } from '../case-details/case-details.page';
+import { FeeCalculatorPage } from '../fee-calculator/fee-calculator.page';
 @Component({
   selector: 'app-visit-form',
   templateUrl: './visit-form.page.html',
@@ -44,6 +50,56 @@ export class VisitFormPage implements OnInit {
   linked = [];
   linked_cases_to_visit = [];
   isNewlyn = false;
+  actionListArray: any = {
+    'add_note': {
+      text: 'Add Note',
+      handler: () => {
+        this.addNote();
+      }
+    },
+    'add_fee': {
+      text: 'Add Fee',
+      handler: () => {
+        this.addFee();
+      }
+    },
+    'arrangement': {
+      text: 'Arrangement',
+      handler: () => {
+        this.addArrangement();
+      }
+    },
+    'deallocate_case': {
+      text: 'Deallocate case',
+      handler: () => {
+        this.deallocateCase();
+      }
+    },
+    'upload_document': {
+      text: 'Upload Document',
+      handler: () => {
+        this.uploadDocument();
+      }
+    },
+    'take_payment': {
+      text: 'Take Payment',
+      handler: () => {
+        this.takePayment();
+      }
+    },
+    'view_financials': {
+      text: 'Financial Details',
+      handler: () => {
+        this.viewFinancials();
+      }
+    },
+    'fee_calculations': {
+      text: 'Fee Calculations',
+      handler: () => {
+        this.seeFeeCalculations();
+      }
+    }
+  };
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -57,7 +113,8 @@ export class VisitFormPage implements OnInit {
     private networkService: NetworkService,
     private alertCtrl: AlertController,
     private navCtrl: NavController,
-    private caseActionService: CaseActionService
+    private caseActionService: CaseActionService,
+    private actionSheetController: ActionSheetController
   ) { }
 
   ngOnInit() {
@@ -75,7 +132,8 @@ export class VisitFormPage implements OnInit {
 
   async ionViewWillEnter() {
     this.caseId = this.route.snapshot.params.id;
-    this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'));
+    // this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'));
+    this.visitCaseData = await this.databaseService.getCaseInfo(this.caseId);
     this.isNewlyn = this.commonService.isClient('newlyn');
     this.commonService.checkLocation();
     this.getLocation();
@@ -85,7 +143,7 @@ export class VisitFormPage implements OnInit {
     visitFrom.data = await this.storageService.get('visit_form');
     this.visitOutcome = await this.storageService.get('visitOutcomes');
     this.visitOutcome = Object.values(this.visitOutcome);
-    console.log(this.visitOutcome);
+    // console.log(this.visitOutcome);
 
     if (!this.visitOutcome) {
       this.visitOutcome = [];
@@ -384,5 +442,196 @@ export class VisitFormPage implements OnInit {
   }
   ionViewWillLeave() {
     this.storageService.remove('caseId');
+  }
+  async presentActionSheet() {
+    let buttons = [{
+      text: 'Cancel',
+      role: 'cancel',
+      handler: () => {
+        console.log('Delete clicked');
+      }
+    }];
+    const isNewlyn = this.commonService.isClient('newlyn');
+    if (isNewlyn) {
+      buttons.push(this.actionListArray['add_note']);
+      buttons.push(this.actionListArray['add_fee']);
+      buttons.push(this.actionListArray['view_financials']);
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddArrangement)) {
+        buttons.push(this.actionListArray['arrangement']);
+      }
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.DeAllocate)) {
+        buttons.push(this.actionListArray['deallocate_case']);
+      }
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.Document)) {
+        buttons.push(this.actionListArray['upload_document']);
+      }
+      if (1 || await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
+        buttons.push(this.actionListArray['take_payment']);
+      }
+    } else {
+      buttons.push(this.actionListArray['add_note']);
+      buttons.push(this.actionListArray['add_fee']);
+      buttons.push(this.actionListArray['view_financials']);
+      buttons.push(this.actionListArray['fee_calculations']);
+      buttons.push(this.actionListArray['arrangement']);
+      buttons.push(this.actionListArray['deallocate_case']);
+      buttons.push(this.actionListArray['upload_document']);
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Actions',
+        cssClass: 'my-custom-class',
+        buttons: buttons
+      });
+      await actionSheet.present();
+    }
+  }
+
+  async addNote() {
+    const AddNoteModal = await this.modalCtrl.create({
+      component: AddNoteModalPage,
+      componentProps: {
+        caseId: this.caseId,
+        currentCase: this.visitCaseData
+      }
+    });
+    await AddNoteModal.present();
+  }
+  async addFee() {
+    const AddFeeModal = await this.modalCtrl.create({
+      component: AddFeeModalPage,
+      componentProps: {
+        caseId: this.caseId,
+        currentCase: this.visitCaseData
+      }
+    });
+    await AddFeeModal.present();
+  }
+
+  async uploadDocument() {
+    const uploadDocument = await this.modalCtrl.create({
+      component: UploadDocumentModalPage,
+      componentProps: {
+        caseId: this.caseId,
+      }
+    });
+    await uploadDocument.present();
+  }
+
+  async deallocateCase() {
+    const alert = await this.alertCtrl.create({
+      header: 'Deallocate Case',
+      message: 'Are you sure you want to Deallocate Case?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Save',
+          handler: async () => {
+            const data = {
+              field_agent_id: -1
+            };
+            // if (this.networkService.getCurrentNetworkStatus() == 1) {
+            //   this.caseActionService.deAllocationCase(data, this.caseId).
+            //     subscribe(async (response) => {
+            //       this.storageService.set('is_case_updated', true);
+            //       // TODO
+            //       // let cases = await this.storageService.get('cases');
+            //       // console.log(cases);
+            //       // cases = cases.filter((currentCase) => {
+            //       //   if (currentCase.id === this.caseId) {
+            //       //     return false;
+            //       //   } else {
+            //       //     if (currentCase.linked_cases) {
+            //       //       currentCase.linked_cases = currentCase.linked_cases.filter(linked_case => linked_case.id !== this.caseId);
+            //       //     }
+            //       //     return true;
+            //       //   }
+            //       // });
+            //       // this.storageService.set('cases', cases);
+            //       // localStorage.removeItem('detais_case_data');
+            //       // localStorage.setItem('detais_case_data_deallocated', 'true');
+            //       this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
+            //     });
+            // } else {
+            const api_data = [
+              { name: 'case_id', value: `${this.caseId}` },
+              { name: 'url', value: `b/clickdebt_panel_layout/legacy/case_actions_panels/case_actions_change_field_agent/${this.caseId}?source=API` },
+              { name: 'type', value: `post` },
+              { name: 'data', value: `${encodeURI(JSON.stringify(data))}` },
+              { name: 'is_sync', value: 0 },
+              { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+            ]
+            this.caseActionService.saveActionOffline('api_calls', api_data);
+
+            this.storageService.set('is_case_updated', true);
+            this.router.navigate(['/home/job-list'], { state: { updateInfos: true } });
+          }
+
+        }
+        // }
+      ]
+    });
+    await alert.present();
+  }
+  async addPayment() {
+    const AddPaymentModal = await this.modalCtrl.create({
+      component: PaymentModalPage,
+      componentProps: {
+        caseId: this.caseId,
+        isDetailsPage: true
+      }
+    });
+
+    await AddPaymentModal.present();
+  }
+  async takePayment() {
+    const takePaymentModal = await this.modalCtrl.create({
+      component: TakePaymentPage,
+      componentProps: {
+        caseId: this.caseId,
+        debtorId: this.visitCaseData.debtorid,
+        isDetailsPage: true
+      }
+    });
+
+    await takePaymentModal.present();
+  }
+
+  async viewFinancials() {
+    await this.storageService.set('caseId', this.caseId);
+    const viewFinancialsModal = await this.modalCtrl.create({
+      component: CaseDetailsPage,
+      componentProps: {
+        caseId: this.caseId,
+        fromVisit: true
+      }
+    });
+
+    await viewFinancialsModal.present();
+  }
+  async addArrangement() {
+    
+    const AddArrangementModal = await this.modalCtrl.create({
+      component: ArrangementModalPage,
+      componentProps: {
+        caseId: this.caseId,
+        d_outstanding: this.visitCaseData.d_outstanding,
+        isDetailsPage: true,
+        currentCase: this.visitCaseData
+      }
+    });
+    await AddArrangementModal.present();
+  }
+  async seeFeeCalculations() {
+    const feeCalculations = await this.modalCtrl.create({
+      component: FeeCalculatorPage,
+      componentProps: {
+        caseId: this.caseId
+      }
+    });
+    await feeCalculations.present();
   }
 }

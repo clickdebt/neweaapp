@@ -147,11 +147,6 @@ ion-toolbar {
     font-size: 16px;
     width: 80%;
   }
-  ion-col {
-    span {
-      color: #000;
-    }
-  }
   .d-grid {
     display: grid;
   }
@@ -197,4 +192,7 @@ ion-toolbar {
   &.guard {
     background-color: #5fc7c7;
   }
+}
+.color-primary{
+  color: #ce5092;
 }
