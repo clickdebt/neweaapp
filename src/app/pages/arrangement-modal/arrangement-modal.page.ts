@@ -246,7 +246,7 @@ export class ArrangementModalPage implements OnInit {
     finalResult = finalResult[0];
     finalResult.data = this.databaseService.getDecodeString(finalResult.data);
     finalResult.arranagement = this.databaseService.getDecodeString(finalResult.arranagement);
-    this.outstanding = finalResult.d_outstanding;
+    this.baseOutstanding = this.outstanding = finalResult.d_outstanding;
     console.log(this.outstanding);
     
     console.log(finalResult);

@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>Fee Calculations</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col *ngIf="!fromVisit" size-md="8" size-sm="12" size-xs="12">
+        <ion-card class="m-0 h-100">
+          <ion-card-header>
+            <ion-card-subtitle><b>Enforcement Fee Calculations</b></ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid>
+              <ion-row *ngIf="currentCaseData">
+                <ion-col size-md="4" size-sm="12" size-xs="12">
+
+                  <span class="d-block dark"><b>Selected Case</b></span>
+                  <span class="list-item-inline">
+                    <span>Case Id</span>
+                    <span>Outstanding</span>
+                  </span>
+                  <span class="list-item-inline"><span class="color-primary">{{this.caseId}}</span>
+                    <span><b>{{currentCaseData.d_outstanding | number:'0.2-2'}}</b></span>
+                  </span>
+                  <!-- ------------------------------------------------------------------------------------------------------------- -->
+                  <ng-container *ngIf="currentCaseData.linked_cases && currentCaseData.linked_cases.length">
+                    <hr>
+                    <span class="d-block dark mt-15"><b>Linked Cases</b></span>
+                    <span class="list-item-inline">
+                      <span>Case Id</span>
+                      <span>Outstanding</span>
+                    </span>
+                    <span class="list-item-inline" *ngFor="let linked_case of currentCaseData.linked_cases">
+                      <span class="color-primary">{{linked_case.id}}</span>
+                      <span><b>
+                          {{linked_case.d_outstanding | number:'0.2-2'}}
+                        </b></span>
+                    </span>
+                  </ng-container>
+
+                  <hr>
+                  <span class="list-item-inline"><span class="color-primary">Total Outstanding Amount</span>
+                    <span><b>{{getTotalOutstanding() | number:'0.2-2'}}</b></span>
+                  </span>
+                  <!-- ----------------------------------------------------------------------------- -->
+                  <hr>
+                  <br>
+                  <span class="d-block dark"><b>Enforcement Fee</b></span>
+                  <span class="list-item-inline">
+                    <span>Type</span>
+                    <span>Amount</span>
+                  </span>
+                  <span class="list-item-inline">
+                    <span class="color-primary">Pro Rata Fee Net</span>
+                    <span><b>{{fee_net | number:'0.2-2'}}</b></span>
+                  </span>
+                  <span class="list-item-inline">
+                    <span class="color-primary">Pro Rata Fee Net (> 1500)</span>
+                    <span><b>{{fee_net_1 | number:'0.2-2'}}</b></span>
+                  </span>
+                </ion-col>
+
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

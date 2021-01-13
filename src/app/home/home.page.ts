@@ -27,6 +27,8 @@ export class HomePage implements OnInit {
   bgNetworkSubscription;
   limit = 50;
   downloading = false;
+  last_updated_date = '';
+  showRefreshingData = false;
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -47,12 +49,13 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
     this.logo = localStorage.getItem('logo');
-    this.syncOfflineVisitForm();
     this.startBackgroundEvent();
-    // this.platform.pause.subscribe(() => {
-    //   console.log('pause');
-    //   this.startBackgroundEvent();
-    // });
+    this.databaseService.lastUpdateTime.subscribe(date => {
+      this.last_updated_date = date;
+    });
+    this.databaseService.refreshingData.subscribe(refreshingData => {
+      this.showRefreshingData = refreshingData;
+    });
   }
 
   ionViewWillEnter() {
@@ -86,15 +89,18 @@ export class HomePage implements OnInit {
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setFeeOptions(response.feeOptions.data);
+          const time = moment().format('YYYY-MM-DD HH:mm:ss');
           await this.databaseService.setDownloadStatus({
             status: true,
-            time: moment().format('YYYY-MM-DD HH:mm:ss')
+            time: time
           });
+          this.databaseService.setlastUpdateTime(time);
           this.loaderService.hide();
           await this.getcaseDetails();
         });
       } else {
         if (downloadStatus) {
+          this.databaseService.setlastUpdateTime(downloadStatus.time)
           const diffMs = Math.floor((new Date(moment().format('YYYY-MM-DD HH:mm:ss')).getTime() - new Date(downloadStatus.time).getTime()) / 1000 / 60);
           if (diffMs >= 60) {
             this.caseService.getCases({ last_update_date: downloadStatus.time }, 1).subscribe(async (response: any) => {
@@ -102,10 +108,12 @@ export class HomePage implements OnInit {
                 await this.databaseService.setCases(response.data, response.linked, response.allCases);
                 this.caseService.getFilterMasterData().subscribe(async (data: any) => {
                   await this.databaseService.setFilterMasterData(data.data);
+                  const time = moment().format('YYYY-MM-DD HH:mm:ss');
                   await this.databaseService.setDownloadStatus({
                     status: true,
-                    time: moment().format('YYYY-MM-DD HH:mm:ss')
+                    time: time
                   });
+                  this.databaseService.setlastUpdateTime(time);
                 });
                 await this.getcaseDetails(downloadStatus.time);
               }
@@ -164,16 +172,7 @@ export class HomePage implements OnInit {
     const downloadStatus = await this.databaseService.getDownloadStatus();
     if (downloadStatus) {
       const params = { last_update_date: downloadStatus.time };
-      this.databaseService.refreshData(params).then(res => {
-        this.databaseService.setDownloadStatus({
-          status: true,
-          time: moment().format('YYYY-MM-DD HH:mm:ss')
-        });
-        this.databaseService.setHistoryDownloadStatus({
-          status: true,
-          time: moment().format('YYYY-MM-DD HH:mm:ss')
-        });
-
+      this.databaseService.refreshData(params).then(() => {
       });
     }
   }
@@ -210,13 +209,6 @@ export class HomePage implements OnInit {
     });
     await panicModalPage.present();
   }
-  syncOfflineVisitForm() {
-    this.networkService.onNetworkChange().subscribe((response) => {
-      if (response === 1) {
-        this.saveUnsyncVisitForms();
-      }
-    });
-  }
 
   startBackgroundEvent() {
     this.backgroundMode.setDefaults({ title: 'FieldAgent 3.0', ticker: 'FieldAgent 3.0', text: 'Running in Background' });
@@ -225,7 +217,9 @@ export class HomePage implements OnInit {
       console.log('active');
       this.bgNetworkSubscription = this.network.onConnect().subscribe(() => {
         console.log('net connected');
-        this.saveUnsyncVisitForms();
+        this.databaseService.isApiPending.subscribe(res => {
+          this.databaseService.savePendingApi(res);
+        })
       });
     });
     this.backgroundMode.on('deactivate').subscribe(() => {
@@ -238,24 +232,6 @@ export class HomePage implements OnInit {
     });
   }
 
-  async saveUnsyncVisitForms() {
-    if (!await this.storageService.get('isVisitFormSync')) {
-      this.databaseService.getApiStored().then(async (data) => {
-        if (data) {
-          var currentFormData;
-          for (let i = 0; i < data.rows.length; i++) {
-            currentFormData = data.rows.item(i);
-            let form_data = JSON.parse(decodeURI(currentFormData.data));
-            let callResponse = await this.databaseService.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
-            if (callResponse) {
-              this.databaseService.markApiCallSuccess(currentFormData.id);
-              this.databaseService.getcaseDetailsData(currentFormData.case_id)
-            }
-          }
-        }
-      });
-    }
-  }
   saveTimeSettings(timeSettings) {
     timeSettings = timeSettings.map((time) => {
       const res = time.split(' ');

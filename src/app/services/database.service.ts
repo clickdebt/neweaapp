@@ -17,7 +17,9 @@ export class DatabaseService {
   private database: any;
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public refreshingData: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private detailsReady: BehaviorSubject<boolean>;
+  public lastUpdateTime: BehaviorSubject<any> = new BehaviorSubject(false);
   linkedIds = [];
   version = 4;
   tables = ['rdebt_cases', 'rdebt_linked_cases', 'history', 'api_calls'];
@@ -36,13 +38,9 @@ export class DatabaseService {
     this.platform.ready().then(async () => {
 
       if (!this.platform.is('android') || !this.platform.is('ios')) {
-        console.log('window');
-
         let db = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
         this.database = browserDBInstance(db);
       } else {
-        console.log('app');
-
         this.database = await this.sqlite.create({
           name: 'fieldAgentV3.db',
           location: 'default',
@@ -64,9 +62,6 @@ export class DatabaseService {
           })
         }
       });
-      this.isApiPending.subscribe(res => {
-        this.savePendingApi(res);
-      })
 
     }).catch((error) => { });
   }
@@ -171,6 +166,41 @@ export class DatabaseService {
     }
   }
 
+  async getCaseInfo(id) {
+    let query = `select * from rdebt_cases where id = ${id} and 1=1`;
+    let result = await this.executeQuery(query);
+    result = await this.extractResult(result);
+    if (result) {
+      let finalData = result[0];
+      finalData = JSON.parse(decodeURI(finalData.data));
+      finalData = await this.getLinkedCases(finalData);
+      return finalData;
+    } else {
+      return '';
+    }
+  }
+  async getLinkedCases(item) {
+    let query = 'select * from rdebt_linked_cases where (manual_link_id = ? or debtor_id = ? )and id != ?';
+    let p = [item.manual_link_id, item.debtor_id, item.id];
+    const results: any[] = [];
+
+    await this.executeQuery(query, p).then((data) => {
+      let link_item;
+      for (let i = 0; i < data.rows.length; i++) {
+        link_item = data.rows.item(i);
+        link_item.data = JSON.parse(decodeURI(link_item.data));
+        this.linkedIds.push(link_item.data.id);
+        results.push(link_item.data);
+      }
+      item.linked_cases = results;
+      item.linkedCasesTotalBalance = item.linked_cases.reduce((accumulator, currentValue) => {
+        return accumulator + parseFloat(currentValue.d_outstanding);
+      }, 0);
+      item.linkedCasesTotalBalance = item.linkedCasesTotalBalance.toFixed(2);
+    });
+    return item;
+  }
+
   async insert(tableName, params = []) {
     const fields = params.map(item => item.name);
     const values = params.map(item => `'${item.value}'`);
@@ -247,7 +277,6 @@ export class DatabaseService {
     }
     await Promise.all(promiseArray)
       .then((res: any) => {
-        console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
         // console.log(res);
       })
       .catch((error) => { });
@@ -294,8 +323,6 @@ export class DatabaseService {
   }
   async setcaseDetails(data) {
     try {
-      console.log(data);
-
       const promiseArray = [];
       for (const currentCase of data.cases) {
         // console.log(currentCase);
@@ -312,6 +339,7 @@ export class DatabaseService {
       }
       await Promise.all(promiseArray)
         .then((res: any) => {
+          return res;
           // console.log(res);
         })
         .catch((error) => {
@@ -354,7 +382,9 @@ export class DatabaseService {
   getDetailsDownloadState() {
     return this.detailsReady.asObservable();
   }
-
+  setlastUpdateTime(val) {
+    return this.lastUpdateTime.next(val);
+  }
   public getStoredApiStatus(): Observable<boolean> {
     return this.isApiPending.asObservable();
   }
@@ -373,17 +403,33 @@ export class DatabaseService {
 
   async refreshData(params) {
     return new Promise((resolve, reject) => {
+      this.refreshingData.next(true);
       forkJoin({
         cases: this.caseService.getCases(params, 1),
         caseDetails: this.caseService.getCaseDetails(params)
       }).subscribe(async (response: any) => {
         await this.setCases(response.cases.data, response.cases.linked, response.cases.allCases);
         await this.setcaseDetails(response.caseDetails);
+        await this.updateLastUpdatedDates();
         resolve(response);
       }, (error) => {
         reject(error)
       });
     });
+  }
+
+  async updateLastUpdatedDates() {
+    const time = moment().format('YYYY-MM-DD HH:mm:ss');
+    await this.setDownloadStatus({
+      status: true,
+      time: time
+    });
+    await this.setHistoryDownloadStatus({
+      status: true,
+      time: time
+    });
+    await this.setlastUpdateTime(time);
+    await this.refreshingData.next(false);
   }
 
   async getOfflinecaseDetails(id) {
@@ -397,7 +443,7 @@ export class DatabaseService {
       caseDetails.data = this.getDecodeString(finalResult[0].data);
       caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
 
-      query = `select * from history where caseid = ${id} order by id desc`;
+      query = `select * from history where caseid = ${id} order by time desc`;
       result = await this.executeQuery(query);
       finalResult = await this.extractResult(result);
       caseDetails.history = finalResult;
@@ -422,14 +468,12 @@ export class DatabaseService {
   }
 
   changeIsApiPending(val) {
-    console.log('va', val);
-
     this.isApiPending.next(val);
   }
   checkApiPending() {
     this.getApiStored().then(data => {
       if (data.rows.length > 0) {
-        this.isApiPending.next(true);
+        this.changeIsApiPending(true);
       }
     })
   }
@@ -437,8 +481,8 @@ export class DatabaseService {
     const query = "select * from api_calls where is_sync = 0"
     return this.executeQuery(query, []);
   }
-  markApiCallSuccess(id) {
-    const updateQuery = `update api_calls set is_sync = 1 where id = ${id}`;
+  changeApiCallStatus(id, status = 1) {
+    const updateQuery = `update api_calls set is_sync = ${status} where id = ${id}`;
     return this.executeQuery(updateQuery);
   }
   async savePendingApi(val) {
@@ -446,14 +490,18 @@ export class DatabaseService {
       this.getApiStored().then(async (data) => {
         const arr = [];
         if (data) {
-          var currentFormData;
           for (let i = 0; i < data.rows.length; i++) {
-            currentFormData = data.rows.item(i);
+            const currentFormData = data.rows.item(i);
+            this.changeApiCallStatus(currentFormData.id, 2);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
             let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
+            console.log(callResponse);
+
             if (callResponse) {
-              this.markApiCallSuccess(currentFormData.id);
-              this.getcaseDetailsData(currentFormData.case_id)
+              this.changeApiCallStatus(currentFormData.id, 1);
+              this.refreshData({ 'cases': currentFormData.case_id })
+            } else {
+              this.changeApiCallStatus(currentFormData.id, 0);
             }
           }
         }
@@ -463,12 +511,6 @@ export class DatabaseService {
 
   async callHttpApi(type, url, data) {
     return await this.http.request(type, url, data).toPromise();
-  }
-
-  getcaseDetailsData(case_id) {
-    this.caseService.getCaseDetails({ case_id: case_id }).subscribe((data) => {
-      this.setcaseDetails(data);
-    })
   }
 
   async clearData() {
@@ -493,7 +535,7 @@ export class DatabaseService {
     this.tables.forEach(async element => {
       let checkSync = ' ;';
       if (element == 'visit_reports' || element == 'api_calls') {
-        checkSync = 'where is_sync=1';
+        checkSync = ' where is_sync=1';
       }
       const deleteQuery = 'delete from ' + element + checkSync;
       let a = await this.database.executeSql(deleteQuery);

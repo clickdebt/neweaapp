@@ -20,15 +20,29 @@
   <table class="table table-striped">
     <thead>
       <tr>
-        <th><h4>Field</h4></th>
-        <th><h4>Value</h4></th>
+        <th>
+          <h4>Field</h4>
+        </th>
+        <th>
+          <h4>Value</h4>
+        </th>
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let data of visitData.data.form_data | keyvalue">
-        <tr *ngIf="data.value">
-          <td>{{camelToNormaltext(data.key)}}</td>
-          <td>{{data.value}}</td>
+      <ng-container *ngIf="visitData">
+        <tr>
+          <td>Case ID</td>
+          <td>{{visitData.data.case_id}}</td>
+        </tr>
+        <ng-container *ngFor="let data of visitData.data.form_data | keyvalue">
+          <tr *ngIf="data.value && data.value.length">
+            <td>{{camelToNormaltext(data.key)}}</td>
+            <td>{{data.value}}</td>
+          </tr>
+        </ng-container>
+        <tr>
+          <td> Created at</td>
+          <td>{{visitData.data.created_at}}</td>
         </tr>
       </ng-container>
     </tbody>

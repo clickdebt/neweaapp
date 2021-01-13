@@ -1,15 +1,18 @@
 <ion-header class="shadow">
   <ion-toolbar class="ion-text-center">
-    <ion-buttons slot="start" (click)="goBack()">
+    <ion-buttons *ngIf="!fromVisit" slot="start" (click)="goBack()">
       <ion-icon size="large" name="arrow-back-outline"></ion-icon>
     </ion-buttons>
     <ion-title>#{{currentCaseData.id}}</ion-title>
     <ion-buttons slot="end">
-      <ion-button size="small" color="secondary" (click)="doRefresh()">
+      <ion-button *ngIf="!fromVisit" size="small" color="secondary" (click)="doRefresh()">
         <ion-icon size="large" name="refresh-circle-outline"></ion-icon>
       </ion-button>
-      <ion-button size="small" color="secondary" (click)="presentActionSheet()">
+      <ion-button *ngIf="!fromVisit" size="small" color="secondary" (click)="presentActionSheet()">
         Actions
+      </ion-button>
+      <ion-button *ngIf="fromVisit" (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -21,7 +24,7 @@
   </ion-refresher>
   <ion-grid>
     <ion-row>
-      <ion-col size-md="8" size-sm="12" size-xs="12">
+      <ion-col *ngIf="!fromVisit" size-md="8" size-sm="12" size-xs="12">
         <ion-card class="m-0 h-100">
           <ion-card-header>
             <ion-card-subtitle><b>QUICK INFO</b></ion-card-subtitle>
@@ -76,6 +79,12 @@
                   <hr>
                   <span class="d-block color-primary">Last visit date</span>
                   <span class="d-block"><b>{{caseDetails.data.last_visit_date}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">VRM</span>
+                  <span class="d-block"><b>{{caseDetails.data.custom_5}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Warrant Date</span>
+                  <span class="d-block"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
                   <hr>
                   <ng-template *ngIf="fromVrmSearch">
                     <span class="d-block color-primary">Agent Name</span>
@@ -175,7 +184,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col size-md="12">
+      <ion-col *ngIf="!fromVisit" size-md="12">
         <ion-card class="m-0 h-100">
           <ion-card-header>
             <ion-grid class="ion-no-padding">

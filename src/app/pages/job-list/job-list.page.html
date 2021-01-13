@@ -1,13 +1,23 @@
 <ion-toolbar color="light">
   <ion-grid class="p-y-0">
     <ion-row class="searchbar-wrpper">
-      <ion-col size-md="8" size-xs="6">
+      <ion-col size-md="8" size-xs="8">
         <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
           (keyup.enter)="filterCases()" (ionCancel)="filterCases()" placeholder="Search ID, ref, postcode, name">
         </ion-searchbar>
       </ion-col>
-      <ion-col size-md="4" size-xs="6" class="ion-text-end">
+      <ion-col size-xs="4" *ngIf="isMobile">
         <ion-button color="secondary" size="small" (click)="filterCases()">
+          Search
+        </ion-button>
+      </ion-col>
+      <ion-col size-md="4" size-xs="12">
+        <ion-button color="light" *ngIf="isMobile" size="small">
+          <ion-checkbox [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
+          </ion-checkbox>
+          <ion-label class="ion-margin-horizontal"> All</ion-label>
+        </ion-button>
+        <ion-button *ngIf="!isMobile" color="secondary" size="small" (click)="filterCases()">
           Search
         </ion-button>
         <ion-button color="secondary" size="small" (click)="showFilterDiv()">
@@ -18,13 +28,13 @@
         </ion-button>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="isMobile">
+    <!-- <ion-row *ngIf="isMobile">
       <ion-item lines="none">
         <ion-checkbox [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
         </ion-checkbox>
         <ion-label class="ion-margin-horizontal"> Select All</ion-label>
       </ion-item>
-    </ion-row>
+    </ion-row> -->
   </ion-grid>
 </ion-toolbar>
 
@@ -235,8 +245,7 @@
             <td>{{case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
             <td>{{case.custom5}}</td> -->
             <td class="action ">
-              <ion-button size="small" color="secondary"
-                (click)="goToCaseDetails(case)">
+              <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
                 Details
               </ion-button>
             </td>
@@ -293,8 +302,7 @@
                     <td>{{link_case.hold_until > currentDate ? 'Yes' : 'No'}}</td>
                     <td>{{link_case.custom5}}</td> -->
                     <td class="action ">
-                      <ion-button size="small" color="secondary"
-                        (click)="goToCaseDetails(link_case)">
+                      <ion-button size="small" color="secondary" (click)="goToCaseDetails(link_case)">
                         Details
                       </ion-button>
                     </td>
@@ -340,8 +348,7 @@
             <span class="d-block"> (#{{case.id}}) </span>
           </h6>
           <div class="d-grid">
-            <ion-button size="small" color="secondary"
-              (click)="goToCaseDetails(case)">
+            <ion-button size="small" color="secondary" (click)="goToCaseDetails(case)">
               <ion-icon name="information-circle-outline"></ion-icon><span>Details</span>
             </ion-button>
             <ion-button size="small" color="tertiary" *ngIf="case.stage.stage_type.stage_type == 'Visit'"
@@ -353,10 +360,9 @@
         <ion-grid class="m-t-10">
           <ion-row>
             <ion-col *ngFor="let caseField of caseFields" size="6">
-              <span *ngIf="getCaseFieldValue(case,caseField.field)">
-                <span class="font-weight-bold font-16 text-nowrap">{{caseField.label}} :</span>
-                <span class="font-16 text-color-light text-nowrap"
-                  [innerHTML]="getCaseFieldValue(case,caseField.field)"></span>
+              <span *ngIf="getCaseFieldValue(case,caseField.field) != undefined">
+                <span class="d-block color-primary">{{caseField.label}}</span>
+                <span class="d-block" [innerHTML]="getCaseFieldValue(case,caseField.field)"></span>
               </span>
             </ion-col>
             <!-- <ion-col size="6">
@@ -409,8 +415,7 @@
                   <span class="d-block"> (#{{link_case.id}}) </span>
                 </h6>
                 <span class="d-grid">
-                  <ion-button size="small" color="secondary"
-                    (click)="goToCaseDetails(link_case)">
+                  <ion-button size="small" color="secondary" (click)="goToCaseDetails(link_case)">
                     <ion-icon name="information-circle-outline"></ion-icon><span>Details</span>
                   </ion-button>
                   <ion-button size="small" color="tertiary" *ngIf="link_case.stage_type == 'Visit'"
@@ -422,10 +427,14 @@
               <ion-grid class="m-t-10">
                 <ion-row>
                   <ion-col *ngFor="let caseField of caseFields" size="6">
-                    <span *ngIf="getLinkedCaseFieldValue(link_case,caseField.field)">
+                    <!-- <span *ngIf="getLinkedCaseFieldValue(link_case,caseField.field)">
                       <span class="font-weight-bold font-16 text-nowrap"> {{caseField.label}} :</span>
                       <span class="font-16 text-color-light text-nowrap"
                         [innerHTML]="getLinkedCaseFieldValue(link_case,caseField.field)"></span>
+                    </span> -->
+                    <span *ngIf="getLinkedCaseFieldValue(link_case,caseField.field) != undefined">
+                      <span class="d-block color-primary">{{caseField.label}}</span>
+                      <span class="d-block" [innerHTML]="getLinkedCaseFieldValue(link_case,caseField.field)"></span>
                     </span>
                   </ion-col>
                   <!-- <ion-col size="6">

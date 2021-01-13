@@ -32,6 +32,8 @@ export class VisitDetailsPage implements OnInit {
           data.data = JSON.parse(data.form_values);
           console.log(data);
           this.visitData = data;
+          this.visitData.data.created_at = res.data[0].created_at;
+          this.visitData.data.case_id = res.data[0].case_id;
         }
       });
     }

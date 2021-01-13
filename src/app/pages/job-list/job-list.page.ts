@@ -70,7 +70,7 @@ export class JobListPage implements OnInit {
     { field: 'manual_link_id', label: 'Manual Link Id' },
     { field: 'bailiffid', label: 'Ballif Id' },
     { field: 'd_outstanding', label: 'Amount' },
-    { field: 'visitcount_total', label: 'visit' },
+    { field: 'visitcount_total', label: 'Visit' },
     { field: 'current_status.status_name', label: 'Status' },
     { field: 'current_status_id', label: 'Current Status ID' },
     { field: 'current_status.status_type', label: 'Current Status Type' },
@@ -90,7 +90,7 @@ export class JobListPage implements OnInit {
     { field: 'debtor.addresses[0].address_town', label: 'Address Line Town' },
     { field: 'debtor.addresses[0].address_postcode', label: 'Postcode' },
     { field: 'custom5', label: 'VRM' },
-    { field: 'linkedCasesTotalBalance', label: ' Linked Cases Amount Total' }
+    { field: 'linkedCasesTotalBalance', label: 'Linked Balance' }
   ];
   constructor(
     private caseService: CaseService,
@@ -103,8 +103,9 @@ export class JobListPage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    this.caseFields = ["current_status.status_name", "ref", "d_outstanding", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode"];
-    const caseFields = await this.storageService.get('fields');
+    const caseFields= ["ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
+    // const caseFields = await this.storageService.get('fields');
+    
     if (caseFields) {
       this.caseFields = this.totalFields.filter((c) => {
         if (caseFields.includes(c.field)) {
@@ -112,9 +113,15 @@ export class JobListPage implements OnInit {
         }
       });
     }
+    console.log(this.caseFields);
+    
     this.colspanLength = 6 + this.caseFields.length;
     this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
+    this.databaseService.lastUpdateTime.subscribe(date => {
+      if(date)
+        this.filterCases();
+    })
   }
 
   async ionViewWillEnter() {
@@ -293,7 +300,7 @@ export class JobListPage implements OnInit {
         query += ' ORDER BY ' + this.filters['sorting'];
       }
       query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
-      console.log(query);
+      // console.log(query);
       this.databaseService.executeQuery(query, p).then(async (data) => {
         let results: any[] = [];
         let item;
