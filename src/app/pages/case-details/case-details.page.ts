@@ -164,7 +164,7 @@ export class CaseDetailsPage implements OnInit {
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.Document)) {
         buttons.push(this.actionListArray['upload_document']);
       }
-      if (1 || await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
         buttons.push(this.actionListArray['take_payment']);
       }
     } else {
@@ -177,14 +177,13 @@ export class CaseDetailsPage implements OnInit {
       if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
         buttons.push(this.actionListArray['visit_case'])
       }
-
-      const actionSheet = await this.actionSheetController.create({
-        header: 'Actions',
-        cssClass: 'my-custom-class',
-        buttons: buttons
-      });
-      await actionSheet.present();
     }
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Actions',
+      cssClass: 'my-custom-class',
+      buttons: buttons
+    });
+    await actionSheet.present();
   }
 
   async loadInitData() {

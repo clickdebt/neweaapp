@@ -465,7 +465,7 @@ export class VisitFormPage implements OnInit {
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.Document)) {
         buttons.push(this.actionListArray['upload_document']);
       }
-      if (1 || await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
+      if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddPayment)) {
         buttons.push(this.actionListArray['take_payment']);
       }
     } else {
@@ -476,13 +476,13 @@ export class VisitFormPage implements OnInit {
       buttons.push(this.actionListArray['arrangement']);
       buttons.push(this.actionListArray['deallocate_case']);
       buttons.push(this.actionListArray['upload_document']);
-      const actionSheet = await this.actionSheetController.create({
-        header: 'Actions',
-        cssClass: 'my-custom-class',
-        buttons: buttons
-      });
-      await actionSheet.present();
     }
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Actions',
+      cssClass: 'my-custom-class',
+      buttons: buttons
+    });
+    await actionSheet.present();
   }
 
   async addNote() {
