@@ -17,6 +17,12 @@ export class CommonService {
     SelfAllocate: 'app_self_allocate',
     DeAllocate: 'app_deallocate_case',
   };
+  newlynURLS = [
+    'https://production.newlynservices.co.uk/',
+    'https://staging.newlynservices.co.uk/',
+    'https://production.staging.omnicrm.co/',
+    'https://production.nodeb.lateral1.com/'
+  ];
   constructor(
     private toastController: ToastController,
     private loadingController: LoadingController,
@@ -52,6 +58,9 @@ export class CommonService {
   }
 
   isClient(name) {
+    if(name == 'newlyn') {
+      return this.newlynURLS.indexOf(localStorage.getItem('server_url')) > -1
+    }
     return localStorage.getItem('server_url').indexOf(name) > -1;
   }
   async hasPermission(item) {
