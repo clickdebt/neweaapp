@@ -45,8 +45,10 @@ export class LoginPage implements OnInit {
   }
   login() {
     if (this.loginForm.valid) {
+      this.commonService.showLoader();
       this.authService.authenticate(this.loginForm.value.username, this.loginForm.value.password).subscribe(
         data => {
+          this.commonService.dismissLoader();
           if (data['result']) {
             const userdata = data['data'];
             localStorage.setItem('userdata', JSON.stringify(userdata));
@@ -70,6 +72,7 @@ export class LoginPage implements OnInit {
           }
         },
         err => {
+          this.commonService.dismissLoader();
           this.commonService.showToast(err, 'danger');
         }
       );
