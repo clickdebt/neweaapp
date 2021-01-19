@@ -57,6 +57,7 @@ export class JobListPage implements OnInit {
   busy = false;
   caseFields;
   colspanLength;
+  downloadDate;
   totalFields = [
     { field: 'id', label: 'Id' },
     { field: 'scheme_id', label: 'Scheme Id' },
@@ -113,14 +114,18 @@ export class JobListPage implements OnInit {
         }
       });
     }
-    console.log(this.caseFields);
+    // console.log(this.caseFields);
     
     this.colspanLength = 6 + this.caseFields.length;
     this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
     this.databaseService.lastUpdateTime.subscribe(date => {
-      if(date)
+      if(this.downloadDate && date && this.downloadDate != date) {
+        this.downloadDate = date;
         this.filterCases();
+      } else {
+        this.downloadDate = date;
+      }
     })
   }
 
@@ -217,7 +222,7 @@ export class JobListPage implements OnInit {
       limit: this.limit,
       page: this.page
     };
-    console.log(this.filters);
+    // console.log(this.filters);
     Object.keys(this.filters).forEach(fil => {
       if (this.filters[fil] != undefined && this.filters[fil].length) {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
@@ -488,8 +493,7 @@ export class JobListPage implements OnInit {
     if (downloadStatus) {
       const params = { last_update_date: downloadStatus.time };
       this.databaseService.refreshData(params).then((res: any) => {
-        console.log('res');
-        this.filterCases();
+        // this.filterCases();
         if (event)
           event.target.complete();
 
