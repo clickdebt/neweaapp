@@ -183,7 +183,12 @@ export class JobListPage implements OnInit {
     this.linkedIds = [];
     this.getCases('');
   }
-
+  searchChange() {
+    if(this.searchBarValue && (this.searchBarValue.length > 3 || this.searchBarValue.length == 0)){
+      this.filterCases();
+    }
+    
+  }
   filterCases(clear = true) {
     this.filters = [];
     if (this.searchBarValue) {
@@ -291,8 +296,8 @@ export class JobListPage implements OnInit {
               });
               query += ' and ( ' + osQuery.join(' or ') + ') ';
             } else if (key === 'q') {
-              query += ' and (id = ? or ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ?) ';
-              p.push(params[key]);
+              query += ' and (id LIKE ? or ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ?) ';
+              p.push(params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
@@ -350,7 +355,7 @@ export class JobListPage implements OnInit {
         results.push(link_item.data);
       }
       item.data.linked_cases = results;
-      item.data.linkedCasesTotalBalance = item.data.linked_cases.reduce((accumulator, currentValue) => {
+      item.data.linkedCasesTotalBalance =  parseFloat(item.data.d_outstanding) + item.data.linked_cases.reduce((accumulator, currentValue) => {
         return accumulator + parseFloat(currentValue.d_outstanding);
       }, 0);
       item.data.linkedCasesTotalBalance = item.data.linkedCasesTotalBalance.toFixed(2);

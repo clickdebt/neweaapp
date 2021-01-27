@@ -3,7 +3,7 @@
     <ion-row class="searchbar-wrpper">
       <ion-col size-md="8" size-xs="8">
         <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
-          (keyup.enter)="filterCases()" (ionCancel)="filterCases()" placeholder="Search ID, ref, postcode, name">
+          (keyup.enter)="filterCases()" (ionChange)="searchChange()" (ionCancel)="filterCases()" placeholder="Search ID, ref, postcode, name">
         </ion-searchbar>
       </ion-col>
       <ion-col size-xs="4" *ngIf="isMobile">

@@ -80,7 +80,7 @@
   <div class="ion-margin-top">
     <ion-item class="bg-main" (click)="toggleShow(arrangementObj)" color="secondary" ng-class="{active: isShown(arrangementObj)}">
       <ion-label>
-        <h2>Create Arrangement <span *ngIf="outstanding"> - O/S {{outstanding}}</span></h2>
+        <h2>Create Arrangement <span *ngIf="outstanding"> - Outstanding Amount : {{outstanding}}</span></h2>
       </ion-label>
       <ion-icon slot="end" [name]="isShown(arrangementObj) ? 'chevron-up-sharp':'chevron-down-sharp'">
       </ion-icon>
@@ -105,7 +105,7 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
+        <ion-item class="ion-hide">
           <ion-label position="floating">Total Amount <ion-text color="danger">*</ion-text>
           </ion-label>
           <ion-input type="text" formControlName="ref_amount"></ion-input>
@@ -139,7 +139,7 @@
           </ion-label>
           <ion-input formControlName="start" (click)="openCalendar('start')"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item *ngIf="!isNewlyn">
           <ion-label position="floating">Method<ion-text color="danger">*</ion-text>
           </ion-label>
           <ion-select placeholder="Select Payment Method" formControlName="method">

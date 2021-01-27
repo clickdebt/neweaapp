@@ -49,36 +49,33 @@ export class UploadDocumentModalPage implements OnInit {
   }
   uploadDocument() {
     if (this.uploadForm.valid && this.file) {
-      // if (this.networkService.getCurrentNetworkStatus() == 1) {
-      //   this.storageService.set('is_case_updated', true);
-      //   this.caseActionService.uploadDocument(this.file, this.caseId).subscribe((res: any) => {
-      //     if (res.message) {
-      //       this.commonUtils.showToast(res.message);
-      //       this.modalCtrl.dismiss({
-      //         saved: true
-      //       });
-      //     }
-      //   });
-      // } else {
-      const formData = new FormData();
-      formData.append('file', this.file);
-      const api_data = [
-        { name: 'case_id', value: `${this.caseId}` },
-        { name: 'url', value: `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${this.caseId}?source=API` },
-        { name: 'type', value: `post` },
-        { name: 'data', value: `${encodeURI(JSON.stringify(formData))}` },
-        { name: 'is_sync', value: 0 },
-        { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
-      ]
-      this.caseActionService.saveActionOffline('api_calls', api_data);
+      if (this.networkService.getCurrentNetworkStatus() == 1) {
+        this.storageService.set('is_case_updated', true);
+        this.caseActionService.uploadDocument(this.file, this.caseId).subscribe((res: any) => {
+          if (res.message) {
+            this.commonUtils.showToast(res.message);
+            this.modalCtrl.dismiss({
+              saved: true
+            });
+          }
+        });
+      } else {
+        const formData = { file: new Blob([this.file], { type: this.file.type }), file_name: this.file.name }
+        // formData.append('file', this.file);
 
-      this.modalCtrl.dismiss({
-        saved: true
-      });
+        const api_data = [
+          { name: 'case_id', value: `${this.caseId}` },
+          { name: 'url', value: `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${this.caseId}?source=API` },
+          { name: 'type', value: `post` },
+          { name: 'data', value: `${encodeURI(JSON.stringify(formData))}` },
+          { name: 'is_sync', value: 0 },
+          { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+        ]
+        this.caseActionService.saveActionOffline('api_calls', api_data);
+        this.modalCtrl.dismiss({
+          saved: true
+        });
+      }
     }
-
-
-
   }
-  // }
 }

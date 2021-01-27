@@ -17,6 +17,7 @@ export class CommonService {
     SelfAllocate: 'app_self_allocate',
     DeAllocate: 'app_deallocate_case',
   };
+  appName = 'EA APP';
   newlynURLS = [
     'https://production.newlynservices.co.uk/',
     'https://staging.newlynservices.co.uk/',

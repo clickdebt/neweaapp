@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>FieldAgent 3.0</ion-title>
+    <ion-title>{{appName}}</ion-title>
     <ion-buttons slot="end" [routerLink]="['/server-settings']">
       <ion-icon size="large" name="settings-outline"></ion-icon>
     </ion-buttons>
@@ -19,14 +19,14 @@
       <ion-item>
         <ion-label position="floating">Username <ion-text color="danger">*</ion-text>
         </ion-label>
-        <ion-input type="text" formControlName="username"></ion-input>
+        <ion-input type="text" formControlName="username" (keyup.enter)="login()"></ion-input>
 
       </ion-item>
 
       <ion-item>
         <ion-label position="floating">Password <ion-text color="danger">*</ion-text>
         </ion-label>
-        <ion-input type="password" formControlName="password"></ion-input>
+        <ion-input type="password" formControlName="password" (keyup.enter)="login()"></ion-input>
       </ion-item>
     </ion-list>
     <div class="ion-padding">

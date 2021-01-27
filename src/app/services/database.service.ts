@@ -494,6 +494,11 @@ export class DatabaseService {
             const currentFormData = data.rows.item(i);
             this.changeApiCallStatus(currentFormData.id, 2);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
+            if(form_data.file) {
+              const form_data1 = new FormData();
+              form_data1.append('file',  new File([form_data.file], form_data.file_name));
+              form_data = form_data1;
+            }
             let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
             console.log(callResponse);
 
