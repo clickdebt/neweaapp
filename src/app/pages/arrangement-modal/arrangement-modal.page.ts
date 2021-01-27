@@ -49,6 +49,7 @@ export class ArrangementModalPage implements OnInit {
   baseOutstanding;
   groupArrId;
   date;
+  isNewlyn = false;
   paymentGateways = [];
   constructor(
     private modalCtrl: ModalController,
@@ -70,6 +71,7 @@ export class ArrangementModalPage implements OnInit {
     this.initForm();
   }
   async ionViewWillEnter() {
+    this.isNewlyn = this.commonService.isClient('newlyn');
     this.getActiveArrangements();
   }
 
@@ -111,7 +113,7 @@ export class ArrangementModalPage implements OnInit {
       frequency: ['', [Validators.required]],
       amount: ['', [Validators.required]],
       ref_amount: [this.outstanding, [Validators.required]],
-      method: ['', [Validators.required]],
+      method: ['', []],
       start: ['', [Validators.required]],
       note: ['', []],
       differentFirstPayment: [false, []],
@@ -247,6 +249,7 @@ export class ArrangementModalPage implements OnInit {
     finalResult.data = this.databaseService.getDecodeString(finalResult.data);
     finalResult.arranagement = this.databaseService.getDecodeString(finalResult.arranagement);
     this.baseOutstanding = this.outstanding = finalResult.d_outstanding;
+    this.arrangementForm.patchValue({ref_amount: this.outstanding});
     console.log(this.outstanding);
     
     console.log(finalResult);

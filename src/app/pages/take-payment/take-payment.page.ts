@@ -29,7 +29,8 @@ export class TakePaymentPage implements OnInit {
     private caseDetailsService: CaseDetailsService,
     private networkService: NetworkService,
     private caseActionService: CaseActionService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private storageService: StorageService
   ) {
     this.caseId = navParams.get('caseId');
     this.debtorId = navParams.get('debtorId');
@@ -101,32 +102,35 @@ export class TakePaymentPage implements OnInit {
         sent: 1,
         sent_at: date
       };
-      // console.log(obj);
-      // this.caseActionService.takePayment(obj).subscribe((res: any) => {
-      //   console.log(res);
-      //   if (res.status == 'Ok') {
-      //     this.storageService.set('is_case_updated', true);
-      //     this.commonService.showToast('Payment added successfully');
-      //     if (res.data.success) {
-      //       this.paymentsForm.reset();
-      //       this.dismiss();
-      //     }
-      //     // this.addPayment(res);
-      //   } else {
-      //     this.commonService.showToast('Error while creating payment');
-      //   }
-      // });
-      const api_data = [
-        { name: 'case_id', value: `${this.caseId}` },
-        { name: 'url', value: `b/payment/sage_pay_actions/take_app_payment?source=API` },
-        { name: 'type', value: `post` },
-        { name: 'data', value: `${encodeURI(JSON.stringify(obj))}` },
-        { name: 'is_sync', value: 0 },
-        { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
-      ]
-      this.caseActionService.saveActionOffline('api_calls', api_data);
-      this.paymentsForm.reset();
-      this.dismiss();
+      if (this.networkStatus == 1) {
+        console.log(obj);
+        this.caseActionService.takePayment(obj).subscribe((res: any) => {
+          console.log(res);
+          if (res.status == 'Ok') {
+            this.storageService.set('is_case_updated', true);
+            this.commonService.showToast('Payment added successfully');
+            if (res.data.success) {
+              this.paymentsForm.reset();
+              this.dismiss();
+            }
+            // this.addPayment(res);
+          } else {
+            this.commonService.showToast('Error while creating payment');
+          }
+        });
+      } else {
+        const api_data = [
+          { name: 'case_id', value: `${this.caseId}` },
+          { name: 'url', value: `b/payment/sage_pay_actions/take_app_payment?source=API` },
+          { name: 'type', value: `post` },
+          { name: 'data', value: `${encodeURI(JSON.stringify(obj))}` },
+          { name: 'is_sync', value: 0 },
+          { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+        ]
+        this.caseActionService.saveActionOffline('api_calls', api_data);
+        this.paymentsForm.reset();
+        this.dismiss();
+      }
     }
 
   }

@@ -88,6 +88,7 @@ export class CaseDetailsPage implements OnInit {
   };
   dataReady = false;
   fromVisit = false;
+  isNewlyn = false;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -147,8 +148,8 @@ export class CaseDetailsPage implements OnInit {
         console.log('Delete clicked');
       }
     }];
-    const isNewlyn = this.commonService.isClient('newlyn');
-    if (isNewlyn) {
+    this.isNewlyn = this.commonService.isClient('newlyn');
+    if (this.isNewlyn) {
       buttons.push(this.actionListArray['add_note']);
       buttons.push(this.actionListArray['add_fee']);
 
@@ -222,21 +223,21 @@ export class CaseDetailsPage implements OnInit {
       let custArr: any = [];
       custom_data = Object.values(custom_data);
 
-      custom_data.forEach(element => {
-        if (!isArray(element)) {
-          custArr[element.field_name] = element.field_value
-        }
-      });
+      this.flatternCustomData(custom_data, custArr);
+      // custom_data.forEach(element => {
+      //   if (!isArray(element)) {
+      //     custArr[element.field_name] = element.field_value
+      //   }
+      // });
       this.caseDetails.case_custom_data = custArr;
       this.caseDetails.data = result.data;
-console.log(this.caseDetails);
 
       this.getCaseSchemeSpecificData = [
-        { 'label': 'Offence Description', 'value': result.data.offense },
+        { 'label': 'Offence Description', 'value': this.caseDetails.case_custom_data.Offence_Details ? this.caseDetails.case_custom_data.Offence_Details : result.data.offense },
         { 'label': 'Offence Time', 'value': custArr.offense_time },
         { 'label': 'Offence Date', 'value': result.data.offense_date },
         { 'label': 'Offence Code', 'value': custArr.offense_code },
-        { 'label': 'Offence Location', 'value': this.caseDetails.case_custom_data.offence_location ? this.caseDetails.case_custom_data.offence_location : result.data.offense_add1 },
+        { 'label': 'Offence Location', 'value': this.caseDetails.case_custom_data.Offence_Location ? this.caseDetails.case_custom_data.Offence_Location : result.data.offense_add1 },
         { 'label': 'Offence Address Line2', 'value': result.data.offense_add2 },
         { 'label': 'Offence Address Line 3', 'value': result.data.offense_add3 },
         { 'label': 'Offence Line 4', 'value': result.data.offense_add4 },
@@ -258,6 +259,15 @@ console.log(this.caseDetails);
     }
   }
 
+  flatternCustomData(arr, custArr) {
+    arr.forEach(element => {
+      if (!isArray(element)) {
+        custArr[element.field_name] = element.field_value
+      } else {
+        this.flatternCustomData(element, custArr);
+      }
+    });
+  }
   async showVisitDetails(history) {
     const modal = await this.modalController.create({
       component: VisitDetailsPage, componentProps: {

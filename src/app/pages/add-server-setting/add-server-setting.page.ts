@@ -12,6 +12,8 @@ export class AddServerSettingPage implements OnInit {
   settingForm: FormGroup;
   submitted = false;
   url_array = [];
+  appName = '';
+  showFetch = true;
   constructor(
     private formBuilder: FormBuilder,
     private settingsService: SettingsService,
@@ -20,6 +22,7 @@ export class AddServerSettingPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.appName = this.commonService.appName;
     this.initForm();
   }
 
@@ -33,6 +36,7 @@ export class AddServerSettingPage implements OnInit {
 
   fetchSettings() {
     this.url_array = [];
+    this.settingForm.controls['url'].patchValue('', { onlySelf: true });
     this.submitted = true;
     if (this.settingForm.controls['company_code'].valid) {
       this.commonService.showLoader();
@@ -44,7 +48,7 @@ export class AddServerSettingPage implements OnInit {
             if (key != 'features' && key != 'logo') {
               this.url_array.push({
                 val: settings[key].url,
-                server_url: key + '-' + settings[key].url
+                server_url: key + ':  ' + settings[key].url
               });
             }
           }
@@ -55,7 +59,14 @@ export class AddServerSettingPage implements OnInit {
       });
     }
   }
-
+  companyChange() {
+    this.showFetch = true;
+  }
+  serverSelect(event) {
+    if(this.settingForm.controls['url'].value) {
+      this.showFetch = false;
+    }
+  }
   saveSettings() {
     const serverSettings = localStorage.getItem('serverSettings');
     let setting = { nickname: this.settingForm.controls['nickname'].value, url: this.settingForm.controls['url'].value, active: 0 };

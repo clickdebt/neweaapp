@@ -63,7 +63,8 @@
                 <ion-col size-sm="6" size-xs="12">
                   <span class="d-block dark"><b>Case Details</b></span>
                   <span class="d-block color-primary">Client Reference</span>
-                  <span class="d-block"><b>{{caseDetails.data.ref}}</b></span>
+                  <span class="d-block" *ngIf="isNewlyn"><b>{{caseDetails.data.cl_ref}}</b></span>
+                  <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.ref}}</b></span>
                   <hr>
                   <span class="d-block color-primary">Client Name</span>
                   <span class="d-block"><b>{{caseDetails.data.client_name}}</b></span>
@@ -81,10 +82,11 @@
                   <span class="d-block"><b>{{caseDetails.data.last_visit_date}}</b></span>
                   <hr>
                   <span class="d-block color-primary">VRM</span>
-                  <span class="d-block"><b>{{caseDetails.data.custom_5}}</b></span>
+                  <span class="d-block"><b>{{caseDetails.data.custom5}}</b></span>
                   <hr>
                   <span class="d-block color-primary">Warrant Date</span>
-                  <span class="d-block"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
+                  <span class="d-block" *ngIf="isNewlyn"><b>{{caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-'}}</b></span>
+                  <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
                   <hr>
                   <ng-template *ngIf="fromVrmSearch">
                     <span class="d-block color-primary">Agent Name</span>
