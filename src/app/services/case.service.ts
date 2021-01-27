@@ -68,4 +68,12 @@ export class CaseService {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v3/app_config/get_config/1';
     return this.http.get(apiURL);
   }
+  getFeeSchemeManagerLinks() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/fee/get_fee_sm_link';
+    return this.http.get(apiURL);
+  }
+  getClientFees() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/fee/get_client_fees';
+    return this.http.get(apiURL);
+  }
 }
