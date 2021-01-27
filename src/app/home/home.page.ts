@@ -81,11 +81,9 @@ export class HomePage implements OnInit {
         this.loaderService.displayText.next('Downloading Cases');
         this.caseService.getFeeSchemeManagerLinks().subscribe(async (response: any) => {
           await this.storageService.set('fee_sm_link', response.data.FeeSchemeManagerLinks);
-          console.log(response.data.FeeSchemeManagerLinks);
         });
         this.caseService.getClientFees().subscribe(async (response: any) => {
           await this.storageService.set('client_fees', response.data.ClientFees);
-          console.log(response.data.ClientFees);
         });
         forkJoin({
           cases: this.caseService.getCases({}, 1),
