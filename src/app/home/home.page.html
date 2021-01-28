@@ -55,6 +55,9 @@
       <ion-button *ngIf="downloading">
         <ion-icon size="large" name="arrow-down-circle"></ion-icon>
       </ion-button>
+      <ion-button [disabled]="refreshBtnDisable" (click)="doRefresh()">
+        <ion-icon size="large" name="refresh-circle-outline"></ion-icon>
+      </ion-button>
       <ion-button (click)="openPanicModal()">
         <ion-icon size="large" name="shield-checkmark"></ion-icon>
       </ion-button>

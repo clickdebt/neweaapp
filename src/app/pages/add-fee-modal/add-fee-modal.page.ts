@@ -29,15 +29,11 @@ export class AddFeeModalPage implements OnInit {
   }
   async getFeeOptions() {
     this.feeOptions = await this.storageService.get('fee_options');
-    var fee_sm_link = await this.storageService.get('fee_sm_link');
-
-    fee_sm_link = fee_sm_link.filter((item: any) => {
-      return item.sm_id == this.currentCase.scheme_id;
-    }).map((item: any)=>{return item.fee_id});
-    
     this.feeOptions = this.feeOptions.filter((item: any) => {
-      return fee_sm_link.indexOf(item.id) > -1;
-    })
+      return (item.sm_id == this.currentCase.scheme_id) && item.fee['id'] > 0;
+    }).map((item: any)=>{
+        return item.fee
+    });
     // this.caseActionService.getFeeOptions(this.caseId).subscribe((response: any) => {
     //   this.feeOptions = response.data.data;
     // });

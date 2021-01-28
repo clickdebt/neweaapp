@@ -18,10 +18,10 @@ export class CaseActionService {
     private databaseService: DatabaseService
   ) { }
 
-  getFeeOptions(caseId) {
-    const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/financial/case_actions_panels/case_action_fee_options/${caseId}?source=API`;
-    return this.http.get(apiURL);
-  }
+  // getFeeOptions(caseId) {
+  //   const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/financial/case_actions_panels/case_action_fee_options/${caseId}?source=API`;
+  //   return this.http.get(apiURL);
+  // }
   addFee(data, caseId) {
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_panel_layout/financial/case_actions_panels/case_action_add_fee/${caseId}?source=API`;
     return this.http.post(apiURL, data);

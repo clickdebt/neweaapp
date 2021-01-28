@@ -355,7 +355,7 @@ export class DatabaseService {
     await this.storageService.set('visit_form', data);
   }
   async setFeeOptions(data) {
-    await this.storageService.set('fee_options', data.data);
+    await this.storageService.set('fee_options', data);
   }
   async setFilterMasterData(data) {
     await this.storageService.set('filters', data);
@@ -537,7 +537,6 @@ export class DatabaseService {
     await this.storageService.remove('caseId');
     await this.storageService.remove('not_reload_map');
     await this.storageService.remove('permissionAsked');
-    await this.storageService.remove('fee_sm_link');
     this.tables.forEach(async element => {
       let checkSync = ' ;';
       if (element == 'visit_reports' || element == 'api_calls') {

@@ -30,6 +30,7 @@ export class HomePage implements OnInit {
   last_updated_date = '';
   showRefreshingData = false;
   appName = '';
+  refreshBtnDisable = false;
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -81,19 +82,16 @@ export class HomePage implements OnInit {
         });
         this.loaderService.show();
         this.loaderService.displayText.next('Downloading Cases');
-        this.caseService.getFeeSchemeManagerLinks().subscribe(async (response: any) => {
-          await this.storageService.set('fee_sm_link', response.data.FeeSchemeManagerLinks);
-        });
         forkJoin({
           cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
-          feeOptions: this.caseActionService.getFeeOptions(1)
+          feeOptions: this.caseService.getFeeSchemeManagerLinks(),
         }).subscribe(async (response: any) => {
           await this.databaseService.setCases(response.cases.data, response.cases.linked, response.cases.allCases);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
-          await this.databaseService.setFeeOptions(response.feeOptions.data);
+          await this.databaseService.setFeeOptions(response.feeOptions.data.FeeSchemeManagerLinks);
           const time = moment().format('YYYY-MM-DD HH:mm:ss');
           await this.databaseService.setDownloadStatus({
             status: true,
@@ -213,6 +211,16 @@ export class HomePage implements OnInit {
       component: PanicModalPage, componentProps: { 'cssClass': 'case-action-modal' }
     });
     await panicModalPage.present();
+  }
+  async doRefresh() {
+    this.refreshBtnDisable = true;
+    const downloadStatus = await this.databaseService.getDownloadStatus();
+    if (downloadStatus) {
+      const params = { last_update_date: downloadStatus.time };
+      this.databaseService.refreshData(params).then((res: any) => {
+        this.refreshBtnDisable = false;
+      });
+    }
   }
 
   startBackgroundEvent() {
