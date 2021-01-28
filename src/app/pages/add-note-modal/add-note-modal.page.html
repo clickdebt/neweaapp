@@ -1,8 +1,9 @@
-<ion-header class="shadow">
-  <ion-toolbar>
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>Add Note</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
-        <ion-icon size="large" name="close-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -11,11 +12,6 @@
 <ion-content>
 
   <ion-grid>
-    <ion-row class="modal-header ion-margin-horizontal ion-justify-content-center">
-      <ion-item lines="none" class="font-size-21">
-        <ion-label>Add Note</ion-label>
-      </ion-item>
-    </ion-row>
     <ion-row class="ion-margin">
       <ion-col *ngIf="currentCase.linked_cases.length>0" size-md="6" class="ion-margin-top d-flex">
         <ion-label class="ion-align-self-center">Select Linked case</ion-label>
