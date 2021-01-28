@@ -84,9 +84,6 @@ export class HomePage implements OnInit {
         this.caseService.getFeeSchemeManagerLinks().subscribe(async (response: any) => {
           await this.storageService.set('fee_sm_link', response.data.FeeSchemeManagerLinks);
         });
-        this.caseService.getClientFees().subscribe(async (response: any) => {
-          await this.storageService.set('client_fees', response.data.ClientFees);
-        });
         forkJoin({
           cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
