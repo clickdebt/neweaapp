@@ -29,6 +29,7 @@ export class HomePage implements OnInit {
   downloading = false;
   last_updated_date = '';
   showRefreshingData = false;
+  appName = '';
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -48,6 +49,7 @@ export class HomePage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.appName = this.commonService.appName;
     this.logo = localStorage.getItem('logo');
     this.startBackgroundEvent();
     this.databaseService.lastUpdateTime.subscribe(date => {
@@ -217,7 +219,7 @@ export class HomePage implements OnInit {
   }
 
   startBackgroundEvent() {
-    this.backgroundMode.setDefaults({ title: 'FieldAgent 3.0', ticker: 'FieldAgent 3.0', text: 'Running in Background' });
+    this.backgroundMode.setDefaults({ title: this.commonService.appName, ticker: this.commonService.appName, text: 'Running in Background' });
     this.backgroundMode.enable();
     this.bgSubscription = this.backgroundMode.on('activate').subscribe(() => {
       console.log('active');

@@ -13,6 +13,7 @@ export class LoginPage implements OnInit {
 
   loginForm: FormGroup;
   setting;
+  appName = '';
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
@@ -22,6 +23,7 @@ export class LoginPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.appName = this.commonService.appName;
     this.initForm();
   }
   ionViewWillEnter() {

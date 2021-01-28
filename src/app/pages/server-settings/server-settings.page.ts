@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonService } from 'src/app/services';
 
 @Component({
   selector: 'app-server-settings',
@@ -7,9 +8,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ServerSettingsPage implements OnInit {
   settings = [];
-  constructor() { }
+  appName;
+  constructor(
+    private commonService: CommonService
+  ) { }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    this.appName = this.commonService.appName;
+  }
 
   ionViewWillEnter() {
     const serverSettings = localStorage.getItem('serverSettings');
