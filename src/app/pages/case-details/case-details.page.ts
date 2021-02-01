@@ -233,11 +233,11 @@ export class CaseDetailsPage implements OnInit {
       this.caseDetails.data = result.data;
 
       this.getCaseSchemeSpecificData = [
-        { 'label': 'Offence Description', 'value': this.caseDetails.case_custom_data.Offence_Details ? this.caseDetails.case_custom_data.Offence_Details : result.data.offense },
+        { 'label': 'Offence Description', 'value': this.caseDetails.case_custom_data.offence_details ? this.caseDetails.case_custom_data.offence_details : result.data.offense },
         { 'label': 'Offence Time', 'value': custArr.offense_time },
         { 'label': 'Offence Date', 'value': result.data.offense_date },
         { 'label': 'Offence Code', 'value': custArr.offense_code },
-        { 'label': 'Offence Location', 'value': this.caseDetails.case_custom_data.Offence_Location ? this.caseDetails.case_custom_data.Offence_Location : result.data.offense_add1 },
+        { 'label': 'Offence Location', 'value': this.caseDetails.case_custom_data.offence_location ? this.caseDetails.case_custom_data.offence_location : result.data.offense_add1 },
         { 'label': 'Offence Address Line2', 'value': result.data.offense_add2 },
         { 'label': 'Offence Address Line 3', 'value': result.data.offense_add3 },
         { 'label': 'Offence Line 4', 'value': result.data.offense_add4 },
@@ -262,7 +262,7 @@ export class CaseDetailsPage implements OnInit {
   flatternCustomData(arr, custArr) {
     arr.forEach(element => {
       if (!isArray(element)) {
-        custArr[element.field_name] = element.field_value
+        custArr[(element.field_name).toLowerCase()] = element.field_value
       } else {
         this.flatternCustomData(element, custArr);
       }
