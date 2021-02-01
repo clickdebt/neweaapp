@@ -20,7 +20,7 @@
       <ion-col *ngIf="currentCase.linked_cases.length>0" size-md="6" class="ion-margin-top d-flex">
         <ion-label class="ion-align-self-center">Select Linked case</ion-label>
         <ion-item class="w-50" lines="none">
-          <ion-select multiple="true" [(ngModel)]="selectedLinkCaseIds" (ionChange)="onLinkCaseSelectChange($event)" okText="Okay"
+          <ion-select multiple="true" [(ngModel)]="selectedLinkCaseIds" (ionChange)="onLinkCaseSelectChange()" okText="Okay"
             cancelText="Dismiss" placeholder="Select linked case">
             <ion-select-option [value]="linkCase.id" *ngFor="let linkCase of currentCase.linked_cases,let i=index">
               {{linkCase.id}}
