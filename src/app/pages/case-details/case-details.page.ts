@@ -124,6 +124,7 @@ export class CaseDetailsPage implements OnInit {
     this.modalCtrl.dismiss();
   }
   async ionViewWillEnter() {
+    this.isNewlyn = this.commonService.isClient('newlyn');
     this.fromVrmSearch = localStorage.getItem('from_vrm');
     const downloadStatus = await this.databaseService.getHistoryDownloadStatus();
     if (downloadStatus && downloadStatus.status) {
@@ -148,7 +149,6 @@ export class CaseDetailsPage implements OnInit {
         console.log('Delete clicked');
       }
     }];
-    this.isNewlyn = this.commonService.isClient('newlyn');
     if (this.isNewlyn) {
       buttons.push(this.actionListArray['add_note']);
       buttons.push(this.actionListArray['add_fee']);
