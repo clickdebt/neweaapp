@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CaseService, DatabaseService } from '../../services';
+import { CaseService, CommonService, DatabaseService } from '../../services';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storage.service';
 import { Platform, ModalController } from '@ionic/angular';
@@ -62,6 +62,7 @@ export class JobListPage implements OnInit {
     { field: 'id', label: 'Id' },
     { field: 'scheme_id', label: 'Scheme Id' },
     { field: 'ref', label: 'Ref' },
+    { field: 'cl_ref', label: 'Client Ref' },
     { field: 'debtorid', label: 'Debtor Id' },
     { field: 'debtor.debtor_id', label: 'Debtor Id' },
     { field: 'debtor.debtor_name', label: 'Debtor Name' },
@@ -77,7 +78,7 @@ export class JobListPage implements OnInit {
     { field: 'current_status.status_type', label: 'Current Status Type' },
     { field: 'current_stage_id', label: 'Current Stage ID' },
     { field: 'stage.stage_type.stage_type', label: 'Stage Type' },
-    { field: 'date', label: 'Date' },
+    { field: 'date', label: 'Date Allocated' },
     { field: 'last_allocated_date', label: 'Last Allocate Date' },
     { field: 'hold_until', label: 'Hold' },
     { field: 'debtor.enforcement_addresses[0].address_ln1', label: 'Enforcement Address Line 1' },
@@ -101,12 +102,15 @@ export class JobListPage implements OnInit {
     private networkService: NetworkService,
     private databaseService: DatabaseService,
     private modalCtrl: ModalController,
+    private commonService: CommonService
   ) { }
 
   async ngOnInit() {
-    const caseFields= ["ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
+    let caseFields= ["ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
     // const caseFields = await this.storageService.get('fields');
-    
+    if(this.commonService.isClient('newlyn')) {
+      caseFields= ["cl_ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
+    }
     if (caseFields) {
       this.caseFields = this.totalFields.filter((c) => {
         if (caseFields.includes(c.field)) {
@@ -184,7 +188,7 @@ export class JobListPage implements OnInit {
     this.getCases('');
   }
   searchChange() {
-    if(this.searchBarValue && (this.searchBarValue.length > 3 || this.searchBarValue.length == 0)){
+    if((this.searchBarValue && this.searchBarValue.length > 2) || this.searchBarValue == ''){
       this.filterCases();
     }
     
@@ -296,12 +300,13 @@ export class JobListPage implements OnInit {
               });
               query += ' and ( ' + osQuery.join(' or ') + ') ';
             } else if (key === 'q') {
-              query += ' and (id LIKE ? or ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ?) ';
+              query += ' and (id LIKE ? or ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ? or custom5 LIKE ?) ';
               p.push(params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
+              p.push(params[key] + '%');
             }
           }
         }

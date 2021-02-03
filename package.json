@@ -1,5 +1,5 @@
 {
-  "name": "fieldagent_v3.0",
+  "name": "eaapp",
   "version": "0.0.1",
   "author": "Lateral",
   "homepage": "https://getlateral.com/",
@@ -40,14 +40,12 @@
     "@ionic/storage": "^2.2.0",
     "angular-formio": "^3.7.0",
     "angular-svg-round-progressbar": "^3.0.1",
-    "cordova-android": "^8.1.0",
     "cordova-browser": "^6.0.0",
     "cordova-plugin-actionsheet": "^2.3.3",
     "cordova-plugin-aes256-encryption": "^2.0.1",
     "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.2",
-    "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
     "cordova-plugin-nativegeocoder": "^3.2.2",
     "cordova-plugin-network-information": "^2.0.2",
     "cordova-plugin-request-location-accuracy": "^2.3.0",
@@ -75,9 +73,15 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "^5.0.0",
+    "cordova-android": "^8.1.0",
+    "cordova-plugin-androidx": "^3.0.0",
+    "cordova-plugin-androidx-adapter": "^1.1.3",
     "cordova-plugin-device": "^2.0.2",
+    "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
     "cordova-plugin-ionic-webview": "^4.1.3",
+    "cordova-plugin-nativeaudio": "^3.0.9",
+    "cordova-plugin-navigationbar": "^1.0.31",
     "cordova-plugin-splashscreen": "^5.0.2",
     "cordova-plugin-statusbar": "^2.4.2",
     "cordova-plugin-whitelist": "^1.3.3",
@@ -117,12 +121,15 @@
       "cordova-plugin-background-mode": {},
       "cordova-plugin-navigationbar": {},
       "cordova-plugin-aes256-encryption": {},
-      "cordova-plugin-request-location-accuracy": {
-        "PLAY_SERVICES_LOCATION_VERSION": "16.+"
-      }
+      "cordova-plugin-request-location-accuracy": {},
+      "cordova.plugins.diagnostic": {
+        "ANDROIDX_VERSION": "1.0.0"
+      },
+      "cordova-plugin-androidx": {}
     },
     "platforms": [
-      "browser"
+      "browser",
+      "android"
     ]
   }
 }

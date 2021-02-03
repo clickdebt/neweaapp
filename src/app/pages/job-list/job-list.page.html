@@ -3,7 +3,7 @@
     <ion-row class="searchbar-wrpper">
       <ion-col size-md="8" size-xs="8">
         <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
-          (keyup.enter)="filterCases()" (ionChange)="searchChange()" (ionCancel)="filterCases()" placeholder="Search ID, ref, postcode, name">
+          (keyup.enter)="filterCases()" (ionChange)="searchChange()" (ionCancel)="filterCases()" placeholder="Search ID, ref, postcode, name, VRM">
         </ion-searchbar>
       </ion-col>
       <ion-col size-xs="4" *ngIf="isMobile">
@@ -131,10 +131,11 @@
   <div class="filter-footer">
     <ion-grid>
       <ion-row>
-        <ion-col size-xs="6">
+        <ion-col size-xs="8">
           <ion-button color="dark" size="default" fill="clear" (click)="clearFilter()">CLEAR</ion-button>
+          <ion-button color="dark" size="default" fill="clear" (click)="showFilter = false">CLOSE</ion-button>
         </ion-col>
-        <ion-col size-xs="6" class="ion-text-end">
+        <ion-col size-xs="4" class="ion-text-end">
           <ion-button color="secondary" size="default" fill="solid" (click)="filterCases()">Apply Filter</ion-button>
         </ion-col>
       </ion-row>
@@ -163,10 +164,12 @@
   <div class="filter-footer">
     <ion-grid>
       <ion-row>
-        <ion-col size-xs="6">
+        <ion-col size-xs="8">
           <ion-button color="dark" size="default" fill="clear" (click)="clearSort()">CLEAR</ion-button>
+          <ion-button color="dark" size="default" fill="clear" (click)="showSort = false">CLOSE</ion-button>
+
         </ion-col>
-        <ion-col size-xs="6" class="ion-text-end">
+        <ion-col size-xs="4" class="ion-text-end">
           <ion-button color="secondary" size="default" fill="solid" (click)="filterCases()">Apply SORT</ion-button>
         </ion-col>
       </ion-row>
