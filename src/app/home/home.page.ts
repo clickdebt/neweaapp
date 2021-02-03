@@ -25,6 +25,7 @@ export class HomePage implements OnInit {
   bgSubscription;
   hasVRMpermission = false;
   bgNetworkSubscription;
+  bgApiChecker;
   limit = 50;
   downloading = false;
   last_updated_date = '';
@@ -219,7 +220,7 @@ export class HomePage implements OnInit {
       console.log('active');
       this.bgNetworkSubscription = this.network.onConnect().subscribe(() => {
         console.log('net connected');
-        this.databaseService.isApiPending.subscribe(res => {
+        this.bgApiChecker = this.databaseService.isApiPending.subscribe(res => {
           this.databaseService.savePendingApi(res);
         })
       });
@@ -228,6 +229,7 @@ export class HomePage implements OnInit {
       setTimeout(() => {
         console.log('deactive');
         // this.bgSubscription.unsubscribe();
+        this.bgApiChecker.unsubscribe();
         this.bgNetworkSubscription.unsubscribe();
         // this.backgroundMode.disable();
       }, 300);

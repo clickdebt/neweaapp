@@ -55,13 +55,14 @@ export class DatabaseService {
       } else {
         this.setUpDatabase();
       }
-      this.networkService.onNetworkChange().subscribe((response) => {
-        if (response === 1) {
-          this.isApiPending.subscribe(res => {
-            this.savePendingApi(res);
-          })
-        }
-      });
+      this.isApiPending.subscribe(res => {
+        this.savePendingApi(res);
+      })
+      // this.networkService.onNetworkChange().subscribe((response) => {
+      //   if (response === 1) {
+          
+      //   }
+      // });
 
     }).catch((error) => { });
   }
