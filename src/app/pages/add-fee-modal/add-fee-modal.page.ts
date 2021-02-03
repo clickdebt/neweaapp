@@ -11,6 +11,7 @@ import * as moment from 'moment';
 })
 export class AddFeeModalPage implements OnInit {
   @Input() caseId;
+  @Input() currentCase;
   feeOptions: any[];
   selectedFeeOption = '';
   feeActions: any[];
@@ -28,16 +29,23 @@ export class AddFeeModalPage implements OnInit {
   }
   async getFeeOptions() {
     this.feeOptions = await this.storageService.get('fee_options');
-    
+    this.feeOptions = this.feeOptions.filter((item: any) => {
+      return (item.sm_id == this.currentCase.scheme_id) && item.fee['id'] > 0;
+    }).map((item: any)=>{
+        return item.fee
+    });
     // this.caseActionService.getFeeOptions(this.caseId).subscribe((response: any) => {
     //   this.feeOptions = response.data.data;
     // });
   }
   onSelectChange(event) {
     if (this.selectedFeeOption) {
+      var selectedFee = this.feeOptions.filter((item: any) => {
+        return item.id == this.selectedFeeOption;
+      });
       const feeData = {
-        fee_id: this.selectedFeeOption,
-        amount: this.feeOptions[this.selectedFeeOption].amount
+        fee_id: selectedFee[0].id,
+        amount: selectedFee[0].amount
       };
       const api_data = [
         { name: 'case_id', value: `${this.caseId}` },

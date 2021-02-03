@@ -1,8 +1,9 @@
-<ion-header class="shadow">
-  <ion-toolbar>
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>Add Fees</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
-        <ion-icon size="large" name="close-outline"></ion-icon>
+        <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -10,11 +11,6 @@
 
 <ion-content>
   <ion-grid>
-    <ion-row class="modal-header ion-margin-horizontal ion-justify-content-center">
-      <ion-item lines="none" class="font-size-21">
-        <ion-label>Add Fees</ion-label>
-      </ion-item>
-    </ion-row>
     <ion-row class="ion-justify-content-center">
       <ion-col size-md="3" class="ion-margin-top">
         <ion-item lines="none">
@@ -31,7 +27,7 @@
 
   <ion-grid>
     <ion-row class="ion-margin-top">
-      <ion-toolbar class="fee-title">
+      <ion-toolbar class="fee-title" color="secondary">
         <ion-title>Fees</ion-title>
       </ion-toolbar>
     </ion-row>

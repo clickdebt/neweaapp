@@ -1,6 +1,6 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Upload Document</ion-title>
+  <ion-toolbar color="dark">
+    <ion-title>upload Document</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
         <ion-icon name="close-outline"></ion-icon>
@@ -10,6 +10,7 @@
 </ion-header>
 
 <ion-content>
+  <ion-row class="ion-margin"><ion-col>
   <form [formGroup]="uploadForm" name="uploadForm">
     <ion-list lines="full" class="ion-no-margin ion-no-padding">
       <ion-item>
@@ -23,4 +24,5 @@
       </div>
     </ion-list>
   </form>
+</ion-col></ion-row>
 </ion-content>

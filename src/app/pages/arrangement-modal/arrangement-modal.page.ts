@@ -23,7 +23,7 @@ export class ArrangementModalPage implements OnInit {
   // tslint:disable: max-line-length
   frequency = [{ id: '2', label: 'One time final payment' }, { id: '3', label: 'Weekly By day of the week' }, { id: '4', label: 'Monthly by date' }, { id: '5', label: 'Monthly by day' }, { id: '6', label: 'Fortnightly' }, { id: '7', label: '4 weekly' }];
   paymentMethods = [{ id: 1, label: 'Cash' }, { id: 2, label: 'Cheque' }, { id: 4, label: 'Credit card' }, { id: 5, label: 'Debit Card' }, { id: 8, label: 'BACS' }];
-  arrangementObj: any = { show: false };
+  arrangementObj: any = { show: true };
   currentArrangementString = '';
   currArrangement;
   arrangementMode = 'make';
@@ -33,7 +33,7 @@ export class ArrangementModalPage implements OnInit {
       show: true
     },
     scheduleArrangements: {
-      show: false
+      show: true
     }
   };
   inActiveArrangements: any = {
