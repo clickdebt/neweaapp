@@ -65,7 +65,23 @@ export class CommonService {
     return localStorage.getItem('server_url').indexOf(name) > -1;
   }
   async hasPermission(item) {
-    const permissionArray = await this.storageService.get('permissionArray');
+    let permissionArray = await this.storageService.get('permissionArray');
+    if(permissionArray == undefined) {
+      const userdata : any = localStorage.getItem('userdata');
+      if (userdata.user_permissions) {
+        const permissions = userdata.user_permissions;
+        let permissionArr = [];
+        permissions.filter(per => {
+          const p = Object.keys(per).filter(element => {
+            return per[element] == true;
+          });
+          permissionArr = permissionArr.concat(p);
+        });
+        // console.log(permissionArr);
+        await this.storageService.set('permissionArray', permissionArr);
+        permissionArray =  permissionArr;
+      }
+    }
     if (permissionArray && permissionArray.indexOf(item) !== -1) {
       return true;
     }

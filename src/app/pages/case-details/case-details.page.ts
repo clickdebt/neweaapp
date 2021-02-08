@@ -116,6 +116,7 @@ export class CaseDetailsPage implements OnInit {
         this.fromVisit = true;
     }
     
+    this.fromVrmSearch = localStorage.getItem('from_vrm');
     this.databaseService.lastUpdateTime.subscribe(date => {
       this.loadInitData();
     })
@@ -188,23 +189,35 @@ export class CaseDetailsPage implements OnInit {
   }
 
   async loadInitData() {
+    
+      if(this.fromVrmSearch) {
+        let case_data = localStorage.getItem('vrm_case_data');
+        case_data = JSON.parse(case_data);
+        this.currentCaseData = case_data;
+        this.caseService.getCaseDetails({ 'cases': this.caseId }).subscribe((response: any) => {
+          const history = response;
+          this.parseResultData({data: case_data, history: history.history});
+        });
+      } else {
+        
+        const data = await this.databaseService.getCaseInfo(this.caseId);
+        if (data) {
+          this.currentCaseData = data;
+          if (this.currentCaseData.linked_cases && this.currentCaseData.linked_cases.length) {
+            const linkedCasesTotalBalance = parseFloat(this.currentCaseData.d_outstanding)
+              + this.currentCaseData.linked_cases.reduce((accumulator, currentValue) => {
+                return accumulator + parseFloat(currentValue.d_outstanding);
+              }, 0);
+            this.linkedTotal = linkedCasesTotalBalance;
+          }
+          this.getOfflinecaseDetails();
 
-    const data = await this.databaseService.getCaseInfo(this.caseId);
-    if (data) {
-      this.currentCaseData = data;
-      if (this.currentCaseData.linked_cases && this.currentCaseData.linked_cases.length) {
-        const linkedCasesTotalBalance = parseFloat(this.currentCaseData.d_outstanding)
-          + this.currentCaseData.linked_cases.reduce((accumulator, currentValue) => {
-            return accumulator + parseFloat(currentValue.d_outstanding);
-          }, 0);
-        this.linkedTotal = linkedCasesTotalBalance;
+        } else {
+          this.router.navigate(['/home/job-list']);
+        }
+        this.currentCaseData.show = false;
       }
-      this.getOfflinecaseDetails();
-
-    } else {
-      this.router.navigate(['/home/job-list']);
-    }
-    this.currentCaseData.show = false;
+    
   }
 
   sum(a, b) {
@@ -214,6 +227,9 @@ export class CaseDetailsPage implements OnInit {
   async getOfflinecaseDetails() {
 
     const result = await this.databaseService.getOfflinecaseDetails(this.currentCaseData.id);
+    this.parseResultData(result);
+  }
+  parseResultData(result) {
     if (result.deleted) {
       this.commonService.showToast('Case no longer allocated to you.');
       this.router.navigate(['/home/job-list']);
@@ -224,11 +240,6 @@ export class CaseDetailsPage implements OnInit {
       custom_data = Object.values(custom_data);
 
       this.flatternCustomData(custom_data, custArr);
-      // custom_data.forEach(element => {
-      //   if (!isArray(element)) {
-      //     custArr[element.field_name] = element.field_value
-      //   }
-      // });
       this.caseDetails.case_custom_data = custArr;
       this.caseDetails.data = result.data;
 
@@ -501,7 +512,7 @@ export class CaseDetailsPage implements OnInit {
 
   doRefresh(event: any = '') {
     this.databaseService.refreshData({ 'cases': this.caseId }).then((res: any) => {
-      this.loadInitData();
+      // this.loadInitData();
       if (event)
         event.target.complete();
 
@@ -510,6 +521,7 @@ export class CaseDetailsPage implements OnInit {
 
   ionViewWillLeave() {
     localStorage.removeItem('from_vrm');
+    localStorage.removeItem('vrm_case_data');
     this.storageService.remove('caseId');
   }
 }
