@@ -33,6 +33,7 @@ export class VrmSearchPage implements OnInit {
   }
   async ionViewWillEnter() {
     this.currentDate = moment().format('YYYY-MM-DD hh:mm:ss');
+    this.cases = [];
     this.checkPermissions();
   }
   async checkPermissions() {
@@ -43,6 +44,7 @@ export class VrmSearchPage implements OnInit {
       const param = {
         vrm: this.searchBarValue
       };
+      this.cases = [];
       this.caseService.getCases(param).subscribe((response: any) => {
         this.isSearch = true;
         this.cases = response.data;

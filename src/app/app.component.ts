@@ -4,8 +4,7 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { NetworkService, ConnectionStatus } from './services/network.service';
-import { CommonService, StorageService } from './services';
-import { CaseDetailsService } from './services/case-details.service';
+import { CommonService, DatabaseService, StorageService } from './services';
 import { CaseActionService } from './services/case-action.service';
 
 @Component({
@@ -22,6 +21,7 @@ export class AppComponent implements OnInit {
     private networkService: NetworkService,
     private commonService: CommonService,
     private storageService: StorageService,
+    private databaseService: DatabaseService,
     private caseActionService: CaseActionService) {
     this.initializeApp();
   }
@@ -34,6 +34,7 @@ export class AppComponent implements OnInit {
       this.commonService.askUserPermissions();
       this.networkService.onNetworkChange().subscribe(async (status: ConnectionStatus) => {
         if (status === ConnectionStatus.Online) {
+          this.databaseService.checkApiPending('app');
           // Perform upload to server
           // this.caseActionService.offlineActions();
 

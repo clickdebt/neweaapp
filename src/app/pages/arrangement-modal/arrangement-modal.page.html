@@ -28,7 +28,7 @@
   </div>
 
   <div class=" ion-margin-top" *ngIf="activeArrangements.scheduleArrangements.data">
-    <ion-item  color="secondary" class="bg-main" (click)="toggleShow(activeArrangements?.scheduleArrangements)"
+    <ion-item color="secondary" class="bg-main" (click)="toggleShow(activeArrangements?.scheduleArrangements)"
       ng-class="{active: isShown(activeArrangements?.scheduleArrangements)}">
       <ion-label>
         <h2>Arrangement Schedule</h2>
@@ -78,7 +78,8 @@
   </div>
 
   <div class="ion-margin-top">
-    <ion-item class="bg-main" (click)="toggleShow(arrangementObj)" color="secondary" ng-class="{active: isShown(arrangementObj)}">
+    <ion-item class="bg-main" (click)="toggleShow(arrangementObj)" color="secondary"
+      ng-class="{active: isShown(arrangementObj)}">
       <ion-label>
         <h2>Create Arrangement <span *ngIf="outstanding"> - Outstanding Amount : {{outstanding}}</span></h2>
       </ion-label>
@@ -153,7 +154,7 @@
           <ion-textarea formControlName="note" placeholder="note"></ion-textarea>
         </ion-item>
 
-        <!-- <ion-item>
+        <ion-item>
           <ion-checkbox slot="start" formControlName="repeatPayment" (ionChange)="repeatPaymentSelected($event)">
           </ion-checkbox>
           <ion-label>Repeat Payment</ion-label>
@@ -177,17 +178,17 @@
         </ion-item>
         <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
           <ion-button (click)="manageCards()">Manage Cards</ion-button>
-        </ion-item> -->
+        </ion-item>
       </ion-list>
       <div class="ion-padding">
         <ion-row>
           <ion-col>
-            <ion-button expand="block" type="submit" [disabled]="this.arrangementForm.invalid" (click)="save()">
+            <ion-button color="secondary" expand="block" type="submit" [disabled]="this.arrangementForm.invalid" (click)="save()">
               Save
             </ion-button>
           </ion-col>
           <ion-col>
-            <ion-button expand="block" type="button" (click)="dismiss()">Close</ion-button>
+            <ion-button color="secondary" expand="block" type="button" (click)="dismiss()">Close</ion-button>
           </ion-col>
         </ion-row>
       </div>

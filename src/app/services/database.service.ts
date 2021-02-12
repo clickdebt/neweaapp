@@ -18,6 +18,7 @@ export class DatabaseService {
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public refreshingData: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public syncingAPI: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private detailsReady: BehaviorSubject<boolean>;
   public lastUpdateTime: BehaviorSubject<any> = new BehaviorSubject(false);
   linkedIds = [];
@@ -51,7 +52,6 @@ export class DatabaseService {
       const storageVersion = await this.storageService.get('version');
       if (value && storageVersion && storageVersion == this.version) {
         this.databaseReady.next(true);
-        this.checkApiPending();
       } else {
         this.setUpDatabase();
       }
@@ -153,7 +153,6 @@ export class DatabaseService {
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
     await this.storageService.set('version', this.version)
-    this.checkApiPending();
   }
 
   async executeQuery(query, params = null) {
@@ -338,6 +337,9 @@ export class DatabaseService {
       if (data.exitCodeData) {
         await this.setvisitOutcomes(data.exitCodeData);
       }
+      if(data.paymentGatewayList){
+        await this.storageService.set('gateway', data.paymentGatewayList);
+      }
       await Promise.all(promiseArray)
         .then((res: any) => {
           return res;
@@ -471,43 +473,49 @@ export class DatabaseService {
   changeIsApiPending(val) {
     this.isApiPending.next(val);
   }
-  checkApiPending() {
+  checkApiPending(source= 'false') {
+    
     this.getApiStored().then(data => {
       if (data.rows.length > 0) {
         this.changeIsApiPending(true);
       }
     })
   }
-  async getApiStored() {
-    const query = "select * from api_calls where is_sync = 0"
+  async getApiStored(limit = false) {
+    let query = "select * from api_calls where is_sync = 0"
+    if(limit) {
+      query += ' limit 1';
+    }
     return this.executeQuery(query, []);
   }
-  changeApiCallStatus(id, status = 1) {
+  async changeApiCallStatus(id, status = 1) {
     const updateQuery = `update api_calls set is_sync = ${status} where id = ${id}`;
     return this.executeQuery(updateQuery);
   }
   async savePendingApi(val) {
     if (val && this.networkService.getCurrentNetworkStatus() === 1) {
-      this.getApiStored().then(async (data) => {
-        const arr = [];
+      this.getApiStored(true).then(async (data) => {
         if (data) {
           for (let i = 0; i < data.rows.length; i++) {
             const currentFormData = data.rows.item(i);
-            this.changeApiCallStatus(currentFormData.id, 2);
+            await this.changeApiCallStatus(currentFormData.id, 2);
             let form_data = JSON.parse(decodeURI(currentFormData.data));
             if(form_data.file) {
               const form_data1 = new FormData();
               form_data1.append('file',  new File([form_data.file], form_data.file_name));
               form_data = form_data1;
             }
+            this.syncingAPI.next(true);
             let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
             console.log(callResponse);
-
+            this.syncingAPI.next(false);
             if (callResponse) {
-              this.changeApiCallStatus(currentFormData.id, 1);
+              await this.changeApiCallStatus(currentFormData.id, 1);
+              this.checkApiPending('514');
               this.refreshData({ 'cases': currentFormData.case_id })
             } else {
-              this.changeApiCallStatus(currentFormData.id, 0);
+              await this.changeApiCallStatus(currentFormData.id, 0);
+              this.checkApiPending('518');
             }
           }
         }
