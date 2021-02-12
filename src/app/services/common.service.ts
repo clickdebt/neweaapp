@@ -66,8 +66,10 @@ export class CommonService {
   }
   async hasPermission(item) {
     let permissionArray = await this.storageService.get('permissionArray');
-    if(permissionArray == undefined) {
-      const userdata : any = localStorage.getItem('userdata');
+    if(!permissionArray) {
+      let userdata : any = localStorage.getItem('userdata');
+      userdata = JSON.parse(userdata);
+      
       if (userdata.user_permissions) {
         const permissions = userdata.user_permissions;
         let permissionArr = [];

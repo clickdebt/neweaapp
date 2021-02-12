@@ -73,6 +73,7 @@
     <ion-router-outlet id="main-content"></ion-router-outlet>
   </ion-content>
   <ion-footer *ngIf="last_updated_date" class="text-center text-info">
+    <ion-spinner class="ion-float-left" name="dots" *ngIf="showSyncingData"></ion-spinner>
     Last update time : {{last_updated_date}}
     <ion-spinner name="bubbles" *ngIf="showRefreshingData"></ion-spinner>
   </ion-footer>

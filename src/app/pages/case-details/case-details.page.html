@@ -8,7 +8,7 @@
       <ion-button *ngIf="!fromVisit" size="small" color="secondary" (click)="doRefresh()">
         <ion-icon size="large" name="refresh-circle-outline"></ion-icon>
       </ion-button>
-      <ion-button *ngIf="!fromVisit" size="small" color="secondary" (click)="presentActionSheet()">
+      <ion-button *ngIf="!fromVisit && !fromVrmSearch" size="small" color="secondary" (click)="presentActionSheet()">
         Actions
       </ion-button>
       <ion-button *ngIf="fromVisit" (click)="dismiss()">
@@ -158,7 +158,7 @@
                         number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Paid Out </span>
-                    <span><b>{{sum(caseDetails.data.d_client_cleared, caseDetails.data.d_fees_cleared) |
+                    <span><b>{{sum(caseDetails.data.d_client_received, caseDetails.data.d_fees_received) |
                         number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Current outstanding</span>

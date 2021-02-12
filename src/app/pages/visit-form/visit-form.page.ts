@@ -227,7 +227,8 @@ export class VisitFormPage implements OnInit {
     this.currLat = coords.latitude;
     console.log(this.currLang, this.currLat);
     if (this.visitCaseData) {
-      if (this.visitCaseData.debtor.enforcement_addresses.length) {
+      let en_add = this.visitCaseData.debtor.enforcement_addresses;
+      if (en_add.length && (en_add.address_ln1 != null || en_add.address_postcode != null)) {
         this.addressData = {
           address_ln1: this.visitCaseData.debtor.enforcement_addresses[0].address_ln1,
           address_ln2: this.visitCaseData.debtor.enforcement_addresses[0].address_ln2,
@@ -412,13 +413,15 @@ export class VisitFormPage implements OnInit {
       console.log(visit_outcome);
       event.data.visit_outcome = visit_outcome.name;
     }
-    const visit_report_data = {
+    let visit_report_data = {
       form_data: event.data,
       payment_data: this.paymentInfo,
       arrangement_data: this.arrangementInfo,
-      locationOverride: this.locationOverride,
-      distance: (this.distance / this.tomiles).toFixed(2)
+      locationOverride: this.locationOverride
     };
+    if(this.isNewlyn) {
+      visit_report_data['distance'] = (this.distance / this.tomiles).toFixed(2);
+    }
 
     const form_data = {
       form_id: this.formData.id,

@@ -115,7 +115,11 @@ export class TakePaymentPage implements OnInit {
             }
             // this.addPayment(res);
           } else {
-            this.commonService.showToast('Error while creating payment');
+            let err = 'Error while creating payment';
+            if(res.data && res.data.response && res.data.response.statusDetail) {
+              err = res.data.response.statusDetail;
+            }
+            this.commonService.showToast(err);
           }
         });
       } else {
@@ -134,36 +138,6 @@ export class TakePaymentPage implements OnInit {
     }
 
   }
-  // addPayment(res) {
-  //   const date = new Date().toISOString();
-  //   const obj = {
-  //     created_by: JSON.parse(localStorage.getItem('userdata')).id,
-  //     created_at: date,
-  //     updated_by: JSON.parse(localStorage.getItem('userdata')).id,
-  //     updated_at: date,
-  //     case_id: this.caseId,
-  //     // sent: 1,
-  //     // sent_at: date,
-  //     transaction_ref: res.transactionId,
-  //     status: 'submitted',
-  //     net_amount: res.amount.totalAmount,
-  //     surcharge_amount: res.amount.surchargeAmount,
-  //     is_card: 1,
-  //     card_type: res.paymentMethod.card.cardType,
-  //     card_auth_no: res.paymentMethod.card.cardIdentifier,
-  //     gateway_configuration: 'sage',
-  //     gateway_status: res.bankAuthorisationCode
-  //   };
-  //   this.caseActionService.addPayment(obj, this.caseId).subscribe((response: any) => {
-  //     console.log(response);
-  //     this.storageService.set('is_case_updated', true);
-  //     this.commonService.showToast(response.data.message);
-  //     if (response.data.success) {
-  //       this.paymentsForm.reset();
-  //       this.dismiss();
-  //     }
-  //   });
-  // }
 
   dismiss() {
     // using the injected ModalController this page

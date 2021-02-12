@@ -258,7 +258,7 @@ export class ArrangementModalPage implements OnInit {
     if (finalResult.debtor_id) {
       this.debtorId = finalResult.debtor_id;
     }
-    this.paymentGateways = [];
+    this.paymentGateways = await this.storageService.get('gateway');
   
     this.currArrangement = this.currArrangement.find(data => data.active == 1);
     

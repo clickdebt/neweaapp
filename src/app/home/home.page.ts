@@ -30,13 +30,14 @@ export class HomePage implements OnInit {
   downloading = false;
   last_updated_date = '';
   showRefreshingData = false;
+  showSyncingData = false;
   appName = '';
   refreshBtnDisable = false;
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
     private router: Router,
-    private databaseService: DatabaseService,
+    private   databaseService: DatabaseService,
     private caseService: CaseService,
     private modalCtrl: ModalController,
     private visitService: VisitService,
@@ -59,6 +60,9 @@ export class HomePage implements OnInit {
     });
     this.databaseService.refreshingData.subscribe(refreshingData => {
       this.showRefreshingData = refreshingData;
+    });
+    this.databaseService.syncingAPI.subscribe(res => {
+      this.showSyncingData =  res;
     });
   }
 
@@ -225,26 +229,22 @@ export class HomePage implements OnInit {
   }
 
   startBackgroundEvent() {
-    this.backgroundMode.setDefaults({ title: this.commonService.appName, ticker: this.commonService.appName, text: 'Running in Background' });
+    this.backgroundMode.setDefaults({ title: this.commonService.appName, ticker: this.commonService.appName, text: 'Running in Background', silent: true });
     this.backgroundMode.enable();
-    this.bgSubscription = this.backgroundMode.on('activate').subscribe(() => {
-      console.log('active');
-      this.bgNetworkSubscription = this.network.onConnect().subscribe(() => {
-        console.log('net connected');
-        this.bgApiChecker = this.databaseService.isApiPending.subscribe(res => {
-          this.databaseService.savePendingApi(res);
-        })
-      });
-    });
-    this.backgroundMode.on('deactivate').subscribe(() => {
-      setTimeout(() => {
-        console.log('deactive');
-        // this.bgSubscription.unsubscribe();
-        this.bgApiChecker.unsubscribe();
-        this.bgNetworkSubscription.unsubscribe();
-        // this.backgroundMode.disable();
-      }, 300);
-    });
+    // this.bgSubscription = this.backgroundMode.on('activate').subscribe(() => {
+    //   console.log('active');
+    //   this.bgNetworkSubscription = this.network.onConnect().subscribe(() => {
+    //     console.log('net connected');
+    //     this.databaseService.checkApiPending('home');
+    //   });
+    // });
+    // this.backgroundMode.on('deactivate').subscribe(() => {
+    //   setTimeout(() => {
+    //     console.log('deactive');
+    //     this.bgNetworkSubscription.unsubscribe();
+    //     // this.backgroundMode.disable();
+    //   }, 300);
+    // });
   }
 
   saveTimeSettings(timeSettings) {
