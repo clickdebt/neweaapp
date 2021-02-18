@@ -218,13 +218,25 @@ export class HomePage implements OnInit {
     await panicModalPage.present();
   }
   async doRefresh() {
-    this.refreshBtnDisable = true;
-    const downloadStatus = await this.databaseService.getDownloadStatus();
-    if (downloadStatus) {
-      const params = { last_update_date: downloadStatus.time };
-      this.databaseService.refreshData(params).then((res: any) => {
-        this.refreshBtnDisable = false;
-      });
+    if (this.networkService.getCurrentNetworkStatus() === 1) {
+      this.refreshBtnDisable = true;
+      const downloadStatus = await this.databaseService.getDownloadStatus();
+      if (downloadStatus) {
+        const params = {};
+        this.loaderService.show();
+        this.loaderService.displayText.next('Downloading Cases');
+        await this.databaseService.executeQuery('delete from rdebt_cases');
+        await this.databaseService.executeQuery('delete from rdebt_linked_cases');
+        this.caseService.getCases(params, 1).subscribe(async(response: any)=>{
+          await this.databaseService.setCases(response.data, response.linked, response.allCases);
+          this.caseService.getCaseDetails(params).subscribe(async(response: any) =>{
+            await this.databaseService.setcaseDetails(response);
+            await this.databaseService.updateLastUpdatedDates();
+            this.refreshBtnDisable = false;
+            this.loaderService.hide();
+          });
+        });
+      }
     }
   }
 
