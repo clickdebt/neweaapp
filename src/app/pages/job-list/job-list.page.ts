@@ -335,6 +335,14 @@ export class JobListPage implements OnInit {
           this.cases = this.cases.concat(results);
           // this.parseCaseData(results, []);
 
+          var tempArr = []; // To remove duplicate records
+          this.cases = this.cases.filter((record)=>{
+            if(tempArr.indexOf(record.id) == -1){
+              tempArr.push(record.id);
+              return true;
+            }
+          });
+
         }
         if (infiniteScrollEvent) {
           infiniteScrollEvent.target.complete();
