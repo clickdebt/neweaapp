@@ -52,8 +52,8 @@ export class TakePaymentPage implements OnInit {
       card_number: ['', [Validators.required, Validators.pattern('^[0-9]{12,20}$')]],
       card_expiry: ['', [Validators.required]],
       card_cvc: ['', [Validators.required, Validators.pattern('^[0-9]{3,4}$')]],
-      method: ['1'],
-      source: ['1'],
+      method: ['16'],
+      source: ['4'],
       note: ['', []],
       financial_split_override_id: ['-1'],
       client_direct: ['0'],
@@ -100,7 +100,10 @@ export class TakePaymentPage implements OnInit {
         updated_by: JSON.parse(localStorage.getItem('userdata')).id,
         updated_at: date,
         sent: 1,
-        sent_at: date
+        sent_at: date,
+        method: this.paymentsForm.value.method,
+        source: this.paymentsForm.value.source,
+        userid: JSON.parse(localStorage.getItem('userdata')).id
       };
       if (this.networkStatus == 1) {
         console.log(obj);

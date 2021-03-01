@@ -51,6 +51,7 @@ export class ArrangementModalPage implements OnInit {
   date;
   isNewlyn = false;
   paymentGateways = [];
+  defaultPaymentMethod='';
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -259,6 +260,7 @@ export class ArrangementModalPage implements OnInit {
       this.debtorId = finalResult.debtor_id;
     }
     this.paymentGateways = await this.storageService.get('gateway');
+    this.defaultPaymentMethod = this.paymentGateways[0].key;
   
     this.currArrangement = this.currArrangement.find(data => data.active == 1);
     

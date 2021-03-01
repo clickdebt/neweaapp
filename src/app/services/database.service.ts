@@ -71,6 +71,7 @@ export class DatabaseService {
     const rdebCases = `CREATE TABLE IF NOT EXISTS rdebt_cases(
       id INTEGER PRIMARY KEY,
       ref TEXT,
+      cl_ref TEXT,
       scheme_id INTEGER,
       debtor_id INTEGER,
       date DATE,
@@ -94,6 +95,7 @@ export class DatabaseService {
     const rdebLinkedCases = `CREATE TABLE IF NOT EXISTS rdebt_linked_cases(
       id INTEGER PRIMARY KEY,
       ref TEXT,
+      cl_ref TEXT,
       scheme_id INTEGER,
       debtor_id INTEGER,
       date DATE,
@@ -223,20 +225,20 @@ export class DatabaseService {
     const sql = [];
     const sqlLinked = [];
     let sqlStart = `insert or replace INTO rdebt_cases
-    ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
+    ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
       client_id, current_status_id, current_stage_id, address_postcode,
       enforcement_addresses_postcode, debtor_name,  data ) VALUES `;
 
     let sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
-    ( id, ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
+    ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
       client_id, current_status_id, current_stage_id, address_postcode,
       enforcement_addresses_postcode, debtor_name, data ) VALUES `;
 
     data.forEach((values) => {
 
-      const query = `(${values.id}, "${values.ref}", ${values.scheme_id},  ${values.debtor_id},
+      const query = `(${values.id}, "${values.ref}", "${values.cl_ref}", ${values.scheme_id},  ${values.debtor_id},
           "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
           "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
           "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
@@ -251,7 +253,7 @@ export class DatabaseService {
 
     linked.forEach((values) => {
 
-      sqlLinked.push(`(${values.id}, "${values.ref}", ${values.scheme_id}, ${values.debtor_id},
+      sqlLinked.push(`(${values.id}, "${values.ref}", "${values.cl_ref}", ${values.scheme_id}, ${values.debtor_id},
         "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
         "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
         "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},

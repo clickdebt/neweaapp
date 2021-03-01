@@ -300,8 +300,9 @@ export class JobListPage implements OnInit {
               });
               query += ' and ( ' + osQuery.join(' or ') + ') ';
             } else if (key === 'q') {
-              query += ' and (id LIKE ? or ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ? or custom5 LIKE ?) ';
+              query += ' and (id LIKE ? or ref LIKE ? or cl_ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ? or custom5 LIKE ?) ';
               p.push(params[key] + '%');
+              p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
@@ -333,6 +334,14 @@ export class JobListPage implements OnInit {
           this.page++;
           this.cases = this.cases.concat(results);
           // this.parseCaseData(results, []);
+
+          var tempArr = []; // To remove duplicate records
+          this.cases = this.cases.filter((record)=>{
+            if(tempArr.indexOf(record.id) == -1){
+              tempArr.push(record.id);
+              return true;
+            }
+          });
 
         }
         if (infiniteScrollEvent) {
