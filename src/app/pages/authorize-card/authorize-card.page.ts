@@ -50,6 +50,7 @@ export class AuthorizeCardPage implements OnInit {
   }
   save() {
     if (this.addCardForm.valid) {
+      this.commonService.showLoader();
       const obj = {
         card_no: this.addCardForm.value.card_number,
         expiry_month: moment(this.addCardForm.value.card_expiry).format('MMYY'),
@@ -71,13 +72,22 @@ export class AuthorizeCardPage implements OnInit {
           console.log(data);
           this.caseActionService.saveCardDetails(data).subscribe((response: any) => {
             console.log(response);
+            this.commonService.dismissLoader();
             if (response.status == 'success') {
               this.commonService.showToast('card added successfully.');
             } else {
-              this.commonService.showToast(response.errors ? response.errors : response.result.statusDetail);
+              if(response.errors.length > 0){
+                (response.errors).forEach(element => {
+                  this.commonService.showToast(element.description);  
+                });
+              } else {
+                this.commonService.showToast(response.status);
+              }
+              // this.commonService.showToast(response.errors ? response.errors : response.result.statusDetail);
             }
           });
         } else {
+          this.commonService.dismissLoader();
           if (res.message) {
             this.commonService.showToast(res.message);
           } else {
