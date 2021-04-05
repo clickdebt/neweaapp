@@ -51,7 +51,7 @@ export class AddNoteModalPage implements OnInit {
         { name: 'case_id', value: `${this.caseId}` },
         { name: 'url', value: `b/clickdebt_panel_layout/history/panels/add_case_note/${this.caseId}?source=API`, },
         { name: 'type', value: `post` },
-        { name: 'data', value: `${encodeURI(JSON.stringify(data))}` },
+        { name: 'data', value: `${encodeURI(JSON.stringify(data)).replace(/'/g, "%27")}` },
         { name: 'is_sync', value: 0 },
         { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
       ]
