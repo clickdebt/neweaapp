@@ -85,8 +85,10 @@
                   <span class="d-block"><b>{{caseDetails.data.custom5}}</b></span>
                   <hr>
                   <span class="d-block color-primary">Warrant Date</span>
-                  <span class="d-block" *ngIf="isNewlyn"><b>{{caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-'}}</b></span>
-                  <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
+                  <span class="d-block" *ngIf="isNewlyn"><b>{{caseDetails.data.custom_date4 ?
+                      caseDetails.data.custom_date4 : '-'}}</b></span>
+                  <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date
+                      : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
                   <hr>
                   <ng-template *ngIf="fromVrmSearch">
                     <span class="d-block color-primary">Agent Name</span>
@@ -113,13 +115,13 @@
                     <span><b>{{caseDetails.data.d_total_client_owed | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Collected</span>
-                    <span><b>{{caseDetails.data.d_client_paid | number:'0.2-2'}}</b></span>
+                    <span><b>{{caseDetails.data.d_client_received | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Cleared</span>
                     <span><b>{{caseDetails.data.d_client_cleared | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Paid Out</span>
-                    <span><b>{{caseDetails.data.d_client_received | number:'0.2-2'}}</b></span>
+                    <span><b>{{caseDetails.data.d_client_paid | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Outstanding</span>
                     <span><b>{{caseDetails.data.d_clientbalance | number:'0.2-2'}}</b></span>
@@ -131,13 +133,13 @@
                     <span><b>{{caseDetails.data.d_total_fees_owed | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Fees Collected </span>
-                    <span><b>{{caseDetails.data.d_fees_paid | number:'0.2-2'}}</b></span>
+                    <span><b>{{caseDetails.data.d_fees_received | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Fees Cleared</span>
                     <span><b>{{caseDetails.data.d_fees_cleared | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Fees Paid Out </span>
-                    <span><b>{{caseDetails.data.d_fees_received | number:'0.2-2'}}</b></span>
+                    <span><b>{{caseDetails.data.d_fees_paid | number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Fee outstanding</span>
                     <span><b>{{caseDetails.data.d_feesbalance | number:'0.2-2'}}</b></span>
@@ -150,7 +152,7 @@
                         number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Collected</span>
-                    <span><b>{{sum(caseDetails.data.d_client_paid, caseDetails.data.d_fees_paid) |
+                    <span><b>{{sum(caseDetails.data.d_client_received, caseDetails.data.d_fees_received) |
                         number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Cleared</span>
@@ -158,7 +160,7 @@
                         number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Amount Paid Out </span>
-                    <span><b>{{sum(caseDetails.data.d_client_received, caseDetails.data.d_fees_received) |
+                    <span><b>{{sum(caseDetails.data.d_client_paid, caseDetails.data.d_fees_paid) |
                         number:'0.2-2'}}</b></span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">Current outstanding</span>
@@ -183,6 +185,18 @@
                 </ion-col>
               </ion-row>
             </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size-md="12" size="12">
+        <ion-card class="m-0 h-100">
+          <ion-card-content>
+            <ion-list class="ion-no-border ion-margin-start" [hidden]="!caseMarkers.length">
+              <ion-button (click)="onCaseMarkerClick(caseMarker)" size="default"
+                [color]="colorCondition(caseMarker.value)" *ngFor="let caseMarker of caseMarkers">
+                {{caseMarker.label}}
+              </ion-button>
+            </ion-list>
           </ion-card-content>
         </ion-card>
       </ion-col>

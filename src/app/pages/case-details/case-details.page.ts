@@ -13,6 +13,7 @@ import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.pag
 import { OnHoldModalPage } from '../on-hold-modal/on-hold-modal.page';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { TakePaymentPage } from '../take-payment/take-payment.page';
+import { ViewPaymentsPage } from '../view-payments/view-payments.page';
 import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
 import { VisitDetailsPage } from '../visit-details/visit-details.page';
 @Component({
@@ -84,11 +85,18 @@ export class CaseDetailsPage implements OnInit {
         this.takePayment();
       }
     },
+    'see_payments': {
+      text: 'Payments',
+      handler: () => {
+        this.seePayment();
+      }
+    },
 
   };
   dataReady = false;
   fromVisit = false;
   isNewlyn = false;
+  caseMarkers = [];
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -112,18 +120,20 @@ export class CaseDetailsPage implements OnInit {
     if (this.caseId == undefined) {
       this.caseId = await this.storageService.get('caseId');
       this.storageService.remove('caseId')
-      if(this.caseId)
+      if (this.caseId)
         this.fromVisit = true;
     }
-    
+
     this.fromVrmSearch = localStorage.getItem('from_vrm');
     this.databaseService.lastUpdateTime.subscribe(date => {
       this.loadInitData();
     })
+    this.getCaseMarkers();
   }
   dismiss() {
     this.modalCtrl.dismiss();
   }
+
   async ionViewWillEnter() {
     this.isNewlyn = this.commonService.isClient('newlyn');
     this.fromVrmSearch = localStorage.getItem('from_vrm');
@@ -153,6 +163,7 @@ export class CaseDetailsPage implements OnInit {
     if (this.isNewlyn) {
       buttons.push(this.actionListArray['add_note']);
       buttons.push(this.actionListArray['add_fee']);
+      buttons.push(this.actionListArray['see_payments']);
 
       if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
         buttons.push(this.actionListArray['visit_case']);
@@ -172,6 +183,7 @@ export class CaseDetailsPage implements OnInit {
     } else {
       buttons.push(this.actionListArray['add_note']);
       buttons.push(this.actionListArray['add_fee']);
+      buttons.push(this.actionListArray['see_payments']);
       buttons.push(this.actionListArray['arrangement']);
       buttons.push(this.actionListArray['deallocate_case']);
       buttons.push(this.actionListArray['upload_document']);
@@ -189,37 +201,111 @@ export class CaseDetailsPage implements OnInit {
   }
 
   async loadInitData() {
-    
-      if(this.fromVrmSearch) {
-        let case_data = localStorage.getItem('vrm_case_data');
-        case_data = JSON.parse(case_data);
-        this.currentCaseData = case_data;
-        this.caseService.getCaseDetails({ 'cases': this.caseId }).subscribe((response: any) => {
-          const history = response;
-          this.parseResultData({data: case_data, history: history.history});
-        });
-      } else {
-        
-        const data = await this.databaseService.getCaseInfo(this.caseId);
-        if (data) {
-          this.currentCaseData = data;
-          if (this.currentCaseData.linked_cases && this.currentCaseData.linked_cases.length) {
-            const linkedCasesTotalBalance = parseFloat(this.currentCaseData.d_outstanding)
-              + this.currentCaseData.linked_cases.reduce((accumulator, currentValue) => {
-                return accumulator + parseFloat(currentValue.d_outstanding);
-              }, 0);
-            this.linkedTotal = linkedCasesTotalBalance;
-          }
-          this.getOfflinecaseDetails();
 
-        } else {
-          this.router.navigate(['/home/job-list']);
+    if (this.fromVrmSearch) {
+      let case_data = localStorage.getItem('vrm_case_data');
+      case_data = JSON.parse(case_data);
+      this.currentCaseData = case_data;
+      this.caseService.getCaseDetails({ 'cases': this.caseId }).subscribe((response: any) => {
+        const history = response;
+        this.parseResultData({ data: case_data, history: history.history });
+      });
+    } else {
+
+      const data = await this.databaseService.getCaseInfo(this.caseId);
+      if (data) {
+        this.currentCaseData = data;
+        if (this.currentCaseData.linked_cases && this.currentCaseData.linked_cases.length) {
+          const linkedCasesTotalBalance = parseFloat(this.currentCaseData.d_outstanding)
+            + this.currentCaseData.linked_cases.reduce((accumulator, currentValue) => {
+              return accumulator + parseFloat(currentValue.d_outstanding);
+            }, 0);
+          this.linkedTotal = linkedCasesTotalBalance;
         }
-        this.currentCaseData.show = false;
+        this.getOfflinecaseDetails();
+
+      } else {
+        this.router.navigate(['/home/job-list']);
       }
-    
+      this.currentCaseData.show = false;
+    }
+
   }
 
+  getCaseMarkers() {
+    this.caseDetailsService.getCaseMarkers(this.caseId).subscribe((response: any) => {
+      this.caseMarkers = response.data.fields;
+    });
+  }
+  colorCondition(index) {
+    if (parseInt(index, 10) === 0) {
+      return 'light';
+    } else if (parseInt(index, 10) === 1) {
+      return 'success';
+    } else {
+      return 'danger';
+    }
+  }
+  async onCaseMarkerClick(caseMarker) {
+    console.log(caseMarker);
+    if (caseMarker.shortcode === 'hold') {
+      this.onHold(caseMarker);
+    } else {
+      const alert = await this.alertCtrl.create({
+        header: 'Update a CaseMarker',
+        message: `Are you sure you want to change <strong>${caseMarker.label}</strong> marker?`,
+        inputs: [
+          {
+            name: 'linked_cases',
+            type: 'checkbox',
+            value: 'linked_cases',
+            label: 'Add for linked cases?'
+          }
+        ],
+        buttons: [
+          {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+            }
+          },
+          {
+            text: 'Yes',
+            handler: data => {
+              let linked = [];
+              if (data.length > 0 && data[0] === 'linked_cases') {
+                linked = this.currentCaseData.linked_cases.map(ca => ca.id);
+              }
+              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
+                .subscribe((response) => {
+                  this.getCaseMarkers();
+                });
+            }
+          }
+        ]
+      });
+      await alert.present();
+    }
+  }
+  
+  async onHold(caseMarker) {
+    const onHoldModal = await this.modalCtrl.create({
+      component: OnHoldModalPage,
+      componentProps: {
+        caseId: this.caseId,
+        // tslint:disable-next-line: object-literal-shorthand
+        caseMarker: caseMarker,
+        case: this.currentCaseData
+      }
+    });
+    onHoldModal.onDidDismiss().then(async (response) => {
+      if (response.data && response.data.saved) {
+        this.getCaseMarkers();
+        this.storageService.set('is_case_updated', true);
+      }
+    });
+    await onHoldModal.present();
+  }
   sum(a, b) {
     return parseFloat(a) + parseFloat(b);
   }
@@ -466,6 +552,18 @@ export class CaseDetailsPage implements OnInit {
   async takePayment() {
     const takePaymentModal = await this.modalCtrl.create({
       component: TakePaymentPage,
+      componentProps: {
+        caseId: this.caseId,
+        debtorId: this.currentCaseData.debtorid,
+        isDetailsPage: true
+      }
+    });
+
+    await takePaymentModal.present();
+  }
+  async seePayment() {
+    const takePaymentModal = await this.modalCtrl.create({
+      component: ViewPaymentsPage,
       componentProps: {
         caseId: this.caseId,
         debtorId: this.currentCaseData.debtorid,

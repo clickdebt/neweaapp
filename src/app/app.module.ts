@@ -35,6 +35,7 @@ import { VisitDetailsModule } from './pages/visit-details/visit-details.module';
 import { LoaderPageModule } from './pages/loader/loader.module';
 import { CaseDetailsPageModule } from './pages/case-details/case-details.module';
 import { FeeCalculatorPageModule } from './pages/fee-calculator/fee-calculator.module';
+import { ViewPaymentsPageModule } from './pages/view-payments/view-payments.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -53,6 +54,7 @@ import { FeeCalculatorPageModule } from './pages/fee-calculator/fee-calculator.m
     FormioModule,
     PaymentModalPageModule,
     TakePaymentPageModule,
+    ViewPaymentsPageModule,
     AuthorizeCardPageModule,
     ArrangementModalPageModule,
     FeeCalculatorPageModule,

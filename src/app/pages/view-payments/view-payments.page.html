@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>Payments</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+ 
+  <ion-grid>
+    <ion-row class="ion-margin-top">
+      <ion-toolbar clas="fee-title" color="secondary">
+        <ion-title>Payments for #{{caseId}}</ion-title>
+      </ion-toolbar>
+    </ion-row>
+    <ion-row *ngFor="let payment of payments" class="ion-margin ion-padding fee-body-bg">
+      <ion-col class="d-flex" size-md="6" size="12">
+        <div class="label-width">
+          <ion-label position="fixed">Date:</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{payment.date}}</span>
+      </ion-col>
+      <ion-col class="d-flex" size-md="6" size="12">
+        <div class="label-width">
+          <ion-label>Amount</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{payment.amount}}</span>
+      </ion-col>
+      <ion-col class="d-flex" size-md="6" size="12">
+        <div class="label-width">
+          <ion-label>Type:</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{payment.payment_type.name}}</span>
+      </ion-col>
+      <ion-col class="d-flex" size-md="6" size="12">
+        <div class="label-width">
+          <ion-label>Status:</ion-label>
+        </div>
+        <span class="text-color-light ion-margin-start">{{payment.payment_action.name}}</span>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
