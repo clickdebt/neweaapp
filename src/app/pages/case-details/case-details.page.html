@@ -85,8 +85,10 @@
                   <span class="d-block"><b>{{caseDetails.data.custom5}}</b></span>
                   <hr>
                   <span class="d-block color-primary">Warrant Date</span>
-                  <span class="d-block" *ngIf="isNewlyn"><b>{{caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-'}}</b></span>
-                  <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
+                  <span class="d-block" *ngIf="isNewlyn"><b>{{caseDetails.data.custom_date4 ?
+                      caseDetails.data.custom_date4 : '-'}}</b></span>
+                  <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date
+                      : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
                   <hr>
                   <ng-template *ngIf="fromVrmSearch">
                     <span class="d-block color-primary">Agent Name</span>
@@ -183,6 +185,18 @@
                 </ion-col>
               </ion-row>
             </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size-md="12" size="12">
+        <ion-card class="m-0 h-100">
+          <ion-card-content>
+            <ion-list class="ion-no-border ion-margin-start" [hidden]="!caseMarkers.length">
+              <ion-button (click)="onCaseMarkerClick(caseMarker)" size="default"
+                [color]="colorCondition(caseMarker.value)" *ngFor="let caseMarker of caseMarkers">
+                {{caseMarker.label}}
+              </ion-button>
+            </ion-list>
           </ion-card-content>
         </ion-card>
       </ion-col>

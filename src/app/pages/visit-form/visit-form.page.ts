@@ -17,6 +17,7 @@ import { UploadDocumentModalPage } from '../upload-document-modal/upload-documen
 import { TakePaymentPage } from '../take-payment/take-payment.page';
 import { CaseDetailsPage } from '../case-details/case-details.page';
 import { FeeCalculatorPage } from '../fee-calculator/fee-calculator.page';
+import { ViewPaymentsPage } from '../view-payments/view-payments.page';
 @Component({
   selector: 'app-visit-form',
   templateUrl: './visit-form.page.html',
@@ -98,7 +99,13 @@ export class VisitFormPage implements OnInit {
       handler: () => {
         this.seeFeeCalculations();
       }
-    }
+    },
+    'see_payments': {
+      text: 'Payments',
+      handler: () => {
+        this.seePayment();
+      }
+    },
   };
   constructor(
     private visitService: VisitService,
@@ -458,6 +465,7 @@ export class VisitFormPage implements OnInit {
     if (isNewlyn) {
       buttons.push(this.actionListArray['add_note']);
       buttons.push(this.actionListArray['add_fee']);
+      buttons.push(this.actionListArray['see_payments']);
       buttons.push(this.actionListArray['view_financials']);
       if (await this.commonService.hasPermission(this.commonService.permissionSlug.AddArrangement)) {
         buttons.push(this.actionListArray['arrangement']);
@@ -474,6 +482,7 @@ export class VisitFormPage implements OnInit {
     } else {
       buttons.push(this.actionListArray['add_note']);
       buttons.push(this.actionListArray['add_fee']);
+      buttons.push(this.actionListArray['see_payments']);
       buttons.push(this.actionListArray['view_financials']);
       buttons.push(this.actionListArray['fee_calculations']);
       buttons.push(this.actionListArray['arrangement']);
@@ -593,6 +602,18 @@ export class VisitFormPage implements OnInit {
   async takePayment() {
     const takePaymentModal = await this.modalCtrl.create({
       component: TakePaymentPage,
+      componentProps: {
+        caseId: this.caseId,
+        debtorId: this.visitCaseData.debtorid,
+        isDetailsPage: true
+      }
+    });
+
+    await takePaymentModal.present();
+  }
+  async seePayment() {
+    const takePaymentModal = await this.modalCtrl.create({
+      component: ViewPaymentsPage,
       componentProps: {
         caseId: this.caseId,
         debtorId: this.visitCaseData.debtorid,
