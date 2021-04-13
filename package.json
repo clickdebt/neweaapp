@@ -122,10 +122,9 @@
       "cordova-plugin-navigationbar": {},
       "cordova-plugin-aes256-encryption": {},
       "cordova-plugin-request-location-accuracy": {},
-      "cordova.plugins.diagnostic": {
-        "ANDROIDX_VERSION": "1.0.0"
-      },
-      "cordova-plugin-androidx": {}
+      "cordova.plugins.diagnostic": {},
+      "cordova-plugin-androidx": {},
+      "cordova-plugin-androidx-adapter": {}
     },
     "platforms": [
       "browser",
