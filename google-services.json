@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "855118638704",
-    "firebase_url": "https://field-agent-c85a7.firebaseio.com",
-    "project_id": "field-agent-c85a7",
-    "storage_bucket": "field-agent-c85a7.appspot.com"
+    "project_number": "475752830685",
+    "project_id": "lateral-ea",
+    "storage_bucket": "lateral-ea.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:855118638704:android:36f5b21942d04c9e958eb5",
+        "mobilesdk_app_id": "1:475752830685:android:d5394901a85642da17ed34",
         "android_client_info": {
-          "package_name": "com.lateral.fieldagent"
+          "package_name": "com.lateral.enforcementagent"
         }
       },
       "oauth_client": [
         {
-          "client_id": "855118638704-5pbs617sprjrvcuovfrcca10rmb49djq.apps.googleusercontent.com",
+          "client_id": "475752830685-2t64guav930056tpro2dgutimodqij0e.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB19_1YZPF2yhEtVYzVR-tkjdZTBx73cnY"
+          "current_key": "AIzaSyAH5zuarRhvUY-9BOoUITT9-8EQ5bWEECw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "855118638704-5pbs617sprjrvcuovfrcca10rmb49djq.apps.googleusercontent.com",
+              "client_id": "475752830685-2t64guav930056tpro2dgutimodqij0e.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
