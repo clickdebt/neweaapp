@@ -112,7 +112,7 @@ export class TakePaymentPage implements OnInit {
         this.caseActionService.takePayment(obj).subscribe((res: any) => {
           this.submitted = false;
           console.log(res);
-          if (res.status == 'Ok') {
+          if (res.status == 200 && res.data.status == 'Ok') {
             this.storageService.set('is_case_updated', true);
             this.commonService.showToast('Payment added successfully');
             if (res.data.success) {
