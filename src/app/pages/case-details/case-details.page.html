@@ -47,6 +47,16 @@
                     </span>
                   </span>
                   <hr>
+                  <span class="d-block color-primary">Enforcement Address</span>
+                  <span *ngFor="let address of currentCaseData.debtor?.enforcement_addresses,let i=index">
+                    <span class="d-block"><b>{{address.address_ln1}}
+                        {{address.address_ln2 ? ', ' +address.address_ln2 : ''}}
+                        {{address.address_ln3 ? ', ' +address.address_ln3 : ''}}
+                        {{address.address_town ? ', ' +address.address_town : ''}}
+                        {{address.address_postcode ? ', ' +address.address_postcode : ''}}</b>
+                    </span>
+                  </span>
+                  <hr>
                   <span class="d-block color-primary">Contact</span>
                   <span class="d-block"
                     *ngIf="currentCaseData.debtor?.debtor_mobile"><b>{{currentCaseData.debtor?.debtor_mobile}}</b></span>

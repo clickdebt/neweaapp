@@ -20,6 +20,7 @@ export class TakePaymentPage implements OnInit {
   networkStatus;
   datemin = moment().format('YYYY-MM-DD');
   datemax = moment().add('100', 'years').format('YYYY-MM-DD');
+  submitted = false;
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -81,6 +82,7 @@ export class TakePaymentPage implements OnInit {
   }
   save() {
     if (this.paymentsForm.valid) {
+      this.submitted = true;
       const date = new Date().toISOString();
       const obj = {
         case_id: this.caseId,
@@ -108,8 +110,9 @@ export class TakePaymentPage implements OnInit {
       if (this.networkStatus == 1) {
         console.log(obj);
         this.caseActionService.takePayment(obj).subscribe((res: any) => {
+          this.submitted = false;
           console.log(res);
-          if (res.status == 'Ok') {
+          if (res.status == 200 && res.data.status == 'Ok') {
             this.storageService.set('is_case_updated', true);
             this.commonService.showToast('Payment added successfully');
             if (res.data.success) {
@@ -121,6 +124,9 @@ export class TakePaymentPage implements OnInit {
             let err = 'Error while creating payment';
             if(res.data && res.data.response && res.data.response.statusDetail) {
               err = res.data.response.statusDetail;
+            }
+            if(res.statusDetail && res.statusDetail.errors) {
+              err = res.statusDetail.errors[0].clientMessage
             }
             this.commonService.showToast(err);
           }
@@ -135,6 +141,7 @@ export class TakePaymentPage implements OnInit {
           { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
         ]
         this.caseActionService.saveActionOffline('api_calls', api_data);
+        this.submitted = false;
         this.paymentsForm.reset();
         this.dismiss();
       }
