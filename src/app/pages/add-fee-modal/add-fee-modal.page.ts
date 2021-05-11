@@ -30,7 +30,7 @@ export class AddFeeModalPage implements OnInit {
   async getFeeOptions() {
     this.feeOptions = await this.storageService.get('fee_options');
     this.feeOptions = this.feeOptions.filter((item: any) => {
-      return (item.sm_id == this.currentCase.scheme_id) && item.fee['id'] > 0;
+      return (item.sm_id == this.currentCase.scheme_manager_id) && item.fee['id'] > 0;
     }).map((item: any)=>{
         return item.fee
     });
