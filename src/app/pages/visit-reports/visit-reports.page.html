@@ -1,7 +1,7 @@
 <ion-toolbar color="light">
   <ion-grid class="p-y-0">
     <ion-row class="searchbar-wrpper">
-      <ion-col size-md="8" size-xs="6">
+      <ion-col size-md="4" size-xs="6">
         <ion-searchbar [(ngModel)]="caseId" [showCancelButton]="shouldShowCancel"
           (keyup.enter)="onInput($event)" (ionCancel)="onInput($event)" placeholder="Search Case ID">
         </ion-searchbar>
@@ -14,6 +14,11 @@
           <ion-select-option value="30">Last Month</ion-select-option>
           <ion-select-option value="-1">All Time</ion-select-option>
         </ion-select>
+      </ion-col>
+      <ion-col  size-md="4" size-xs="4">
+        <ion-button color="secondary" size="small" (click)="onInput($event)">
+          Search
+        </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
