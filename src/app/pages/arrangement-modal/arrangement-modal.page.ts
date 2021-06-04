@@ -51,7 +51,6 @@ export class ArrangementModalPage implements OnInit {
   date;
   isNewlyn = false;
   paymentGateways = [];
-  defaultPaymentMethod='';
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -188,8 +187,20 @@ export class ArrangementModalPage implements OnInit {
   repeatPaymentSelected(event) {
     if (event.detail.checked) {
       this.arrangementForm.controls.payment_card_list.setValidators([Validators.required]);
+      this.arrangementForm.controls.payment_card_list.updateValueAndValidity();
+      this.arrangementForm.controls.payment_method.setValidators([Validators.required]);
+      this.arrangementForm.controls.payment_method.updateValueAndValidity();
+      if(this.paymentGateways.length > 0){
+        this.arrangementForm.controls.payment_method.setValue(this.paymentGateways[0].key);
+        this.getCards();
+      }
     } else {
-      this.arrangementForm.controls.payment_card_list.setValidators([]);
+      this.arrangementForm.controls.payment_card_list.clearValidators();
+      this.arrangementForm.controls.payment_card_list.reset();
+      this.arrangementForm.controls.payment_card_list.updateValueAndValidity();
+      this.arrangementForm.controls.payment_method.clearValidators();
+      this.arrangementForm.controls.payment_method.reset();
+      this.arrangementForm.controls.payment_method.updateValueAndValidity();
     }
   }
   getCards() {
@@ -260,7 +271,6 @@ export class ArrangementModalPage implements OnInit {
       this.debtorId = finalResult.debtor_id;
     }
     this.paymentGateways = await this.storageService.get('gateway');
-    this.defaultPaymentMethod = this.paymentGateways[0].key;
   
     this.currArrangement = this.currArrangement.find(data => data.active == 1);
     
