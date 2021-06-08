@@ -98,92 +98,131 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
-          <ion-label position="floating">Frequency<ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-select placeholder="Select Frequency" formControlName="frequency">
-            <ion-select-option *ngFor="let method of frequency" value="{{method.id}}">{{method.label}}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Total Amount <ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-input type="text" formControlName="ref_amount"></ion-input>
-        </ion-item>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Frequency<ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-select placeholder="Select Frequency" formControlName="frequency">
+                <ion-select-option *ngFor="let method of frequency" value="{{method.id}}">{{method.label}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Total Amount <ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-input type="text" formControlName="ref_amount"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+
+
+
         <!-- Different first payment details -->
-        <ion-item>
-          <ion-checkbox slot="start" formControlName="differentFirstPayment"
-            (ionChange)="differentFirstPaymentChanged($event)"></ion-checkbox>
-          <ion-label>Different First Payment</ion-label>
-        </ion-item>
-        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
-          <ion-label position="floating">First Payment Date<ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-input formControlName="firstPaymentDate" (click)="openCalendar('firstPaymentDate')" readonly="">
-          </ion-input>
-        </ion-item>
-        <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
-          <ion-label position="floating">First Amount<ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-input type="text" formControlName="firstPaymentAmount"></ion-input>
-        </ion-item>
-        <ion-item>
-          <!-- Different first payment details complete-->
-
-          <ion-label position="floating">Payment Amount <ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-input type="text" formControlName="amount"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Start Date <ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-input formControlName="start" (click)="openCalendar('start')"></ion-input>
-        </ion-item>
-        <ion-item *ngIf="!isNewlyn">
-          <ion-label position="floating">Method<ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-select placeholder="Select Payment Method" formControlName="method">
-            <ion-select-option *ngFor="let method of paymentMethods" value="{{method.id}}">{{method.label}}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="floating">Note</ion-label>
-          <ion-textarea formControlName="note" placeholder="note"></ion-textarea>
-        </ion-item>
-
-        <ion-item>
-          <ion-checkbox slot="start" formControlName="repeatPayment" (ionChange)="repeatPaymentSelected($event)">
-          </ion-checkbox>
-          <ion-label>Repeat Payment</ion-label>
-        </ion-item>
-        <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
-          <ion-label position="floating">Payment Method<ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-select placeholder="Select Payment Method" [(ngModel)]="defaultPaymentMethod" formControlName="payment_method" (ionChange)="getCards()">
-            <ion-select-option *ngFor="let method of paymentGateways" value="{{method.key}}">{{method.value}}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
-          <ion-label position="floating">Saved Cards<ion-text color="danger">*</ion-text>
-          </ion-label>
-          <ion-select placeholder="Select Payment Card" formControlName="payment_card_list">
-            <ion-select-option *ngFor="let card of savedCards" value="{{card.key}}">XXXX XXXX XXXX {{card.value}}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-        <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
-          <ion-button (click)="manageCards()">Manage Cards</ion-button>
-        </ion-item>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-checkbox slot="start" formControlName="differentFirstPayment"
+                (ionChange)="differentFirstPaymentChanged($event)"></ion-checkbox>
+              <ion-label>Different First Payment</ion-label>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
+              <ion-label position="floating">First Date<ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-input formControlName="firstPaymentDate" (click)="openCalendar('firstPaymentDate')" readonly="">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item [hidden]="!arrangementForm.controls['differentFirstPayment'].value">
+              <ion-label position="floating">First Amount<ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-input type="text" formControlName="firstPaymentAmount"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <!-- Different first payment details complete-->
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Payment Amount <ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-input type="text" formControlName="amount"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Start Date <ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-input formControlName="start" (click)="openCalendar('start')"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col *ngIf="!isNewlyn">
+            <ion-item>
+              <ion-label position="floating">Method<ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-select placeholder="Select Payment Method" formControlName="method">
+                <ion-select-option *ngFor="let method of paymentMethods" value="{{method.id}}">{{method.label}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Note</ion-label>
+              <ion-textarea formControlName="note" placeholder="note"></ion-textarea>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-checkbox slot="start" formControlName="repeatPayment" (ionChange)="repeatPaymentSelected($event)">
+              </ion-checkbox>
+              <ion-label>Repeat Payment</ion-label>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
+              <ion-label position="floating">Payment Method<ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-select placeholder="Select Payment Method" [(ngModel)]="defaultPaymentMethod"
+                formControlName="payment_method" (ionChange)="getCards()">
+                <ion-select-option *ngFor="let method of paymentGateways" value="{{method.key}}">{{method.value}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
+              <ion-label position="floating">Saved Cards<ion-text color="danger">*</ion-text>
+              </ion-label>
+              <ion-select placeholder="Select Payment Card" formControlName="payment_card_list">
+                <ion-select-option *ngFor="let card of savedCards" value="{{card.key}}">XXXX XXXX XXXX {{card.value}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
+              <ion-button (click)="manageCards()">Manage Cards</ion-button>
+            </ion-item>
+          </ion-col>
+        </ion-row>
       </ion-list>
       <div class="ion-padding">
         <ion-row>
           <ion-col>
-            <ion-button color="secondary" expand="block" type="submit" [disabled]="this.arrangementForm.invalid" (click)="save()">
+            <ion-button color="secondary" expand="block" type="submit" [disabled]="arrangementForm.invalid"
+              (click)="save()">
               Save
             </ion-button>
           </ion-col>

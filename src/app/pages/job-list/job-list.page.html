@@ -2,13 +2,16 @@
   <ion-grid class="p-y-0">
     <ion-row class="searchbar-wrpper">
       <ion-col size-md="8" size-xs="8">
-        <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="shouldShowCancel"
+        <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="showCancelButton"
           (keyup.enter)="filterCases()" (ionChange)="searchChange()" (ionCancel)="filterCases()" placeholder="Search ID, Client ref, Postcode, Name, VRM">
         </ion-searchbar>
       </ion-col>
       <ion-col size-xs="4" *ngIf="isMobile">
         <ion-button color="secondary" size="small" (click)="filterCases()">
-          Search
+          <ion-icon name="search-outline"></ion-icon>
+        </ion-button>
+        <ion-button color="secondary" size="small" (click)="clearSearch()">
+          <ion-icon name="close-outline"></ion-icon>
         </ion-button>
       </ion-col>
       <ion-col size-md="4" size-xs="12">
@@ -19,6 +22,9 @@
         </ion-button>
         <ion-button *ngIf="!isMobile" color="secondary" size="small" (click)="filterCases()">
           Search
+        </ion-button>
+        <ion-button *ngIf="!isMobile" color="secondary" size="small" (click)="clearSearch()">
+          Clear
         </ion-button>
         <ion-button color="secondary" size="small" (click)="showFilterDiv()">
           Filters

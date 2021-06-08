@@ -88,7 +88,7 @@ export class ArrangementModalPage implements OnInit {
     this.date = input;
     const options: CalendarModalOptions = {
       title: '',
-      canBackwardsSelected: true
+      // canBackwardsSelected: true
     };
     const myCalendar = await this.modalCtrl.create({
       component: CalendarModal,
@@ -177,19 +177,28 @@ export class ArrangementModalPage implements OnInit {
     }
   }
   differentFirstPaymentChanged(event) {
+    let firstPaymentAmount= this.arrangementForm.controls["firstPaymentAmount"];
+    let firstPaymentDate= this.arrangementForm.controls["firstPaymentDate"];
     if (event.detail.checked) {
-      this.arrangementForm.controls["firstPaymentAmount"].setValidators([Validators.required]);
-      this.arrangementForm.controls["firstPaymentDate"].setValidators([Validators.required]);
+      firstPaymentAmount.setValidators([Validators.required]);
+      firstPaymentDate.setValidators([Validators.required]);
+      firstPaymentAmount.updateValueAndValidity();
+      firstPaymentDate.updateValueAndValidity();
     } else {
-      this.arrangementForm.controls["firstPaymentAmount"].setValidators([]);
-      this.arrangementForm.controls["firstPaymentDate"].setValidators([]);
+      firstPaymentAmount.setValidators([]);
+      firstPaymentDate.setValidators([]);
+      firstPaymentAmount.updateValueAndValidity();
+      firstPaymentDate.updateValueAndValidity();
     }
   }
   repeatPaymentSelected(event) {
+    let payment_card_list = this.arrangementForm.controls.payment_card_list;
     if (event.detail.checked) {
-      this.arrangementForm.controls.payment_card_list.setValidators([Validators.required]);
+      payment_card_list.setValidators([Validators.required]);
+      payment_card_list.updateValueAndValidity();
     } else {
-      this.arrangementForm.controls.payment_card_list.setValidators([]);
+      payment_card_list.setValidators([]);
+      payment_card_list.updateValueAndValidity();
     }
   }
   getCards() {
