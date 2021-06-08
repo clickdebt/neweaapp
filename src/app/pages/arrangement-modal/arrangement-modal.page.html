@@ -162,7 +162,7 @@
         <ion-item [hidden]="!arrangementForm.controls.repeatPayment.value">
           <ion-label position="floating">Payment Method<ion-text color="danger">*</ion-text>
           </ion-label>
-          <ion-select placeholder="Select Payment Method" [(ngModel)]="defaultPaymentMethod" formControlName="payment_method" (ionChange)="getCards()">
+          <ion-select placeholder="Select Payment Method" formControlName="payment_method" (ionChange)="getCards()">
             <ion-select-option *ngFor="let method of paymentGateways" value="{{method.key}}">{{method.value}}
             </ion-select-option>
           </ion-select>
