@@ -87,7 +87,7 @@ export class ArrangementModalPage implements OnInit {
     this.date = input;
     const options: CalendarModalOptions = {
       title: '',
-      canBackwardsSelected: true
+      // canBackwardsSelected: true
     };
     const myCalendar = await this.modalCtrl.create({
       component: CalendarModal,
@@ -176,31 +176,39 @@ export class ArrangementModalPage implements OnInit {
     }
   }
   differentFirstPaymentChanged(event) {
+    let firstPaymentAmount= this.arrangementForm.controls["firstPaymentAmount"];
+    let firstPaymentDate= this.arrangementForm.controls["firstPaymentDate"];
     if (event.detail.checked) {
-      this.arrangementForm.controls["firstPaymentAmount"].setValidators([Validators.required]);
-      this.arrangementForm.controls["firstPaymentDate"].setValidators([Validators.required]);
+      firstPaymentAmount.setValidators([Validators.required]);
+      firstPaymentDate.setValidators([Validators.required]);
+      firstPaymentAmount.updateValueAndValidity();
+      firstPaymentDate.updateValueAndValidity();
     } else {
-      this.arrangementForm.controls["firstPaymentAmount"].setValidators([]);
-      this.arrangementForm.controls["firstPaymentDate"].setValidators([]);
+      firstPaymentAmount.setValidators([]);
+      firstPaymentDate.setValidators([]);
+      firstPaymentAmount.updateValueAndValidity();
+      firstPaymentDate.updateValueAndValidity();
     }
   }
   repeatPaymentSelected(event) {
+    let payment_card_list = this.arrangementForm.controls.payment_card_list;
+    let payment_method = this.arrangementForm.controls.payment_method;
     if (event.detail.checked) {
-      this.arrangementForm.controls.payment_card_list.setValidators([Validators.required]);
-      this.arrangementForm.controls.payment_card_list.updateValueAndValidity();
-      this.arrangementForm.controls.payment_method.setValidators([Validators.required]);
-      this.arrangementForm.controls.payment_method.updateValueAndValidity();
+      payment_card_list.setValidators([Validators.required]);
+      payment_card_list.updateValueAndValidity();
+      payment_method.setValidators([Validators.required]);
+      payment_method.updateValueAndValidity();
       if(this.paymentGateways.length > 0){
-        this.arrangementForm.controls.payment_method.setValue(this.paymentGateways[0].key);
+        payment_method.setValue(this.paymentGateways[0].key);
         this.getCards();
       }
     } else {
-      this.arrangementForm.controls.payment_card_list.clearValidators();
-      this.arrangementForm.controls.payment_card_list.reset();
-      this.arrangementForm.controls.payment_card_list.updateValueAndValidity();
-      this.arrangementForm.controls.payment_method.clearValidators();
-      this.arrangementForm.controls.payment_method.reset();
-      this.arrangementForm.controls.payment_method.updateValueAndValidity();
+      payment_card_list.clearValidators();
+      payment_card_list.reset();
+      payment_card_list.updateValueAndValidity();
+      payment_method.clearValidators();
+      payment_method.reset();
+      payment_method.updateValueAndValidity();
     }
   }
   getCards() {

@@ -247,44 +247,50 @@ export class CaseDetailsPage implements OnInit {
     }
   }
   async onCaseMarkerClick(caseMarker) {
-    console.log(caseMarker);
     if (caseMarker.shortcode === 'hold') {
       this.onHold(caseMarker);
     } else {
-      const alert = await this.alertCtrl.create({
-        header: 'Update a CaseMarker',
-        message: `Are you sure you want to change <strong>${caseMarker.label}</strong> marker?`,
-        inputs: [
-          {
-            name: 'linked_cases',
-            type: 'checkbox',
-            value: 'linked_cases',
-            label: 'Add for linked cases?'
-          }
-        ],
-        buttons: [
-          {
-            text: 'No',
-            role: 'cancel',
-            handler: () => {
+      if((this.currentCaseData.linked_cases).length) {
+        const alert = await this.alertCtrl.create({
+          header: 'Update a CaseMarker',
+          message: `Are you sure you want to change <strong>${caseMarker.label}</strong> marker?`,
+          inputs: [
+            {
+              name: 'linked_cases',
+              type: 'checkbox',
+              value: 'linked_cases',
+              label: 'Add for linked cases?'
             }
-          },
-          {
-            text: 'Yes',
-            handler: data => {
-              let linked = [];
-              if (data.length > 0 && data[0] === 'linked_cases') {
-                linked = this.currentCaseData.linked_cases.map(ca => ca.id);
+          ],
+          buttons: [
+            {
+              text: 'No',
+              role: 'cancel',
+              handler: () => {
               }
-              this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
-                .subscribe((response) => {
-                  this.getCaseMarkers();
-                });
+            },
+            {
+              text: 'Yes',
+              handler: data => {
+                let linked = [];
+                if (data.length > 0 && data[0] === 'linked_cases') {
+                  linked = this.currentCaseData.linked_cases.map(ca => ca.id);
+                }
+                this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, linked)
+                  .subscribe((response) => {
+                    this.getCaseMarkers();
+                  });
+              }
             }
-          }
-        ]
-      });
-      await alert.present();
+          ]
+        });
+        await alert.present();
+      } else {
+        this.caseDetailsService.updateCaseMarker(caseMarker.col, this.caseId, [])
+                  .subscribe((response) => {
+                    this.getCaseMarkers();
+                  });
+      }
     }
   }
   

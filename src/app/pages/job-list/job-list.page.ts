@@ -221,6 +221,10 @@ export class JobListPage implements OnInit {
     this.getCases('');
 
   }
+  clearSearch() {
+    this.searchBarValue = '';
+    this.filterCases();
+  }
   // onInput() {
   //   this.filters['q'] = this.searchBarValue;
   //   this.filterCases();
