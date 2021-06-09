@@ -266,7 +266,9 @@ export class ArrangementModalPage implements OnInit {
     
     console.log(finalResult);
 
-    this.currArrangement = finalResult.arranagement.current_arrangement;
+    if(finalResult.arranagement){
+      this.currArrangement = finalResult.arranagement.current_arrangement;
+    }
     if (finalResult.debtor_id) {
       this.debtorId = finalResult.debtor_id;
     }
