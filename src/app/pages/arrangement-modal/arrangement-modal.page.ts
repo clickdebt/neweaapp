@@ -282,7 +282,8 @@ export class ArrangementModalPage implements OnInit {
     }
     this.paymentGateways = await this.storageService.get('gateway');
   
-    this.currArrangement = this.currArrangement.find(data => data.active == 1);
+    if(this.currArrangement)
+      this.currArrangement = this.currArrangement.find(data => data.active == 1);
     
     this.makeCurrentArrangementString();
     if (this.currArrangement) {
