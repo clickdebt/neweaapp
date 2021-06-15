@@ -103,6 +103,7 @@ export class ArrangementModalPage implements OnInit {
         console.log(response);
         if (response.role == 'done') {
           this.arrangementForm.controls[date].patchValue(moment(response.data.dateObj).format('YYYY-MM-DD'), { onlySelf: true });
+          this.arrangementForm.controls[date].updateValueAndValidity();
         }
       });
     await myCalendar.present();

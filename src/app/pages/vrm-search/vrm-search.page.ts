@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CaseService } from '../../services/case.service';
 import * as moment from 'moment';
 import { Platform } from '@ionic/angular';
-import { StorageService, CommonService } from 'src/app/services';
+import { StorageService, CommonService, DatabaseService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { CaseActionService } from 'src/app/services/case-action.service';
 import { ThrowStmt } from '@angular/compiler';
@@ -25,6 +25,7 @@ export class VrmSearchPage implements OnInit {
     private router: Router,
     private storageService: StorageService,
     private caseActionService: CaseActionService,
+    private databaseService: DatabaseService,
     private commonService: CommonService
   ) { }
 
@@ -52,8 +53,13 @@ export class VrmSearchPage implements OnInit {
     }
   }
   selfAllocate(currentCase) {
-    this.caseActionService.selfCaseAllocate(currentCase.id).subscribe((response: any) => {
+    this.caseActionService.selfCaseAllocate(currentCase.id).subscribe(async (response: any) => {
       this.commonService.showToast('Case Successfully allocated to you.');
+      const downloadStatus = await this.databaseService.getDownloadStatus();
+      if (downloadStatus) {
+        const params = { last_update_date: downloadStatus.time };
+        this.databaseService.refreshData(params).then((res: any) => {})
+      }
     });
   }
   goToCaseDetails(currentCaseData) {
