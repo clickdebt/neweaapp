@@ -39,7 +39,7 @@
         <ng-container *ngFor="let case of cases">
           <tr class="no-border" [ngClass]="{'bg-hold':case.hold_until > currentDate}">
             <td>{{case.id}}</td>
-            <td>{{case.ref}}</td>
+            <td>{{case.cl_ref}}</td>
             <td>{{case.debtor.debtor_name}}</td>
             <td>{{case.d_outstanding}}</td>
             <td><span *ngIf="case.debtor.enforcement_addresses.length">{{case.debtor.enforcement_addresses[0].address_postcode}}</span></td>
@@ -87,7 +87,7 @@
           <ion-row>
             <ion-col size="6">
               Client Ref :
-              <span> {{case.ref}} </span>
+              <span> {{case.cl_ref}} </span>
             </ion-col>
             <ion-col size="6">
               Amount :
