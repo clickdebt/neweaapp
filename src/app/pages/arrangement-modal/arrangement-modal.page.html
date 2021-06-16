@@ -81,7 +81,7 @@
     <ion-item class="bg-main" (click)="toggleShow(arrangementObj)" color="secondary"
       ng-class="{active: isShown(arrangementObj)}">
       <ion-label>
-        <h2>Create Arrangement <span *ngIf="outstanding"> - Outstanding Amount : {{outstanding}}</span></h2>
+        <h2>Create Arrangement <span *ngIf="outstanding"> - Outstanding Amount : {{outstanding | number : '1.2-2'}}</span></h2>
       </ion-label>
       <ion-icon slot="end" [name]="isShown(arrangementObj) ? 'chevron-up-sharp':'chevron-down-sharp'">
       </ion-icon>
@@ -110,7 +110,7 @@
             </ion-item>
           </ion-col>
           <ion-col>
-            <ion-item>
+            <ion-item hidden>
               <ion-label position="floating">Total Amount <ion-text color="danger">*</ion-text>
               </ion-label>
               <ion-input type="text" formControlName="ref_amount"></ion-input>
