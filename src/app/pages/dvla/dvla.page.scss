@@ -1,0 +1,18 @@
+.joblist-card {
+    h6 {
+        display: inline-block;
+        color: #000;
+        font-weight: 600;
+        font-size: 16px;
+        width: 80%;
+    }
+    .d-grid {
+        display: grid;
+    }
+    .font-16 {
+        font-size: 16px;
+    }
+    .text-color-light {
+        color: #585858 !important;
+    }
+}

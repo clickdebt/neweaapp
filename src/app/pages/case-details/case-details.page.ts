@@ -16,6 +16,7 @@ import { TakePaymentPage } from '../take-payment/take-payment.page';
 import { ViewPaymentsPage } from '../view-payments/view-payments.page';
 import { UploadDocumentModalPage } from '../upload-document-modal/upload-document-modal.page';
 import { VisitDetailsPage } from '../visit-details/visit-details.page';
+import { DvlaPage } from '../dvla/dvla.page';
 @Component({
   selector: 'app-case-details',
   templateUrl: './case-details.page.html',
@@ -91,12 +92,19 @@ export class CaseDetailsPage implements OnInit {
         this.seePayment();
       }
     },
+    'dvla': {
+      text: 'DVLA',
+      handler: () => {
+        this.seeDvla();
+      }
+    },
 
   };
   dataReady = false;
   fromVisit = false;
   isNewlyn = false;
   caseMarkers = [];
+  currentDate;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -137,6 +145,7 @@ export class CaseDetailsPage implements OnInit {
   async ionViewWillEnter() {
     this.isNewlyn = this.commonService.isClient('newlyn');
     this.fromVrmSearch = localStorage.getItem('from_vrm');
+    this.currentDate = moment().format('YYYY-MM-DD hh:mm:ss');
     const downloadStatus = await this.databaseService.getHistoryDownloadStatus();
     if (downloadStatus && downloadStatus.status) {
       this.dataReady = true;
@@ -164,6 +173,7 @@ export class CaseDetailsPage implements OnInit {
       buttons.push(this.actionListArray['add_note']);
       buttons.push(this.actionListArray['add_fee']);
       buttons.push(this.actionListArray['see_payments']);
+      buttons.push(this.actionListArray['dvla']);
 
       if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
         buttons.push(this.actionListArray['visit_case']);
@@ -334,11 +344,14 @@ export class CaseDetailsPage implements OnInit {
       this.flatternCustomData(custom_data, custArr);
       this.caseDetails.case_custom_data = custArr;
       this.caseDetails.data = result.data;
+      // console.log(this.caseDetails);
 
       this.getCaseSchemeSpecificData = [
         { 'label': 'Offence Description', 'value': this.caseDetails.case_custom_data.offence_details ? this.caseDetails.case_custom_data.offence_details : result.data.offense },
         { 'label': 'Offence Time', 'value': custArr.offense_time },
         { 'label': 'Offence Date', 'value': result.data.offense_date },
+        { 'label': 'Offence To', 'value': result.data.offense_date_to },
+        { 'label': 'Offence From', 'value': result.data.offense_date_from },
         { 'label': 'Offence Code', 'value': custArr.offense_code },
         { 'label': 'Offence Location', 'value': this.caseDetails.case_custom_data.offence_location ? this.caseDetails.case_custom_data.offence_location : '' },
         { 'label': 'Offence Address Line1', 'value': result.data.offense_add1 },
@@ -579,6 +592,17 @@ export class CaseDetailsPage implements OnInit {
     });
 
     await takePaymentModal.present();
+  }
+  async seeDvla() {
+    const dvlaModal = await this.modalCtrl.create({
+      component: DvlaPage,
+      componentProps: {
+        caseData: this.currentCaseData,
+        isDetailsPage: true
+      }
+    });
+
+    await dvlaModal.present();
   }
   async addArrangement() {
     const AddArrangementModal = await this.modalCtrl.create({

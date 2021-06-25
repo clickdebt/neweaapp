@@ -50,4 +50,8 @@ export class CaseDetailsService {
     const apiURL = localStorage.getItem('server_url') + 'b/clickdebt_panel_layout/legacy/debtor_panels/manage_debtor_addresses/' + debtorId + '/' + caseId + '?source=API';
     return this.http.get(apiURL);
   }
+  getDvlaEnquires(vrm) {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_dvla_enquiries/' + vrm + '?source=API';
+    return this.http.get(apiURL);
+  }
 }

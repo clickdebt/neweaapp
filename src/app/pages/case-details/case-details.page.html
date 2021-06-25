@@ -100,11 +100,36 @@
                   <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.award_date ? caseDetails.data.award_date
                       : (caseDetails.data.custom_date4 ? caseDetails.data.custom_date4 : '-')}}</b></span>
                   <hr>
-                  <ng-template *ngIf="fromVrmSearch">
+                  <span class="d-block color-primary">On Hold</span>
+                  <span class="d-block"><b>{{(caseDetails.data.current_status &&
+                      caseDetails.data.current_status.status_type == 3) || caseDetails.data.hold_until > currentDate
+                      ? 'Yes' : 'No'}}</b></span>
+                  <hr>
+                  <ng-container
+                    *ngIf="(caseDetails.data.current_status && caseDetails.data.current_status.status_type == 3) || caseDetails.data.hold_until > currentDate">
+                    <span class="d-block color-primary">Hold Expiry</span>
+                    <span class="d-block"><b>{{caseDetails.data.hold_until}}</b></span>
+                    <hr>
+                  </ng-container>
+                  <span class="d-block color-primary">Liability Order Date</span>
+                    <span class="d-block"><b>{{caseDetails.data.custom_date5}}</b></span>
+                    <hr>
+                  <ng-container *ngIf="fromVrmSearch">
                     <span class="d-block color-primary">Agent Name</span>
                     <span class="d-block"><b>{{caseDetails.caseSummary.officer?.name}}</b></span>
                     <hr>
-                  </ng-template>
+                  </ng-container>
+                  <span class="d-block dark"><b>Vehicle Details</b></span>
+                  <span class="d-block color-primary">Make</span>
+                  <span class="d-block"><b>{{caseDetails.case_custom_data.vehicle_make ? caseDetails.case_custom_data.vehicle_make : '-'}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Model</span>
+                  <span class="d-block"><b>{{caseDetails.case_custom_data.model ? caseDetails.case_custom_data.model : '-'}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Make</span>
+                  <span class="d-block"><b>{{caseDetails.case_custom_data.colour ? caseDetails.case_custom_data.colour : '-'}}</b></span>
+                  <hr>
+                  
                 </ion-col>
               </ion-row>
             </ion-grid>
