@@ -76,12 +76,17 @@ export class AuthorizeCardPage implements OnInit {
             if (response.status == 'success') {
               this.commonService.showToast('card added successfully.');
             } else {
-              if(response.errors.length > 0){
+              if(Array.isArray(response.errors) && response.errors.length > 0){
                 (response.errors).forEach(element => {
-                  this.commonService.showToast(element.description);  
+                  let msg = element.description;
+                  if(element.property)
+                    msg += ' (' + element.property + ')';
+                  this.commonService.showToast(msg, 'danger');  
                 });
+              } else if(response.result.statusDetail) {
+                this.commonService.showToast(response.result.statusDetail, 'danger');
               } else {
-                this.commonService.showToast(response.status);
+                this.commonService.showToast(response.status, 'danger');
               }
               // this.commonService.showToast(response.errors ? response.errors : response.result.statusDetail);
             }
