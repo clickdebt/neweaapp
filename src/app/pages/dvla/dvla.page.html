@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>DVLA Enquiries</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="table-responsive" *ngIf="!isMobile">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Enquiry Ref</th>
+          <th>Case ID</th>
+          <th>Requested Date</th>
+          <th>VRM</th>
+          <th>Received Date </th>
+          <th>Status</th>
+          <th>Positive </th>
+          <th>Model</th>
+          <th>Make</th>
+          <th>Colour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let dvla of dvlaList">
+          <tr class="no-border">
+            <td>{{dvla.id}}</td>
+            <td>{{dvla.case_id}}</td>
+            <td>{{dvla.requested_date}}</td>
+            <td>{{dvla.case.custom5}}</td>
+            <td>{{dvla.received_date}}</td>
+            <td>{{status[dvla.status]}}</td>
+            <td>{{dvla.dvla.is_positive}}</td>
+            <td>{{dvla.dvla.model || '-'}}</td>
+            <td>{{dvla.dvla.make || '-'}}</td>
+            <td>{{dvla.dvla.colour || '-'}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <div *ngIf="isMobile">
+    <ion-card class="joblist-card" *ngFor="let dvla of dvlaList">
+      <ion-card-content>
+        <ion-grid class="m-t-10">
+          <ion-row>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Enquiry Ref</span>
+              <span class="d-block">{{dvla.id}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Case ID</span>
+              <span class="d-block">{{dvla.case_id}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Requested Date </span>
+              <span class="d-block">{{dvla.requested_date}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">VRM</span>
+              <span class="d-block">{{dvla.case.custom5}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Received Date </span>
+              <span class="d-block">{{dvla.received_date}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Status</span>
+              <span class="d-block">{{status[dvla.status]}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Positive </span>
+              <span class="d-block">{{dvla.dvla.is_positive}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Model</span>
+              <span class="d-block">{{dvla.dvla.model || '-'}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Make</span>
+              <span class="d-block">{{dvla.dvla.make || '-'}}</span>
+            </ion-col>
+            <ion-col size-sm="6" size-md="3">
+              <span class="d-block color-primary">Colour</span>
+              <span class="d-block">{{dvla.dvla.colour || '-'}}</span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
