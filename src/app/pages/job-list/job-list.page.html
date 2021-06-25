@@ -2,7 +2,7 @@
   <ion-grid class="p-y-0">
     <ion-row class="searchbar-wrpper">
       <ion-col size-md="8" size-xs="8">
-        <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue" [showCancelButton]="showCancelButton"
+        <ion-searchbar class="p-y-0 p-x-0" [(ngModel)]="searchBarValue"
           (keyup.enter)="filterCases()" (ionChange)="searchChange()" (ionCancel)="filterCases()" placeholder="Search ID, Client ref, Postcode, Name, VRM">
         </ion-searchbar>
       </ion-col>
