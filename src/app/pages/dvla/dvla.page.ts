@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, NavParams, Platform } from '@ionic/angular';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
+import { DvlaDetailsPage } from '../dvla-details/dvla-details.page';
 
 @Component({
   selector: 'app-dvla',
@@ -35,12 +36,19 @@ export class DvlaPage implements OnInit {
   }
   getDvlaEnquires() {
     this.caseDetailsService.getDvlaEnquires(this.caseData.custom5).subscribe((res: any) => {
-      console.log(res);
-
       this.dvlaList = Object.values(res);
     });
   }
+  async goToDvlaDetails(dvla) {
+    const dvlaDetailsModal = await this.modalCtrl.create({
+      component: DvlaDetailsPage,
+      componentProps: {
+        dvla: dvla
+      }
+    });
 
+    await dvlaDetailsModal.present();
+  }
   dismiss() {
     this.modalCtrl.dismiss({
       saved: false

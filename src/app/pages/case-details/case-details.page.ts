@@ -197,6 +197,7 @@ export class CaseDetailsPage implements OnInit {
       buttons.push(this.actionListArray['arrangement']);
       buttons.push(this.actionListArray['deallocate_case']);
       buttons.push(this.actionListArray['upload_document']);
+      buttons.push(this.actionListArray['dvla']);
 
       if (this.currentCaseData.stage.stage_type.stage_type == 'Visit') {
         buttons.push(this.actionListArray['visit_case'])

@@ -112,8 +112,11 @@
                     <hr>
                   </ng-container>
                   <span class="d-block color-primary">Liability Order Date</span>
-                    <span class="d-block"><b>{{caseDetails.data.custom_date5}}</b></span>
-                    <hr>
+                  <span class="d-block"><b>{{caseDetails.data.custom_date5}}</b></span>
+                  <hr>
+                  <span class="d-block color-primary">Broken Arrangement Count</span>
+                  <span class="d-block"><b>{{caseDetails.data.broken_arrangement_count ? caseDetails.data.broken_arrangement_count : '-'}}</b></span>
+                  <hr>
                   <ng-container *ngIf="fromVrmSearch">
                     <span class="d-block color-primary">Agent Name</span>
                     <span class="d-block"><b>{{caseDetails.caseSummary.officer?.name}}</b></span>
@@ -121,15 +124,18 @@
                   </ng-container>
                   <span class="d-block dark"><b>Vehicle Details</b></span>
                   <span class="d-block color-primary">Make</span>
-                  <span class="d-block"><b>{{caseDetails.case_custom_data.vehicle_make ? caseDetails.case_custom_data.vehicle_make : '-'}}</b></span>
+                  <span class="d-block"><b>{{caseDetails.case_custom_data.vehicle_make ?
+                      caseDetails.case_custom_data.vehicle_make : '-'}}</b></span>
                   <hr>
                   <span class="d-block color-primary">Model</span>
-                  <span class="d-block"><b>{{caseDetails.case_custom_data.model ? caseDetails.case_custom_data.model : '-'}}</b></span>
+                  <span class="d-block"><b>{{caseDetails.case_custom_data.model ? caseDetails.case_custom_data.model :
+                      '-'}}</b></span>
                   <hr>
                   <span class="d-block color-primary">Make</span>
-                  <span class="d-block"><b>{{caseDetails.case_custom_data.colour ? caseDetails.case_custom_data.colour : '-'}}</b></span>
+                  <span class="d-block"><b>{{caseDetails.case_custom_data.colour ? caseDetails.case_custom_data.colour :
+                      '-'}}</b></span>
                   <hr>
-                  
+
                 </ion-col>
               </ion-row>
             </ion-grid>
