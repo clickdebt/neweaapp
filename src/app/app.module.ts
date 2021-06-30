@@ -37,6 +37,7 @@ import { CaseDetailsPageModule } from './pages/case-details/case-details.module'
 import { FeeCalculatorPageModule } from './pages/fee-calculator/fee-calculator.module';
 import { ViewPaymentsPageModule } from './pages/view-payments/view-payments.module';
 import { DvlaPageModule } from './pages/dvla/dvla.module';
+import { DvlaDetailsPageModule } from './pages/dvla-details/dvla-details.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -63,6 +64,7 @@ import { DvlaPageModule } from './pages/dvla/dvla.module';
     VisitDetailsModule,
     LoaderPageModule,
     DvlaPageModule,
+    DvlaDetailsPageModule,
   ],
   providers: [
     StatusBar,

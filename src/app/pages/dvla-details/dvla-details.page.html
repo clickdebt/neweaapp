@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>DVLA Detail</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+ 
+  <div>
+    <ion-card class="joblist-card">
+      <ion-card-content>
+        <ion-grid class="m-t-10">
+          <ion-row>
+            <ion-col size-sm="6" size-md="3" *ngFor="let dvla of dvlaDetail | keyvalue">
+              <span class="d-block color-primary">{{dvla.key}}</span>
+              <span class="d-block">{{dvla.value}}</span>
+            </ion-col>
+           
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

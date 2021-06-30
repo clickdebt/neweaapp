@@ -54,4 +54,8 @@ export class CaseDetailsService {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_dvla_enquiries/' + vrm + '?source=API';
     return this.http.get(apiURL);
   }
+  getDvlaDetails(caseId, id) {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_dvla_details?case_id=' + 3829 + '&dvla_id=' + 44 + '&source=API';
+    return this.http.get(apiURL);
+  }
 }
