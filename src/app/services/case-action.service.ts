@@ -112,7 +112,10 @@ export class CaseActionService {
     const apiURL = localStorage.getItem('server_url') + `b/payment/sage_pay_actions/get_card_list/${debtorId}/${gateway}/${type}?source=API`;
     return this.http.get(apiURL);
   }
-
+  deleteCard(cardId) {
+    const apiURL = localStorage.getItem('server_url') + `b/legacy/payment_cards/delete/${cardId}?source=API`;
+    return this.http.get(apiURL);
+  }
   async offlineActions() {
     // const caseDetailsActions = await this.storageService.get('case_details_action');
     // const requests = [];

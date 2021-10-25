@@ -212,6 +212,12 @@ export class ArrangementModalPage implements OnInit {
       payment_method.updateValueAndValidity();
     }
   }
+  setLatestCard(){
+    if(this.arrangementForm.value.payment_method == 'sagePay' && this.savedCards.length > 0){
+      let payment_card_list = this.arrangementForm.controls.payment_card_list;
+      payment_card_list.setValue(this.savedCards[this.savedCards.length -1].key);
+    }
+  }
   getCards() {
     if (this.arrangementForm.value.payment_method) {
       let method = '';
@@ -231,9 +237,12 @@ export class ArrangementModalPage implements OnInit {
         if (res) {
           const cards = [];
           Object.keys(res).forEach(element => {
-            cards.push({ key: element, value: res[element] });
+            cards.push({ key: element, value: res[element].last_digits });
           });
           this.savedCards = cards;
+          setTimeout(() => {
+            this.setLatestCard();
+          }, 100);
         }
       });
     }
@@ -245,7 +254,9 @@ export class ArrangementModalPage implements OnInit {
       componentProps: {
         caseId: this.isGroupArrangement ? this.groupArrId : this.caseId,
         debtorId: this.debtorId,
-        isGroupArr: this.isGroupArrangement
+        isGroupArr: this.isGroupArrangement,
+        selectedCases: this.arrangementForm.value.selectedLinkCaseIds,
+        paymentMethod: this.arrangementForm.value.payment_method
       }
     });
     manageCards.onDidDismiss()
