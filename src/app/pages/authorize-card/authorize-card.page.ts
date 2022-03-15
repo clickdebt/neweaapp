@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ModalController, NavParams } from '@ionic/angular';
+import { AlertController, ModalController, NavParams } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { CaseDetailsService } from 'src/app/services/case-details.service';
 import { NetworkService } from 'src/app/services/network.service';
@@ -20,6 +20,17 @@ export class AuthorizeCardPage implements OnInit {
   networkStatus;
   datemin = moment().format('YYYY-MM-DD');
   datemax = moment().add('100', 'years').format('YYYY-MM-DD');
+  selectedCases = [];
+  paymentMethod = '';
+  savedCardList = [];
+  showCards: any = {
+    addCard: {
+      show: true
+    },
+    cardList: {
+      show: true
+    }
+  };
   constructor(
     private modalCtrl: ModalController,
     private formBuilder: FormBuilder,
@@ -29,10 +40,13 @@ export class AuthorizeCardPage implements OnInit {
     private networkService: NetworkService,
     private caseActionService: CaseActionService,
     private databaseService: DatabaseService,
+    private alertCtrl: AlertController,
     private storageService: StorageService
   ) {
     this.caseId = navParams.get('caseId');
     this.debtorId = navParams.get('debtorId');
+    this.selectedCases = navParams.get('selectedCases');
+    this.paymentMethod = navParams.get('paymentMethod');
   }
 
   ngOnInit() {
@@ -41,6 +55,33 @@ export class AuthorizeCardPage implements OnInit {
   async ionViewWillEnter() {
     this.networkStatus = await this.networkService.getCurrentNetworkStatus();
     this.getDebtorData();
+    this.getCardDetails();
+  }
+  getCardDetails(){
+      if (this.paymentMethod) {
+        let method = '';
+        let id = this.debtorId;
+        const linkedCases = this.selectedCases;
+        let grpSelCases = '';
+        if (linkedCases.length) {
+          method = 'group';
+          linkedCases.push(this.caseId);
+          linkedCases.forEach(element => {
+            grpSelCases += element + '@@';
+          });
+          id = grpSelCases;
+        }
+        this.caseActionService.getSavedCards(id, this.paymentMethod, method).subscribe((res) => {
+          if (res) {
+            const cards = [];
+            Object.keys(res).forEach(element => {
+              cards.push({ key: element, value: res[element] });
+            });
+            this.savedCardList = cards;
+          }
+        });
+      }
+  
   }
   initForm() {
     this.addCardForm = this.formBuilder.group({
@@ -102,6 +143,7 @@ export class AuthorizeCardPage implements OnInit {
             this.commonService.dismissLoader();
             if (response.status == 'success') {
               this.commonService.showToast('card added successfully.');
+              this.dismiss();
             } else {
               if(Array.isArray(response.errors) && response.errors.length > 0){
                 (response.errors).forEach(element => {
@@ -144,5 +186,36 @@ export class AuthorizeCardPage implements OnInit {
   }
   isShown(object) {
     return object.show;
+  }
+  async delete(id){
+    const alert = await this.alertCtrl.create({
+      header: 'Delete Card',
+      message: 'Are you sure you want to Delete Card?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Delete',
+          handler: async () => {
+            this.caseActionService.deleteCard(id).subscribe((response: any) => {
+              console.log(response);
+              if(response.status){
+                this.commonService.showToast(response.message);
+                this.getCardDetails();
+              } else {
+                this.commonService.showToast(response.message);
+              }
+            });
+          }
+
+        }
+      ]
+    });
+    await alert.present();
+
   }
 }
