@@ -195,6 +195,7 @@ export class VisitFormPage implements OnInit {
         }
       });
       this.jsonString = this.jsonString.replace('{{x,y}}', this.currLat + ' , ' + this.currLang);
+      this.jsonString = this.jsonString.replace('{{scheme_manager_id}}', this.visitCaseData.scheme_manager_id);
     }
     this.jsonObject = JSON.parse(this.jsonString);
     const visitOutcomeObj = {
