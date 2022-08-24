@@ -443,7 +443,7 @@ export class VisitFormPage implements OnInit {
       { name: 'case_id', value: this.caseId },
       { name: 'url', value: 'b/system/v3/forms/create' },
       { name: 'type', value: `post` },
-      { name: 'data', value: `${encodeURI(JSON.stringify(form_data))}` },
+      { name: 'data', value: `${encodeURI(JSON.stringify(form_data)).replace(/'/g, "%27")}` },
       { name: 'is_sync', value: 0 },
       { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
     ];

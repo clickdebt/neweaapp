@@ -13,6 +13,7 @@ export class AddNoteModalPage implements OnInit {
   linkCases;
   selectedLinkCaseIds;
   note: string;
+  btnDisabled: boolean = false;
   constructor(
     private modalCtrl: ModalController,
     private caseActionService: CaseActionService  ) { }
@@ -40,6 +41,7 @@ export class AddNoteModalPage implements OnInit {
   }
   save() {
     if (this.note) {
+      this.btnDisabled = true;
       const data = {
         note: this.note,
         display_client: 1,
