@@ -33,6 +33,7 @@ export class HomePage implements OnInit {
   showSyncingData = false;
   appName = '';
   refreshBtnDisable = false;
+  appVersion = '';
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -64,6 +65,7 @@ export class HomePage implements OnInit {
     this.databaseService.syncingAPI.subscribe(res => {
       this.showSyncingData =  res;
     });
+    this.appVersion = this.commonService.getAppVersion();
   }
 
   ionViewWillEnter() {
