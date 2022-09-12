@@ -36,6 +36,9 @@ export class VisitDetailsPage implements OnInit {
           this.visitData.data.case_id = res.data[0].case_id;
         }
       });
+    } else {
+      this.visitData.data.created_at = this.visitData.created_at;
+      this.visitData.data.case_id = this.visitData.case_id;
     }
   }
 
