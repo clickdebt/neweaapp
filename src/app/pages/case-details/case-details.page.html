@@ -283,7 +283,7 @@
                   <span class="d-block color-primary">{{history.action}}</span>
                 </ion-col>
                 <ion-col size-md="4" size="12">
-                  <span class="d-block d-block-right">{{history.time}}</span>
+                  <span class="d-block d-block-right">{{history.time + 'Z' | date:'yyyy-MM-dd HH:mm:ss' }}</span>
                 </ion-col>
                 <ion-col size-md="12" size="12" *ngIf="history.name && history.name != 'null'">
                   <span class="d-block d-block-right">{{history.name}}</span>

@@ -43,7 +43,7 @@
         <ng-container *ngFor="let report of visitReports">
           <tr class="no-border">
             <td>{{report.case_id}}</td>
-            <td>{{report.created_at}}</td>
+            <td>{{report.created_at + 'Z' | date:'yyyy-MM-dd HH:mm:ss' }}</td>
             <td>{{report.outcome}}</td>
             <td><ion-button size="small" color="secondary" (click)='showDetails(report)'>Details</ion-button></td>
 
