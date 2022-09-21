@@ -30,3 +30,6 @@ npm-debug.log*
 /plugins
 /www
 /resources
+/plugins_test
+/platforms_test
+package_test.json
