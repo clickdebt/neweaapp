@@ -31,7 +31,7 @@
       </ion-item>
     </ion-row>
     <ion-row class="ion-margin-top ion-justify-content-center">
-      <ion-button [disabled]="note?.length<1" color="secondary" (click)="save()">
+      <ion-button [disabled]="note?.length<1 || btnDisabled" color="secondary" (click)="save()">
         Save
       </ion-button>
       <ion-button color="secondary" (click)="cancel()">

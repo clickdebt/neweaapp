@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { CommonService } from '../services';
 
 @Component({
   selector: 'app-index',
@@ -8,9 +9,10 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 })
 export class IndexPage implements OnInit {
 
-  constructor(private statusBar: StatusBar) { }
-
+  constructor(private statusBar: StatusBar,private commonService: CommonService) { }
+  appVersion = '';
   ngOnInit() {
+    this.appVersion = this.commonService.getAppVersion();
   }
   ionViewWillEnter() {
     this.statusBar.styleDefault();

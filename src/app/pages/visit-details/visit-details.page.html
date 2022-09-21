@@ -42,7 +42,7 @@
         </ng-container>
         <tr>
           <td> Created at</td>
-          <td>{{visitData.data.created_at}}</td>
+          <td>{{visitData.data.created_at + 'Z' | date:'yyyy-MM-dd HH:mm:ss' }}</td>
         </tr>
       </ng-container>
     </tbody>

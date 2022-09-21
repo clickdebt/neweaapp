@@ -74,6 +74,7 @@
   </ion-content>
   <ion-footer *ngIf="last_updated_date" class="text-center text-info">
     <ion-spinner class="ion-float-left" name="dots" *ngIf="showSyncingData"></ion-spinner>
+    {{ appVersion }}
     Last update time : {{last_updated_date}}
     <ion-spinner name="bubbles" *ngIf="showRefreshingData"></ion-spinner>
   </ion-footer>

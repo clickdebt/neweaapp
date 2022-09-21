@@ -42,7 +42,7 @@
         <div class="label-width">
           <ion-label>Date Added:</ion-label>
         </div>
-        <span class="text-color-light ion-margin-start">{{feeAction.dateentered}}</span>
+        <span class="text-color-light ion-margin-start">{{feeAction.dateentered + 'Z' | date:'yyyy-MM-dd HH:mm:ss' }}</span>
       </ion-col>
       <ion-col class="d-flex" size-md="8" size="12">
         <div class="label-width">
