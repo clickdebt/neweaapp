@@ -26,6 +26,7 @@
     "@ionic-native/diagnostic": "^5.27.0",
     "@ionic-native/geolocation": "^5.22.0",
     "@ionic-native/google-maps": "^5.5.0",
+    "@ionic-native/keyboard": "^5.36.0",
     "@ionic-native/launch-navigator": "^5.22.0",
     "@ionic-native/location-accuracy": "^5.28.0",
     "@ionic-native/native-audio": "^5.23.0",
@@ -38,14 +39,17 @@
     "@ionic-native/status-bar": "^5.0.0",
     "@ionic/angular": "^5.0.0",
     "@ionic/storage": "^2.2.0",
-    "angular-formio": "^3.7.0",
+    "angular-formio": "^4.11.5",
     "angular-svg-round-progressbar": "^3.0.1",
     "cordova-browser": "^6.0.0",
+    "cordova-ios": "6.2.0",
     "cordova-plugin-actionsheet": "^2.3.3",
     "cordova-plugin-aes256-encryption": "^2.0.1",
     "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.2",
+    "cordova-plugin-googlemaps-sdk": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk.git",
+    "cordova-plugin-ionic-webview": "5.0.0",
     "cordova-plugin-nativegeocoder": "^3.2.2",
     "cordova-plugin-network-information": "^2.0.2",
     "cordova-plugin-request-location-accuracy": "^2.3.0",
@@ -80,7 +84,6 @@
     "cordova-plugin-file-transfer": "git+https://github.com/apache/cordova-plugin-file-transfer.git",
     "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
-    "cordova-plugin-ionic-webview": "^4.1.3",
     "cordova-plugin-nativeaudio": "^3.0.9",
     "cordova-plugin-navigationbar": "^1.0.31",
     "cordova-plugin-splashscreen": "^5.0.2",
@@ -105,36 +108,35 @@
       "cordova-plugin-statusbar": {},
       "cordova-plugin-device": {},
       "cordova-plugin-splashscreen": {},
-      "cordova-plugin-ionic-webview": {
-        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
-      },
       "cordova-plugin-ionic-keyboard": {},
-      "cordova-plugin-googlemaps": {},
+      "cordova-plugin-googlemaps": {
+        "LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
+        "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
+      },
       "cordova-plugin-geolocation": {},
-      "cordova-plugin-nativegeocoder": {},
+      "cordova-plugin-nativegeocoder": {
+        "LOCATION_WHEN_IN_USE_DESCRIPTION": "Use geocoder service"
+      },
+      "uk.co.workingedge.phonegap.plugin.launchnavigator": {
+        "GOOGLE_API_KEY_FOR_ANDROID": "AIzaSyB2SD46TH6aRspJzp_jvIBFTFv-AlN_mUQ",
+        "OKHTTP_VERSION": "3.12.0"
+      },
       "cordova-plugin-network-information": {},
       "cordova-plugin-nativeaudio": {},
       "cordova-plugin-background-mode": {},
       "cordova-plugin-navigationbar": {},
       "cordova-plugin-aes256-encryption": {},
-      "cordova-plugin-request-location-accuracy": {
-        "PLAY_SERVICES_LOCATION_VERSION": "16.+"
-      },
+      "cordova-plugin-request-location-accuracy": {},
+      "cordova.plugins.diagnostic": {},
       "cordova-plugin-androidx": {},
       "cordova-plugin-androidx-adapter": {},
-      "cordova.plugins.diagnostic": {
-        "ANDROIDX_VERSION": "1.0.0",
-        "ANDROIDX_APPCOMPAT_VERSION": "1.3.1"
-      },
       "cordova-sqlite-storage": {},
       "cordova-plugin-file-transfer": {},
-      "uk.co.workingedge.phonegap.plugin.launchnavigator": {
-        "GOOGLE_API_KEY_FOR_ANDROID": "AIzaSyB2SD46TH6aRspJzp_jvIBFTFv-AlN_mUQ",
-        "OKHTTP_VERSION": "3.12.0"
-      }
+      "cordova-plugin-ionic-webview": {}
     },
     "platforms": [
       "browser",
+      "ios",
       "android"
     ]
   }
