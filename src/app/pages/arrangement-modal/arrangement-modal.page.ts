@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, NavParams } from '@ionic/angular';
+import { AlertController, ModalController, NavParams } from '@ionic/angular';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CaseActionService } from 'src/app/services/case-action.service';
@@ -60,7 +60,8 @@ export class ArrangementModalPage implements OnInit {
     private networkService: NetworkService,
     private commonService: CommonService,
     private storageService: StorageService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private alertController: AlertController
   ) {
     this.caseId = navParams.get('caseId');
     this.isDetailsPage = navParams.get('isDetailsPage');
@@ -125,7 +126,39 @@ export class ArrangementModalPage implements OnInit {
       payment_card_list: [],
     });
   }
-  save() {
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Archive Arrangement',
+      message: 'Are you sure want to archive arrangement?',
+      buttons: [{
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+        }
+      },
+      {
+        text: 'Archive',
+        role: 'OK',
+        handler: async (res) => {
+          this.arrangementObj = {
+            note: res.note ? res.note : '',
+            mode: 'archive',
+          };
+          await this.submit_form('edit');
+        }
+      }],
+      inputs: [
+        {
+          type: 'textarea',
+          name: 'note',
+          placeholder: 'Note...'
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+  async save() {
     if (this.arrangementForm.valid) {
       this.storageService.set('is_case_updated', true);
       this.arrangementObj = {
@@ -152,28 +185,31 @@ export class ArrangementModalPage implements OnInit {
         this.arrangementObj.is_group = 1;
         type = 'group_arrangement';
       }
-      if (this.isDetailsPage === true) {
-        const api_data = [
-          { name: 'case_id', value: `${this.caseId}` },
-          { name: 'url', value: `b/clickdebt_panel_layout/arrangements/case_actions_panels/${type}/${this.caseId}?source=API` },
-          { name: 'type', value: `post` },
-          { name: 'data', value: `${encodeURI(JSON.stringify(this.arrangementObj))}` },
-          { name: 'is_sync', value: 0 },
-          { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
-        ]
-        this.caseActionService.saveActionOffline('api_calls', api_data);
-        this.modalCtrl.dismiss({
-          saved: true,
-          arrangementObj: this.arrangementObj
-        });
-      } else {
-        this.modalCtrl.dismiss({
-          saved: true,
-          arrangementObj: this.arrangementObj
-        });
-      }
+      await this.submit_form(type);
     } else {
       this.arrangementObj = {};
+    }
+  }
+  submit_form(type){
+    if (this.isDetailsPage === true) {
+      const api_data = [
+        { name: 'case_id', value: `${this.caseId}` },
+        { name: 'url', value: `b/clickdebt_panel_layout/arrangements/case_actions_panels/${type}/${this.caseId}?source=API` },
+        { name: 'type', value: `post` },
+        { name: 'data', value: `${encodeURI(JSON.stringify(this.arrangementObj))}` },
+        { name: 'is_sync', value: 0 },
+        { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+      ]
+      this.caseActionService.saveActionOffline('api_calls', api_data);
+      this.modalCtrl.dismiss({
+        saved: true,
+        arrangementObj: this.arrangementObj
+      });
+    } else {
+      this.modalCtrl.dismiss({
+        saved: true,
+        arrangementObj: this.arrangementObj
+      });
     }
   }
   differentFirstPaymentChanged(event) {
