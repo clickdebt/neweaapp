@@ -48,6 +48,10 @@
                   <span class="d-block dark"><b>Debtor Details</b></span>
                   <span class="d-block color-primary">Debtor Name</span>
                   <span class="d-block"><b>{{currentCaseData.debtor?.debtor_name}}</b></span>
+                  <span *ngFor="let linked_debtor_name of currentCaseData.debtor?.linked_debtors,let i=index">
+                    <span class="d-block"><b>{{linked_debtor_name}}</b>
+                    </span>
+                  </span>
                   <hr>
                   <span class="d-block color-primary">Address</span>
                   <span *ngFor="let address of currentCaseData.debtor?.addresses,let i=index">
