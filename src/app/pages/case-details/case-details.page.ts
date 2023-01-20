@@ -57,7 +57,7 @@ export class CaseDetailsPage implements OnInit {
       }
     },
     'visit_case': {
-      text: 'Visit Case',
+      text: 'Visit Record',
       handler: () => {
         this.visitCase();
       }
@@ -69,7 +69,7 @@ export class CaseDetailsPage implements OnInit {
       }
     },
     'deallocate_case': {
-      text: 'Deallocate case',
+      text: 'Deallocate Record',
       handler: () => {
         this.deallocateCase();
       }
@@ -501,8 +501,8 @@ export class CaseDetailsPage implements OnInit {
   }
   async deallocateCase() {
     const alert = await this.alertCtrl.create({
-      header: 'Deallocate Case',
-      message: 'Are you sure you want to Deallocate Case?',
+      header: 'Deallocate Record',
+      message: 'Are you sure you want to Deallocate Record?',
       buttons: [
         {
           text: 'Cancel',
@@ -653,5 +653,9 @@ export class CaseDetailsPage implements OnInit {
     localStorage.removeItem('from_vrm');
     localStorage.removeItem('vrm_case_data');
     this.storageService.remove('caseId');
+  }
+  goToCaseDetails(linked_case) {
+    this.storageService.set('caseId', linked_case.id);
+    this.router.navigate(['/home/case-details/' + linked_case.id]);
   }
 }

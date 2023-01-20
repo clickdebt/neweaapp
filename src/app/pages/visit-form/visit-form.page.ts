@@ -71,7 +71,7 @@ export class VisitFormPage implements OnInit {
       }
     },
     'deallocate_case': {
-      text: 'Deallocate case',
+      text: 'Deallocate Record',
       handler: () => {
         this.deallocateCase();
       }
@@ -142,8 +142,17 @@ export class VisitFormPage implements OnInit {
     // this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'));
     this.visitCaseData = await this.databaseService.getCaseInfo(this.caseId);
     this.isNewlyn = this.commonService.isClient('newlyn');
-    this.commonService.checkLocation();
+
+    this.commonService.checkLocation(); // To handle on broswer
     this.getLocation();
+    
+    // let cangetLocation = await this.commonService.checkLocation(); // To handle mobile app
+    // if(cangetLocation){
+    //   this.getLocation();
+    // } else {
+    //   this.commonService.showToast('Please provide location access!','danger');
+    //   this.router.navigate(['/home/job-list']);
+    // }
   }
   async getVisitFormAndOutcome() {
     const visitFrom: any = {};
@@ -229,41 +238,85 @@ export class VisitFormPage implements OnInit {
     this.dataRead(res);
   }
 
+  // async getLocation() {
+  //   const { coords } = await this.geolocation.getCurrentPosition();
+  //   this.currLang = coords.longitude;
+  //   this.currLat = coords.latitude;
+  //   console.log(this.currLang, this.currLat);
+  //   if (this.visitCaseData) {
+  //     let en_add = this.visitCaseData.debtor.enforcement_addresses;
+  //     if (en_add.length && (en_add.address_ln1 != null || en_add.address_postcode != null)) {
+  //       this.addressData = {
+  //         address_ln1: this.visitCaseData.debtor.enforcement_addresses[0].address_ln1,
+  //         address_ln2: this.visitCaseData.debtor.enforcement_addresses[0].address_ln2,
+  //         address_ln3: this.visitCaseData.debtor.enforcement_addresses[0].address_ln3,
+  //         address_town: this.visitCaseData.debtor.enforcement_addresses[0].address_town,
+  //         address_postcode: this.visitCaseData.debtor.enforcement_addresses[0].address_postcode,
+  //       };
+  //       this.addressData.address_str = Object.values(this.addressData).join(',');
+  //       this.getGeocodesLatLongs(this.addressData);
+  //     } else if (this.visitCaseData.debtor.addresses.length) {
+  //       this.addressData = {
+  //         address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
+  //         address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
+  //         address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
+  //         address_town: this.visitCaseData.debtor.addresses[0].address_town,
+  //         address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
+  //       };
+  //       this.addressData.address_str = Object.values(this.addressData).join(',');
+  //       this.getGeocodesLatLongs(this.addressData);
+  //     }
+  //   }
+  //   this.getVisitFormAndOutcome();
+  //   // const source = new google.maps.LatLng(-34, 151);
+  //   // const destination = new google.maps.LatLng(-35, 151);
+  //   // const distance = google.maps.geometry.spherical.computeDistanceBetween(source, destination);
+  //   // console.log(distance);
+  // }
+
   async getLocation() {
-    const { coords } = await this.geolocation.getCurrentPosition();
-    this.currLang = coords.longitude;
-    this.currLat = coords.latitude;
-    console.log(this.currLang, this.currLat);
-    if (this.visitCaseData) {
-      let en_add = this.visitCaseData.debtor.enforcement_addresses;
-      if (en_add.length && (en_add.address_ln1 != null || en_add.address_postcode != null)) {
-        this.addressData = {
-          address_ln1: this.visitCaseData.debtor.enforcement_addresses[0].address_ln1,
-          address_ln2: this.visitCaseData.debtor.enforcement_addresses[0].address_ln2,
-          address_ln3: this.visitCaseData.debtor.enforcement_addresses[0].address_ln3,
-          address_town: this.visitCaseData.debtor.enforcement_addresses[0].address_town,
-          address_postcode: this.visitCaseData.debtor.enforcement_addresses[0].address_postcode,
-        };
-        this.addressData.address_str = Object.values(this.addressData).join(',');
-        this.getGeocodesLatLongs(this.addressData);
-      } else if (this.visitCaseData.debtor.addresses.length) {
-        this.addressData = {
-          address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
-          address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
-          address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
-          address_town: this.visitCaseData.debtor.addresses[0].address_town,
-          address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
-        };
-        this.addressData.address_str = Object.values(this.addressData).join(',');
-        this.getGeocodesLatLongs(this.addressData);
+
+    this.geolocation.getCurrentPosition().then((locationResponse: any)=>{
+      const { coords } = locationResponse
+      this.currLang = coords.longitude;
+      this.currLat = coords.latitude;
+      console.log(this.currLang, this.currLat);
+      if (this.visitCaseData) {
+        let en_add = this.visitCaseData.debtor.enforcement_addresses;
+        if (en_add.length && (en_add.address_ln1 != null || en_add.address_postcode != null)) {
+          this.addressData = {
+            address_ln1: this.visitCaseData.debtor.enforcement_addresses[0].address_ln1,
+            address_ln2: this.visitCaseData.debtor.enforcement_addresses[0].address_ln2,
+            address_ln3: this.visitCaseData.debtor.enforcement_addresses[0].address_ln3,
+            address_town: this.visitCaseData.debtor.enforcement_addresses[0].address_town,
+            address_postcode: this.visitCaseData.debtor.enforcement_addresses[0].address_postcode,
+          };
+          this.addressData.address_str = Object.values(this.addressData).join(',');
+          this.getGeocodesLatLongs(this.addressData);
+        } else if (this.visitCaseData.debtor.addresses.length) {
+          this.addressData = {
+            address_ln1: this.visitCaseData.debtor.addresses[0].address_ln1,
+            address_ln2: this.visitCaseData.debtor.addresses[0].address_ln2,
+            address_ln3: this.visitCaseData.debtor.addresses[0].address_ln3,
+            address_town: this.visitCaseData.debtor.addresses[0].address_town,
+            address_postcode: this.visitCaseData.debtor.addresses[0].address_postcode,
+          };
+          this.addressData.address_str = Object.values(this.addressData).join(',');
+          this.getGeocodesLatLongs(this.addressData);
+        }
       }
-    }
-    this.getVisitFormAndOutcome();
+      this.getVisitFormAndOutcome();
+    }).catch((err => {
+      console.log(err);
+      this.commonService.showToast('Please allow location access','danger');
+      this.router.navigate(['/home/job-list']);
+    }));
     // const source = new google.maps.LatLng(-34, 151);
     // const destination = new google.maps.LatLng(-35, 151);
     // const distance = google.maps.geometry.spherical.computeDistanceBetween(source, destination);
     // console.log(distance);
   }
+
   onRender(event) {
     // console.log(event);
   }

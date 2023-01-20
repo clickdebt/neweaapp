@@ -200,7 +200,7 @@
             <ion-checkbox mode="md" [(ngModel)]="selectedAll" (ionChange)="selectAllCase()" color="secondary">
             </ion-checkbox>
           </th>
-          <th>Case ID</th>
+          <th>Record ID</th>
           <th>Name</th>
           <th *ngFor="let caseField of caseFields">
             <span>{{caseField.label}}</span>
@@ -273,7 +273,7 @@
                   <tr class="no-border">
                     <th width="3%"></th>
                     <th width="3%"></th>
-                    <th>Case ID</th>
+                    <th>Record ID</th>
                     <th>Name</th>
                     <th *ngFor="let caseField of caseFields">
                       <span>{{caseField.label}}</span>

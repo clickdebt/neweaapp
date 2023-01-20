@@ -3,7 +3,7 @@
     <ion-row class="searchbar-wrpper">
       <ion-col size-md="4" size-xs="6">
         <ion-searchbar [(ngModel)]="caseId" [showCancelButton]="shouldShowCancel"
-          (keyup.enter)="onInput($event)" (ionCancel)="onInput($event)" placeholder="Search Case ID">
+          (keyup.enter)="onInput($event)" (ionCancel)="onInput($event)" placeholder="Search Record ID">
         </ion-searchbar>
       </ion-col>
       <ion-col size-md="4" size-xs="6" class="ion-text-end">
@@ -33,7 +33,7 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Case ID</th>
+          <th>Record ID</th>
           <th>Time</th>
           <th>Outcome</th>
           <th>Details</th>
