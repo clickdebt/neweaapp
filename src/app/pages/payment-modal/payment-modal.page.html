@@ -99,7 +99,7 @@
           </ion-select>
         </ion-item>
 
-        <ion-item>
+        <ion-item *ngIf="false">
           <ion-label position="floating">Split</ion-label>
           <ion-select placeholder="Select Split type" formControlName="financial_split_override_id">
             <ion-select-option *ngFor="let method of splites" value="{{method.id}}">{{method.label}}

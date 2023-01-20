@@ -33,6 +33,7 @@
       <ion-label>
         <h2>Arrangement Schedule</h2>
       </ion-label>
+      <ion-button color="danger" (click)="presentAlert()">Archive</ion-button>
       <ion-icon slot="end"
         [name]="isShown(activeArrangements?.scheduleArrangements) ? 'chevron-up-sharp':'chevron-down-sharp'">
       </ion-icon>
