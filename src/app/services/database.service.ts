@@ -38,10 +38,24 @@ export class DatabaseService {
 
     this.platform.ready().then(async () => {
 
+      if(this.platform.is('android')){
+        console.log('platform android');
+      }
+      if(this.platform.is('ios')){
+        console.log('platform ios');
+      }
+      if(this.platform.is('iphone')){
+        console.log('platform iphone');
+      }
+      if(this.platform.is('mobile')){
+        console.log('platform mobile');
+      }
       if (!this.platform.is('android') || !this.platform.is('ios')) {
         let db = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
         this.database = browserDBInstance(db);
+        console.log('1');
       } else {
+        console.log('2');
         this.database = await this.sqlite.create({
           name: 'fieldAgentV3.db',
           location: 'default',
@@ -143,14 +157,34 @@ export class DatabaseService {
 
     this.tables.forEach(async element => {
       const deleteQuery = 'DROP TABLE IF EXISTS ' + element + ';';
-      let a = await this.database.executeSql(deleteQuery);
+      try {
+        let a = await this.database.executeSql(deleteQuery);
+      } catch (error) {
+        console.log(error);        
+      }
     });
     await this.storageService.clearAll();
 
-    await this.database.executeSql(rdebCases);
-    await this.database.executeSql(rdebLinkedCases);
-    await this.database.executeSql(history);
-    await this.database.executeSql(api_calls);
+    try {
+      await this.database.executeSql(rdebCases);
+    } catch (error) {
+      console.log(error)
+    }
+    try {
+      await this.database.executeSql(rdebLinkedCases);
+    } catch (error) {
+      console.log(error)
+    }
+    try {
+      await this.database.executeSql(history);
+    } catch (error) {
+      console.log(error)
+    }
+    try {
+      await this.database.executeSql(api_calls);
+    } catch (error) {
+      console.log(error)
+    }
 
     this.databaseReady.next(true);
     await this.storageService.set('database_filled', true);
