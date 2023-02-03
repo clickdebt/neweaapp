@@ -26,6 +26,7 @@
     "@ionic-native/diagnostic": "^5.27.0",
     "@ionic-native/geolocation": "^5.22.0",
     "@ionic-native/google-maps": "^5.5.0",
+    "@ionic-native/keyboard": "^5.36.0",
     "@ionic-native/launch-navigator": "^5.22.0",
     "@ionic-native/location-accuracy": "^5.28.0",
     "@ionic-native/native-audio": "^5.23.0",
@@ -41,7 +42,7 @@
     "angular-formio": "^3.7.0",
     "angular-svg-round-progressbar": "^3.0.1",
     "cordova-browser": "^6.0.0",
-    "cordova-ios": "6.2.0",
+    "cordova-ios": "5.1.1",
     "cordova-plugin-actionsheet": "^2.3.3",
     "cordova-plugin-aes256-encryption": "^2.0.1",
     "cordova-plugin-background-mode": "^0.7.3",
@@ -52,15 +53,15 @@
     "cordova-plugin-nativegeocoder": "^3.2.2",
     "cordova-plugin-network-information": "^2.0.2",
     "cordova-plugin-request-location-accuracy": "^2.3.0",
-    "cordova-sqlite-storage": "4.0.0",
-    "cordova.plugins.diagnostic": "^6.1.1",
+    "cordova-sqlite-storage": "6.0.0",
+    "cordova.plugins.diagnostic": "7.1.0",
     "core-js": "^2.5.4",
     "ion2-calendar": "^3.0.0-rc.0",
     "moment": "^2.27.0",
     "recursive-readdir": "^2.2.2",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
-    "uk.co.workingedge.cordova.plugin.sqliteporter": "^1.1.1",
+    "uk.co.workingedge.cordova.plugin.sqliteporter": "1.1.1",
     "xml-js": "^1.6.11",
     "zone.js": "~0.9.1"
   },
@@ -103,7 +104,6 @@
   "description": "An Ionic project",
   "cordova": {
     "plugins": {
-      "uk.co.workingedge.cordova.plugin.sqliteporter": {},
       "cordova-plugin-statusbar": {},
       "cordova-plugin-device": {},
       "cordova-plugin-splashscreen": {},
@@ -131,8 +131,8 @@
       "cordova-plugin-androidx-adapter": {},
       "cordova-plugin-file-transfer": {},
       "cordova-plugin-ionic-webview": {},
-      "cordova.plugins.diagnostic": {},
-      "cordova-sqlite-storage": {}
+      "cordova-sqlite-storage": {},
+      "uk.co.workingedge.cordova.plugin.sqliteporter": {}
     },
     "platforms": [
       "browser",

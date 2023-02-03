@@ -2,5 +2,5 @@
     <ion-content>
         <ion-router-outlet id="main-content"></ion-router-outlet>
     </ion-content>
-    <ion-footer class="text-center text-info">{{ appVersion }}</ion-footer>
+    <ion-footer class="text-center text-info pb-3" [hidden]="isHideFooter">{{ appVersion }}</ion-footer>
 </ion-app>

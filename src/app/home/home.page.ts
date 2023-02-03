@@ -11,6 +11,7 @@ import { Network } from '@ionic-native/network/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { CaseActionService } from '../services/case-action.service';
 import { LoaderService } from '../services/loader.service';
+import { Keyboard } from '@ionic-native/keyboard/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -34,6 +35,7 @@ export class HomePage implements OnInit {
   appName = '';
   refreshBtnDisable = false;
   appVersion = '';
+  isHideFooter = false;
   constructor(
     private platform: Platform,
     private alertCtrl: AlertController,
@@ -49,7 +51,8 @@ export class HomePage implements OnInit {
     private commonService: CommonService,
     private statusBar: StatusBar,
     private caseActionService: CaseActionService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private keyboard:Keyboard
   ) { }
 
   ngOnInit() {
@@ -69,6 +72,12 @@ export class HomePage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.keyboard.onKeyboardShow().subscribe((result)=>{
+      this.isHideFooter=true;
+    })
+    this.keyboard.onKeyboardHide().subscribe((result)=>{
+      this.isHideFooter=false;
+    })
     this.statusBar.styleLightContent();
     this.statusBar.overlaysWebView(false);
     this.statusBar.backgroundColorByHexString('#000');
