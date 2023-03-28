@@ -136,16 +136,32 @@ export class CommonService {
         }
       });
   }
-  checkLocation() {
-    this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+  // checkLocation() {
+  //   this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+  //     if (canRequest) {
+  //       // the accuracy option will be ignored by iOS
+  //       this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
+  //         () => console.log('Request successful'),
+  //         error => console.log('Error requesting location permissions', error)
+  //       );
+  //     }
+  //   });
+  // }
+  async checkLocation() {
+    let result = false;
+    await this.locationAccuracy.canRequest().then(async(canRequest: boolean) => {
       if (canRequest) {
         // the accuracy option will be ignored by iOS
-        this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
-          () => console.log('Request successful'),
-          error => console.log('Error requesting location permissions', error)
+        await this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
+          () => {console.log('Request successful'); result= true;},
+          (error) => {console.log('Error requesting location permissions', error); result= false;}
         );
       }
     });
+    return result;
+  }
+  getAppVersion(){
+    return "v1.1";
   }
   getAppVersion(){
     return "v1.1";

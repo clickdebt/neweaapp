@@ -24,6 +24,18 @@
   </ion-refresher>
   <ion-grid>
     <ion-row>
+      <ion-col size-md="12" size="12">
+        <ion-card class="m-0 h-100">
+          <ion-card-content>
+            <ion-list class="ion-no-border ion-margin-start" [hidden]="!caseMarkers.length">
+              <ion-button (click)="onCaseMarkerClick(caseMarker)" size="small"
+                [color]="colorCondition(caseMarker.value)" *ngFor="let caseMarker of caseMarkers">
+                {{caseMarker.label}}
+              </ion-button>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
       <ion-col *ngIf="!fromVisit" size-md="8" size-sm="12" size-xs="12">
         <ion-card class="m-0 h-100">
           <ion-card-header>
@@ -36,6 +48,10 @@
                   <span class="d-block dark"><b>Debtor Details</b></span>
                   <span class="d-block color-primary">Debtor Name</span>
                   <span class="d-block"><b>{{currentCaseData.debtor?.debtor_name}}</b></span>
+                  <span *ngFor="let linked_debtor_name of currentCaseData.debtor?.linked_debtors,let i=index">
+                    <span class="d-block"><b>{{linked_debtor_name}}</b>
+                    </span>
+                  </span>
                   <hr>
                   <span class="d-block color-primary">Address</span>
                   <span *ngFor="let address of currentCaseData.debtor?.addresses,let i=index">
@@ -71,7 +87,7 @@
                   </ng-container>
                 </ion-col>
                 <ion-col size-sm="6" size-xs="12">
-                  <span class="d-block dark"><b>Case Details</b></span>
+                  <span class="d-block dark"><b>Record Details</b></span>
                   <span class="d-block color-primary">Client Reference</span>
                   <span class="d-block" *ngIf="isNewlyn"><b>{{caseDetails.data.cl_ref}}</b></span>
                   <span class="d-block" *ngIf="!isNewlyn"><b>{{caseDetails.data.ref}}</b></span>
@@ -211,14 +227,14 @@
                   <!-- ------------------------------------------------------------------------------------------------------------- -->
                   <ng-container *ngIf="currentCaseData.linked_cases && currentCaseData.linked_cases.length">
                     <hr>
-                    <span class="d-block dark mt-15"><b>Linked Cases</b></span>
+                    <span class="d-block dark mt-15"><b>Linked Records</b></span>
                     <span class="list-item-inline">
-                      <span>Case Id</span>
+                      <span>Record Id</span>
                       <span>Outstanding</span>
                     </span>
                     <span class="list-item-inline" *ngFor="let linked_case of currentCaseData.linked_cases">
-                      <span class="color-primary">{{linked_case.id}}</span>
-                      <span><b>
+                      <span class="color-primary" (click)="goToCaseDetails(linked_case)">{{linked_case.id}}</span>
+                      <span (click)="goToCaseDetails(linked_case)"><b>
                           {{linked_case.d_outstanding | number:'0.2-2'}}
                         </b></span>
                     </span>
@@ -226,18 +242,6 @@
                 </ion-col>
               </ion-row>
             </ion-grid>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size-md="12" size="12">
-        <ion-card class="m-0 h-100">
-          <ion-card-content>
-            <ion-list class="ion-no-border ion-margin-start" [hidden]="!caseMarkers.length">
-              <ion-button (click)="onCaseMarkerClick(caseMarker)" size="default"
-                [color]="colorCondition(caseMarker.value)" *ngFor="let caseMarker of caseMarkers">
-                {{caseMarker.label}}
-              </ion-button>
-            </ion-list>
           </ion-card-content>
         </ion-card>
       </ion-col>

@@ -21,9 +21,9 @@
               <ion-row *ngIf="currentCaseData">
                 <ion-col size-md="4" size-sm="12" size-xs="12">
 
-                  <span class="d-block dark"><b>Selected Case</b></span>
+                  <span class="d-block dark"><b>Selected Record</b></span>
                   <span class="list-item-inline">
-                    <span>Case Id</span>
+                    <span>Record Id</span>
                     <span>Outstanding</span>
                   </span>
                   <span class="list-item-inline"><span class="color-primary">{{this.caseId}}</span>
@@ -32,9 +32,9 @@
                   <!-- ------------------------------------------------------------------------------------------------------------- -->
                   <ng-container *ngIf="currentCaseData.linked_cases && currentCaseData.linked_cases.length">
                     <hr>
-                    <span class="d-block dark mt-15"><b>Linked Cases</b></span>
+                    <span class="d-block dark mt-15"><b>Linked Records</b></span>
                     <span class="list-item-inline">
-                      <span>Case Id</span>
+                      <span>Record Id</span>
                       <span>Outstanding</span>
                     </span>
                     <span class="list-item-inline" *ngFor="let linked_case of currentCaseData.linked_cases">

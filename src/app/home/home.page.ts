@@ -89,6 +89,12 @@ export class HomePage implements OnInit {
     this.hasVRMpermission = await this.commonService.hasPermission(this.commonService.permissionSlug.VRM);
   }
   async ionViewDidEnter() {
+    this.keyboard.onKeyboardShow().subscribe((result)=>{
+      this.isHideFooter=true;
+    })
+    this.keyboard.onKeyboardHide().subscribe((result)=>{
+      this.isHideFooter=false;
+    })
     if (this.networkService.getCurrentNetworkStatus() === 1) {
       const downloadStatus = await this.databaseService.getDownloadStatus();
       if (!downloadStatus || !downloadStatus.status) {
