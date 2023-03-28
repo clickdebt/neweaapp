@@ -163,7 +163,4 @@ export class CommonService {
   getAppVersion(){
     return "v1.1";
   }
-  getAppVersion(){
-    return "v1.1";
-  }
 }
