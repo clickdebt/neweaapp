@@ -72,7 +72,7 @@
   <ion-content>
     <ion-router-outlet id="main-content"></ion-router-outlet>
   </ion-content>
-  <ion-footer *ngIf="last_updated_date" class="text-center text-info">
+  <ion-footer *ngIf="last_updated_date" [hidden]="isHideFooter" class="text-center text-info">
     <ion-spinner class="ion-float-left" name="dots" *ngIf="showSyncingData"></ion-spinner>
     {{ appVersion }}
     Last update time : {{last_updated_date}}
