@@ -8,6 +8,7 @@ export const browserDBInstance = (db) => {
             tx.executeSql(sql, params, (tx, rs) => {
               resolve(rs);
             }, (tx, rs) => {
+              reject(rs);
             console.log(sql, rs)
             });
           });
@@ -19,7 +20,7 @@ export const browserDBInstance = (db) => {
           db.transaction((tx) => {
             for (let i = 0; i < arr.length; i++) {
               batch.push(new Promise((resolve, reject) => {
-                tx.executeSql(arr[i], [], () => { resolve(true) })
+                tx.executeSql(arr[i], [], () => { resolve(true) }, () => {reject(false)})
               }))
               Promise.all(batch).then(() => r(true));
             }
