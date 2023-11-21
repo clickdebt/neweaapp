@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { VisitService, CaseService, DatabaseService } from 'src/app/services';
 import { StorageService } from 'src/app/services/storage.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, AlertController, NavController, ActionSheetController } from '@ionic/angular';
+import { ModalController, AlertController, NavController, ActionSheetController, Platform } from '@ionic/angular';
 import { CommonService } from 'src/app/services';
 import { PaymentModalPage } from '../payment-modal/payment-modal.page';
 import { ArrangementModalPage } from '../arrangement-modal/arrangement-modal.page';
@@ -121,7 +121,8 @@ export class VisitFormPage implements OnInit {
     private alertCtrl: AlertController,
     private navCtrl: NavController,
     private caseActionService: CaseActionService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private platform: Platform,
   ) { }
 
   ngOnInit() {
@@ -143,8 +144,8 @@ export class VisitFormPage implements OnInit {
     this.visitCaseData = await this.databaseService.getCaseInfo(this.caseId);
     this.isNewlyn = this.commonService.isClient('newlyn');
 
-    this.commonService.checkLocation(); // To handle on broswer
-    this.getLocation();
+    // this.commonService.checkLocation(); // To handle on broswer
+    // this.getLocation();
     
     // let cangetLocation = await this.commonService.checkLocation(); // To handle mobile app
     // if(cangetLocation){
@@ -153,6 +154,21 @@ export class VisitFormPage implements OnInit {
     //   this.commonService.showToast('Please provide location access!','danger');
     //   this.router.navigate(['/home/job-list']);
     // }
+
+    if(this.platform.is('hybrid')){
+      console.log('app');
+      let cangetLocation = await this.commonService.checkLocation(); // To handle mobile app
+      if(cangetLocation){
+        this.getLocation();
+      } else {
+        this.commonService.showToast('Please provide location access!','danger');
+        this.router.navigate(['/home/job-list']);
+      }
+    } else {
+      console.log('browser');
+      this.commonService.checkLocation(); // To handle on broswer
+      this.getLocation();
+    }
   }
   async getVisitFormAndOutcome() {
     const visitFrom: any = {};

@@ -38,7 +38,7 @@ import { FeeCalculatorPageModule } from './pages/fee-calculator/fee-calculator.m
 import { ViewPaymentsPageModule } from './pages/view-payments/view-payments.module';
 import { DvlaPageModule } from './pages/dvla/dvla.module';
 import { DvlaDetailsPageModule } from './pages/dvla-details/dvla-details.module';
-
+import { Keyboard } from '@ionic-native/keyboard/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -88,7 +88,8 @@ import { DvlaDetailsPageModule } from './pages/dvla-details/dvla-details.module'
     BackgroundMode,
     AES256,
     Diagnostic,
-    LocationAccuracy
+    LocationAccuracy,
+    Keyboard
   ],
   bootstrap: [AppComponent]
 })
