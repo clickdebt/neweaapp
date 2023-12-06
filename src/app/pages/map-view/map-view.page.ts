@@ -99,17 +99,20 @@ export class MapViewPage implements OnInit {
             `${da.debtor.enforcement_addresses[0].address_ln2}, ` +
             `${da.debtor.enforcement_addresses[0].address_ln3}, ` +
             `${da.debtor.enforcement_addresses[0].address_postcode}`;
+          da.address_lat = `${da.debtor.enforcement_addresses[0].address_lat}`;
+          da.address_lng = `${da.debtor.enforcement_addresses[0].address_lng}`;
         } else if (da.debtor.addresses.length) {
           da.address_str = `${da.debtor.addresses[0].address_ln1}, ` +
             `${da.debtor.addresses[0].address_ln2}, ` +
             `${da.debtor.addresses[0].address_ln3}, ` +
             `${da.debtor.addresses[0].address_postcode}`;
+          da.address_lat = `${da.debtor.addresses[0].address_lat}`;
+          da.address_lng = `${da.debtor.addresses[0].address_lng}`;
         } else {
           da.address_str = '';
         }
 
         da.location = {};
-        console.log(da.address_str);
         if (da.address_str) {
           this.getGeocodesLatLongs(da, caseIndex);
         }
@@ -120,25 +123,40 @@ export class MapViewPage implements OnInit {
   }
 
   getGeocodesLatLongs(obj, caseIndex) {
-    this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
-      if (res.status === 'OK' && res.results && res.results[0]) {
-        obj.location = res.results[0]['geometry']['location'];
-        if (this.index === 0) {
-          this.centerLat = obj.location.lat;
-          this.centerLng = obj.location.lng;
-          this.initMap();
-          this.index++;
-        }
-        this.setCaseMarkers(obj);
-      } else {
-        if (this.index === 0 && caseIndex === this.cases.length - 1) {
-          this.initMap(); this.index++;
-        }
-        console.log(obj, res);
+    if(parseFloat(obj.address_lat) != 0 && parseFloat(obj.address_lng) != 0){
+      obj.location.lat = parseFloat(obj.address_lat); // Lat
+      obj.location.lng = parseFloat(obj.address_lng); // Long
+      if (this.index === 0) {
+        this.centerLat = obj.location.lat; // Lat
+        this.centerLng = obj.location.lng; // Long
+        this.initMap();
+        this.index++;
       }
-    }, err => {
-      console.log(err);
-    });
+      this.setCaseMarkers(obj);
+    } else {
+      if (this.index === 0 && caseIndex === this.cases.length - 1) {
+        this.initMap(); this.index++;
+      }
+    }
+    // this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
+    //   if (res.status === 'OK' && res.results && res.results[0]) {
+    //     obj.location = res.results[0]['geometry']['location'];
+    //     if (this.index === 0) {
+    //       this.centerLat = obj.location.lat;
+    //       this.centerLng = obj.location.lng;
+    //       this.initMap();
+    //       this.index++;
+    //     }
+    //     this.setCaseMarkers(obj);
+    //   } else {
+    //     if (this.index === 0 && caseIndex === this.cases.length - 1) {
+    //       this.initMap(); this.index++;
+    //     }
+    //     console.log(obj, res);
+    //   }
+    // }, err => {
+    //   console.log(err);
+    // });
   }
 
   setCaseMarkers(obj) {
