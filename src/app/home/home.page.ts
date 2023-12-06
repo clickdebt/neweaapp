@@ -95,16 +95,17 @@ export class HomePage implements OnInit {
         this.caseService.getCaseSettings().subscribe(async (response: any) => {
           await this.storageService.set('fields', response.data.fields);
           this.saveTimeSettings(response.data.time);
+          this.loaderService.show();
+          this.loaderService.displayText.next('Downloading Cases');
+          await this.getCasesNew();
         });
-        this.loaderService.show();
-        this.loaderService.displayText.next('Downloading Cases');
         forkJoin({
-          cases: this.caseService.getCases({}, 1),
+          // cases: this.caseService.getCases({}, 1),
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
           feeOptions: this.caseService.getFeeSchemeManagerLinks(),
         }).subscribe(async (response: any) => {
-          await this.databaseService.setCases(response.cases.data, response.cases.linked, response.cases.allCases);
+          // await this.databaseService.setCases(response.cases.data, response.cases.linked, response.cases.allCases);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setFeeOptions(response.feeOptions.data.FeeSchemeManagerLinks);
@@ -114,8 +115,8 @@ export class HomePage implements OnInit {
             time: time
           });
           this.databaseService.setlastUpdateTime(time);
-          this.loaderService.hide();
-          await this.getcaseDetails();
+          // this.loaderService.hide();
+          // await this.getcaseDetails();
         });
       } else {
         if (downloadStatus) {
@@ -156,11 +157,11 @@ export class HomePage implements OnInit {
       if (count > 0) {
         for (let i = 0; i <= count; i++) {
           this.caseService.getCaseDetails({ page: ++page, limit: this.limit, last_update_date: last_update_date }).subscribe(async (data) => {
+            await this.databaseService.setcaseDetails(data);
             downloded += this.limit;
             if (downloded > total) {
               downloded = total;
             }
-            await this.databaseService.setcaseDetails(data);
             if (downloded >= total) {
               await this.setHistoryDownloadStatus();
             }
@@ -229,24 +230,16 @@ export class HomePage implements OnInit {
     await panicModalPage.present();
   }
   async doRefresh() {
-    if (this.networkService.getCurrentNetworkStatus() === 1) {
-      this.refreshBtnDisable = true;
+    if (this.networkService.getCurrentNetworkStatus() === 1 && !this.downloading) {
       const downloadStatus = await this.databaseService.getDownloadStatus();
       if (downloadStatus) {
+        this.refreshBtnDisable = true;
         const params = {};
         this.loaderService.show();
         this.loaderService.displayText.next('Downloading Cases');
         await this.databaseService.executeQuery('delete from rdebt_cases');
         await this.databaseService.executeQuery('delete from rdebt_linked_cases');
-        this.caseService.getCases(params, 1).subscribe(async(response: any)=>{
-          await this.databaseService.setCases(response.data, response.linked, response.allCases);
-          this.caseService.getCaseDetails(params).subscribe(async(response: any) =>{
-            await this.databaseService.setcaseDetails(response);
-            await this.databaseService.updateLastUpdatedDates();
-            this.refreshBtnDisable = false;
-            this.loaderService.hide();
-          });
-        });
+        await this.getCasesNew();
       }
     }
   }
@@ -293,5 +286,40 @@ export class HomePage implements OnInit {
       return { time: totalSeconds, label: displayText };
     });
     this.storageService.set('timeSettings', timeSettings);
+  }
+
+  async getCasesNew() {
+    let downloded = 0;
+    this.caseService.getCases({ page: 1, limit: this.limit }).subscribe(async (response: any) => {
+      let total = response.caseCountsVal;
+      downloded = (response.caseCountsVal >= this.limit) ? this.limit : response.caseCountsVal;
+      let page = 1
+      await this.databaseService.setCases(response.data, response.linked, response.allCases);
+      let count = Math.floor((total - downloded) / this.limit);
+      if (count > 0) {
+        for (let i = 0; i <= count; i++) {
+          this.caseService.getCases({ page: ++page, limit: this.limit }).subscribe(async (response: any) => {
+            await this.databaseService.setCases(response.data, response.linked, response.allCases);
+            downloded += this.limit;
+            if (downloded > total) {
+              downloded = total;
+            }
+            if (downloded >= total) {
+              await this.getcaseDetails();
+            }
+          }, (err) => {
+            console.log(err);
+          });
+        }
+      } else {
+        await this.getcaseDetails();
+      }
+      this.loaderService.hide();
+      this.refreshBtnDisable = false;
+      const time = moment().format('YYYY-MM-DD HH:mm:ss');
+      this.databaseService.setlastUpdateTime(time);
+    }, (err) => {
+      console.log(err);
+    });
   }
 }

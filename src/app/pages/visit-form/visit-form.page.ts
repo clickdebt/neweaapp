@@ -107,6 +107,7 @@ export class VisitFormPage implements OnInit {
       }
     },
   };
+  isVisitSubmitted = false;
   constructor(
     private visitService: VisitService,
     private storageService: StorageService,
@@ -139,6 +140,7 @@ export class VisitFormPage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    this.commonService.showToast('Please wait...');
     this.caseId = this.route.snapshot.params.id;
     // this.visitCaseData = JSON.parse(localStorage.getItem('visit_case_data'));
     this.visitCaseData = await this.databaseService.getCaseInfo(this.caseId);
@@ -205,8 +207,12 @@ export class VisitFormPage implements OnInit {
     }
   }
   dataRead(obj) {
-    this.formData = obj.data[0];
-    this.jsonString = obj.data[0].content;
+    try {
+      this.formData = obj.data[0];
+      this.jsonString = obj.data[0].content;
+    } catch (error) {
+      this.commonService.showToast('Visit Form is not configured!','danger');
+    }
     const re = /\{{([^}}]+)\}/g;
     const variables = this.jsonString.match(re);
 
@@ -431,7 +437,14 @@ export class VisitFormPage implements OnInit {
     }
     this.navCtrl.back();
   }
+
   async onSubmit(event) {
+    if(!this.isVisitSubmitted){
+      this.isVisitSubmitted = true;
+      this.onSubmitNew(event);
+    }
+  }
+  async onSubmitNew(event) {
 
     this.linked = [];
     if (this.visitCaseData.linked_cases && this.visitCaseData.linked_cases.length) {
@@ -522,6 +535,10 @@ export class VisitFormPage implements OnInit {
   }
   ionViewWillLeave() {
     this.storageService.remove('caseId');
+    if (this.storageService.get('from_map_page')) {
+      this.storageService.set('not_reload_map', true);
+      this.storageService.remove('from_map_page');
+    }
   }
   async presentActionSheet() {
     let buttons = [{
