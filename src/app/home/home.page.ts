@@ -153,9 +153,10 @@ export class HomePage implements OnInit {
       downloded = (data.caseCountsVal >= this.limit) ? this.limit : data.caseCountsVal;
       let page = 1
       await this.databaseService.setcaseDetails(data);
-      let count = Math.floor((total - downloded) / this.limit);
+      // let count = Math.floor((total - downloded) / this.limit);
+      let count = Math.ceil(total / this.limit) - 1;
       if (count > 0) {
-        for (let i = 0; i <= count; i++) {
+        for (let i = 0; i < count; i++) {
           this.caseService.getCaseDetails({ page: ++page, limit: this.limit, last_update_date: last_update_date }).subscribe(async (data) => {
             await this.databaseService.setcaseDetails(data);
             downloded += this.limit;
@@ -295,9 +296,10 @@ export class HomePage implements OnInit {
       downloded = (response.caseCountsVal >= this.limit) ? this.limit : response.caseCountsVal;
       let page = 1
       await this.databaseService.setCases(response.data, response.linked, response.allCases);
-      let count = Math.floor((total - downloded) / this.limit);
+      // let count = Math.floor((total - downloded) / this.limit);
+      let count = Math.ceil(total / this.limit) - 1;
       if (count > 0) {
-        for (let i = 0; i <= count; i++) {
+        for (let i = 0; i < count; i++) {
           this.caseService.getCases({ page: ++page, limit: this.limit }).subscribe(async (response: any) => {
             await this.databaseService.setCases(response.data, response.linked, response.allCases);
             downloded += this.limit;

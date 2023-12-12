@@ -485,53 +485,58 @@ export class VisitFormPage implements OnInit {
 
   }
   submitForm(event) {
-    this.storageService.set('is_case_updated', true);
-    // console.log(event, event.data);
-    // console.log(this.paymentInfo);
-    // console.log(this.arrangementInfo);
-    // tslint:disable: triple-equals
-    if (this.paymentInfo == undefined) {
-      event.data.singlePaymentMade = 0;
-    }
-    if (this.arrangementInfo == undefined) {
-      event.data.arrangementAgreed = 0;
-    }
+    try {
+      this.storageService.set('is_case_updated', true);
+      // console.log(event, event.data);
+      // console.log(this.paymentInfo);
+      // console.log(this.arrangementInfo);
+      // tslint:disable: triple-equals
+      if (this.paymentInfo == undefined) {
+        event.data.singlePaymentMade = 0;
+      }
+      if (this.arrangementInfo == undefined) {
+        event.data.arrangementAgreed = 0;
+      }
 
-    if (event.data.visit_outcome != undefined && event.data.visit_outcome != '') {
-      // tslint:disable: variable-name
-      const visit_outcome = this.caseAlerts.find(ca => ca.id == event.data.visit_outcome);
-      console.log(visit_outcome);
-      event.data.visit_outcome = visit_outcome.name;
-    }
-    let visit_report_data = {
-      form_data: event.data,
-      payment_data: this.paymentInfo,
-      arrangement_data: this.arrangementInfo,
-      locationOverride: this.locationOverride
-    };
-    if(this.isNewlyn) {
-      visit_report_data['distance'] = (this.distance / this.tomiles).toFixed(2);
-    }
+      if (event.data.visit_outcome != undefined && event.data.visit_outcome != '') {
+        // tslint:disable: variable-name
+        const visit_outcome = this.caseAlerts.find(ca => ca.id == event.data.visit_outcome);
+        console.log(visit_outcome);
+        event.data.visit_outcome = visit_outcome.name;
+      }
+      let visit_report_data = {
+        form_data: event.data,
+        payment_data: this.paymentInfo,
+        arrangement_data: this.arrangementInfo,
+        locationOverride: this.locationOverride
+      };
+      if(this.isNewlyn) {
+        visit_report_data['distance'] = (this.distance / this.tomiles).toFixed(2);
+      }
 
-    const form_data = {
-      form_id: this.formData.id,
-      case_id: this.caseId,
-      linked_cases_to_visit: this.linked_cases_to_visit,
-      status: 1,
-      form_values: visit_report_data
-    };
-    console.log(form_data);
-    const visitFormData = [
-      { name: 'case_id', value: this.caseId },
-      { name: 'url', value: 'b/system/v3/forms/create' },
-      { name: 'type', value: `post` },
-      { name: 'data', value: `${encodeURI(JSON.stringify(form_data)).replace(/'/g, "%27")}` },
-      { name: 'is_sync', value: 0 },
-      { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
-    ];
+      const form_data = {
+        form_id: this.formData.id,
+        case_id: this.caseId,
+        linked_cases_to_visit: this.linked_cases_to_visit,
+        status: 1,
+        form_values: visit_report_data
+      };
+      console.log(form_data);
+      const visitFormData = [
+        { name: 'case_id', value: this.caseId },
+        { name: 'url', value: 'b/system/v3/forms/create' },
+        { name: 'type', value: `post` },
+        { name: 'data', value: `${encodeURI(JSON.stringify(form_data)).replace(/'/g, "%27")}` },
+        { name: 'is_sync', value: 0 },
+        { name: 'created_at', value: `${moment().format('YYYY-MM-DD hh:mm:ss')}` },
+      ];
 
-    this.caseActionService.saveActionOffline('api_calls', visitFormData);
-    this.router.navigate(['/home/job-list']);
+      this.caseActionService.saveActionOffline('api_calls', visitFormData);
+      this.router.navigate(['/home/job-list']);
+    } catch (error) {
+      console.log(error);
+      this.commonService.showToast(error);
+    }
   }
   ionViewWillLeave() {
     this.storageService.remove('caseId');
