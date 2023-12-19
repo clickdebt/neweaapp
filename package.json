@@ -119,7 +119,8 @@
       },
       "uk.co.workingedge.phonegap.plugin.launchnavigator": {
         "GOOGLE_API_KEY_FOR_ANDROID": "AIzaSyB2SD46TH6aRspJzp_jvIBFTFv-AlN_mUQ",
-        "OKHTTP_VERSION": "3.12.0"
+        "OKHTTP_VERSION": "3.12.0",
+        "LOCATION_USAGE_DESCRIPTION": "This app requires access to your location for navigation purposes"
       },
       "cordova-plugin-network-information": {},
       "cordova-plugin-nativeaudio": {},
