@@ -14,7 +14,7 @@ import { SosService } from 'src/app/services/sos.service';
   styleUrls: ['./job-list.page.scss'],
 })
 export class JobListPage implements OnInit {
-  limit = 50;
+  limit = 20;
   page = 1;
   cases = [];
   showFilter = false;
@@ -106,20 +106,7 @@ export class JobListPage implements OnInit {
   ) { }
 
   async ngOnInit() {
-    let caseFields= ["ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
-    // const caseFields = await this.storageService.get('fields');
-    if(this.commonService.isClient('newlyn')) {
-      caseFields= ["cl_ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
-    }
-    if (caseFields) {
-      this.caseFields = this.totalFields.filter((c) => {
-        if (caseFields.includes(c.field)) {
-          return true;
-        }
-      });
-    }
-    // console.log(this.caseFields);
-    
+    await this.setCaseFields();
     this.colspanLength = 6 + this.caseFields.length;
     this.isMobile = this.platform.is('mobile');
     this.getFilterMasterData();
@@ -134,6 +121,7 @@ export class JobListPage implements OnInit {
   }
 
   async ionViewWillEnter() {
+    await this.setCaseFields();
     this.currentNetworkStatus = this.networkService.getCurrentNetworkStatus();
     this.showFilter = false;
     this.showSort = false;
@@ -231,16 +219,34 @@ export class JobListPage implements OnInit {
   // }
 
   async getCases(infiniteScrollEvent) {
+    if(!this.caseFields){
+      await this.setCaseFields();
+    }
     let params = {
       limit: this.limit,
       page: this.page
     };
     // console.log(this.filters);
+    let skipIdList = [];
+    try {
+      // 0 => Pending, 1 => Completed, 2 => In Progress, 3 => Failed
+      const query = 'select options as aid from api_calls where is_sync in (0,2)';
+      let re = await this.databaseService.executeReadQuery(query);
+      let finalResult = await this.databaseService.extractResult(re);
+      finalResult.forEach(element => {
+        skipIdList.push(element.case_id);
+      });
+    } catch (error) {
+      console.log('error',error);
+    }
     Object.keys(this.filters).forEach(fil => {
       if (this.filters[fil] != undefined && this.filters[fil].length) {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
       }
     });
+    if (skipIdList != undefined && skipIdList.length) {
+      params['skipIdList'] = typeof skipIdList == 'object' ? skipIdList.join() : skipIdList;
+    }
     //not take case from api, take from sqlite/websql
     if (0 && this.networkService.getCurrentNetworkStatus() == 1) {
       // if (!this.busy) {
@@ -312,6 +318,9 @@ export class JobListPage implements OnInit {
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push(params[key] + '%');
+            } else if (key === 'skipIdList') {
+              let queryParam = params[key];
+              query += ` and id not in (${queryParam})`;
             }
           }
         }
@@ -321,7 +330,9 @@ export class JobListPage implements OnInit {
       }
       query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
       // console.log(query);
-      this.databaseService.executeQuery(query, p).then(async (data) => {
+      this.databaseService.executeReadQuery(query, p).then(async (data) => {
+        if(data == false) this.router.navigate(['/home/dashboard']);
+
         let results: any[] = [];
         let item;
         for (let i = 0; i < data.rows.length; i++) {
@@ -364,7 +375,7 @@ export class JobListPage implements OnInit {
     let p = [item.manual_link_id, item.data.debtor_id, item.id];
     const results: any[] = [];
 
-    await this.databaseService.executeQuery(query, p).then((data) => {
+    await this.databaseService.executeReadQuery(query, p).then((data) => {
       let link_item;
       for (let i = 0; i < data.rows.length; i++) {
         link_item = data.rows.item(i);
@@ -373,7 +384,14 @@ export class JobListPage implements OnInit {
         results.push(link_item.data);
       }
       item.data.linked_cases = results;
-      item.data.linkedCasesTotalBalance =  parseFloat(item.data.d_outstanding) + item.data.linked_cases.reduce((accumulator, currentValue) => {
+      let link_item_arr = []; // To remove duplicate records
+      let uniqueLinkedCases = results.filter((record)=>{
+        if(link_item_arr.indexOf(record.id) == -1){
+          link_item_arr.push(record.id);
+          return true;
+        }
+      });
+      item.data.linkedCasesTotalBalance =  parseFloat(item.data.d_outstanding) + uniqueLinkedCases.reduce((accumulator, currentValue) => {
         return accumulator + parseFloat(currentValue.d_outstanding);
       }, 0);
       item.data.linkedCasesTotalBalance = item.data.linkedCasesTotalBalance.toFixed(2);
@@ -577,6 +595,20 @@ export class JobListPage implements OnInit {
       }
     } else {
       return value[res[res.length - 1]];
+    }
+  }
+
+  async setCaseFields(){
+    let caseFields= ["ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
+    if(this.commonService.isClient('newlyn')) {
+      caseFields= ["cl_ref", "d_outstanding", "date", "visitcount_total", "custom5", "debtor.enforcement_addresses[0].address_postcode", "hold_until", "linkedCasesTotalBalance"];
+    }
+    if (caseFields) {
+      this.caseFields = this.totalFields.filter((c) => {
+        if (caseFields.includes(c.field)) {
+          return true;
+        }
+      });
     }
   }
 }

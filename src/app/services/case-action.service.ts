@@ -80,9 +80,15 @@ export class CaseActionService {
     return this.http.get(apiURL);
   }
 
-  uploadDocument(file, caseId) {
+  uploadDocument(file, caseId, fileName = '', doc_type = '') {
     let formData = new FormData();
-    formData.append('file', file);
+    if(fileName) {
+      formData.append('file', file, fileName);
+      formData.append('doc_name',fileName);
+      if(doc_type) formData.append('document_category',doc_type);
+    } else {
+      formData.append('file', file);
+    }
     const apiURL = localStorage.getItem('server_url') + `b/clickdebt_ajax_layout/legacy/panels/upload_case_documents/${caseId}?source=API`;
     return this.http.post(apiURL, formData);
   }

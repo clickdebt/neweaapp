@@ -311,7 +311,7 @@ export class ArrangementModalPage implements OnInit {
   }
   async getActiveArrangements() {
     let query = `select * from rdebt_cases  where id = ${this.caseId}`;
-    let result = await this.databaseService.executeQuery(query);
+    let result = await this.databaseService.executeReadQuery(query);
     let finalResult: any = await this.databaseService.extractResult(result);
     finalResult = finalResult[0];
     finalResult.data = this.databaseService.getDecodeString(finalResult.data);

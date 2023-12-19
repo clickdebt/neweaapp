@@ -9,12 +9,14 @@ import { CaseService } from './case.service';
 import { NetworkService } from './network.service';
 import { StorageService } from './storage.service';
 import * as moment from 'moment';
+import { CommonService } from './common.service';
 declare var window: any;
 @Injectable({
   providedIn: 'root'
 })
 export class DatabaseService {
   private database: any;
+  private readDatabase: any;
   private databaseReady: BehaviorSubject<boolean>;
   public isApiPending: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public refreshingData: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -31,7 +33,8 @@ export class DatabaseService {
     private storageService: StorageService,
     public sqlitePorter: SQLitePorter,
     private caseService: CaseService,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private commonService: CommonService
   ) {
     this.databaseReady = new BehaviorSubject(false);
     this.detailsReady = new BehaviorSubject(false);
@@ -53,10 +56,17 @@ export class DatabaseService {
       if (!this.platform.is('android') || !this.platform.is('ios')) {
         let db = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
         this.database = browserDBInstance(db);
+        let readdb = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
+        this.readDatabase = browserDBInstance(readdb);
         console.log('1');
       } else {
         console.log('2');
         this.database = await this.sqlite.create({
+          name: 'fieldAgentV3.db',
+          location: 'default',
+          key: 'u3a5wIA73vmG6ruB'
+        });
+        this.readDatabase = await this.sqlite.create({
           name: 'fieldAgentV3.db',
           location: 'default',
           key: 'u3a5wIA73vmG6ruB'
@@ -195,16 +205,31 @@ export class DatabaseService {
     try {
       const result = await this.database.executeSql(query, params);
       // console.log('exexute query', result);
-
       return result;
     } catch (error) {
-      // console.log('error', error, query);
+      console.log('error', error, query);
+      return false;
+    }
+  }
+
+  async executeReadQuery(query, params = null) {
+    try {
+      if (!this.platform.is('android') || !this.platform.is('ios')) {
+        const result = await this.readDatabase.executeSql(query, params);
+        return result;
+      } else {
+        const result = await this.readDatabase.executeSql(query, params);
+        return result;
+      }
+    } catch (error) {
+      console.log('error', error, query);
+      return false;
     }
   }
 
   async getCaseInfo(id) {
     let query = `select * from rdebt_cases where id = ${id} and 1=1`;
-    let result = await this.executeQuery(query);
+    let result = await this.executeReadQuery(query);
     result = await this.extractResult(result);
     if (result) {
       let finalData = result[0];
@@ -251,7 +276,7 @@ export class DatabaseService {
   }
   async getUnsyncVisitForms() {
     const query = 'Select * from visit_reports where 1 = 1 and is_sync = 0';
-    return this.executeQuery(query);
+    return this.executeReadQuery(query);
   }
 
   async setCases(data, linked, allCases) {
@@ -302,6 +327,13 @@ export class DatabaseService {
       const delQuery = 'delete from rdebt_cases where id not in (' + allCases.join(',') + ')';
       promiseArray.push(this.executeQuery(delQuery));
       const delHistoryQuery = 'delete from history where caseid not in (' + allCases.join(',') + ')';
+      promiseArray.push(this.executeQuery(delHistoryQuery));
+    } else if(!allCases) { // Sometime based on respose, the last case is not getting removed. So we add this logic.
+      const delQuery = 'delete from rdebt_cases';
+      promiseArray.push(this.executeQuery(delQuery));
+      const delLinkedCasesQuery = 'delete from rdebt_linked_cases';
+      promiseArray.push(this.executeQuery(delLinkedCasesQuery));
+      const delHistoryQuery = 'delete from history';
       promiseArray.push(this.executeQuery(delHistoryQuery));
     }
 
@@ -476,14 +508,14 @@ export class DatabaseService {
     };
     let query = `select * from rdebt_cases where id = ${id}`;
 
-    let result = await this.executeQuery(query);
+    let result = await this.executeReadQuery(query);
     let finalResult = await this.extractResult(result);
     if (finalResult && finalResult.length) {
       caseDetails.data = this.getDecodeString(finalResult[0].data);
       caseDetails.arranagement = this.getDecodeString(finalResult[0].arranagement);
 
       query = `select * from history where caseid = ${id} order by time desc`;
-      result = await this.executeQuery(query);
+      result = await this.executeReadQuery(query);
       finalResult = await this.extractResult(result);
       caseDetails.history = finalResult;
     } else {
@@ -522,7 +554,7 @@ export class DatabaseService {
     if(limit) {
       query += ' limit 1';
     }
-    return this.executeQuery(query, []);
+    return this.executeReadQuery(query, []);
   }
   async changeApiCallStatus(id, status = 1) {
     const updateQuery = `update api_calls set is_sync = ${status} where id = ${id}`;
@@ -541,17 +573,24 @@ export class DatabaseService {
               form_data1.append('file',  new File([form_data.file], form_data.file_name));
               form_data = form_data1;
             }
-            this.syncingAPI.next(true);
-            let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
-            console.log(callResponse);
-            this.syncingAPI.next(false);
-            if (callResponse) {
-              await this.changeApiCallStatus(currentFormData.id, 1);
-              this.checkApiPending('514');
-              this.refreshData({ 'cases': currentFormData.case_id })
-            } else {
-              await this.changeApiCallStatus(currentFormData.id, 0);
-              this.checkApiPending('518');
+            try {
+              this.syncingAPI.next(true);
+              let callResponse = await this.callHttpApi(currentFormData.type, localStorage.getItem('server_url') + currentFormData.url, { body: form_data });
+              console.log(callResponse);
+              this.syncingAPI.next(false);
+              if (callResponse) {
+                await this.changeApiCallStatus(currentFormData.id, 1);
+                this.checkApiPending('514');
+                this.refreshData({ 'cases': currentFormData.case_id })
+              } else {
+                await this.changeApiCallStatus(currentFormData.id, 0);
+                this.checkApiPending('518');
+              }
+            } catch (error) {
+              console.log(error);
+              this.syncingAPI.next(false);
+              await this.changeApiCallStatus(currentFormData.id, 3);
+              this.commonService.showToast('Last submitted Request Failed!, Please try again');
             }
           }
         }
@@ -585,7 +624,7 @@ export class DatabaseService {
     this.tables.forEach(async element => {
       let checkSync = ' ;';
       if (element == 'visit_reports' || element == 'api_calls') {
-        checkSync = ' where is_sync=1';
+        checkSync = ' where is_sync in (1,3)';
       }
       const deleteQuery = 'delete from ' + element + checkSync;
       let a = await this.database.executeSql(deleteQuery);

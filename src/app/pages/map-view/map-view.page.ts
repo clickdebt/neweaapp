@@ -1,5 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { CaseService, CommonService, StorageService } from 'src/app/services';
+import { CaseService, CommonService, DatabaseService, StorageService } from 'src/app/services';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Router } from '@angular/router';
 declare var google;
@@ -48,7 +48,8 @@ export class MapViewPage implements OnInit {
     private geolocation: Geolocation,
     private storageService: StorageService,
     private router: Router,
-    private launchNavigator: LaunchNavigator
+    private launchNavigator: LaunchNavigator,
+    private databaseService: DatabaseService
   ) { }
 
   ngOnInit() {
@@ -61,11 +62,51 @@ export class MapViewPage implements OnInit {
     this.index = 0;
     this.commonService.checkLocation();
     this.getCurrentLocation();
-    this.getCases();
+    // this.getCases();
+    this.getCasesV2();
   }
   ionViewWillLeave() {
     this.storageService.remove('selected_cases_for_map');
     this.apiReq.unsubscribe();
+  }
+  async getCasesV2() {
+    const caseIds = await this.storageService.get('selected_cases_for_map');
+    const back = await this.storageService.get('not_reload_map');
+    this.storageService.remove('not_reload_map');
+
+    if (!back) {
+      let params: any;
+      if (caseIds && caseIds != undefined && caseIds.length) {
+        params = { cases: typeof caseIds == 'object' ? caseIds.join() : caseIds };
+      } else {
+        params = { page: this.page, limit: this.limit };
+      }
+
+      let query = 'select * from rdebt_cases where 1 = 1';
+      if(params.hasOwnProperty('cases') && params['cases'] !== ''){
+        let queryParam = params['cases'];
+        query += ` and id in (${queryParam})`;
+      }
+      query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
+      console.log(query);
+      this.databaseService.executeReadQuery(query).then(async (data) => {
+        let results: any[] = [];
+        let item;
+        for (let i = 0; i < data.rows.length; i++) {
+          item = data.rows.item(i);
+          item.data = JSON.parse(decodeURI(item.data));
+          results.push(item.data);
+        }
+        if(results && results.length){
+          this.page++;
+          this.cases = this.cases.concat(results);
+          this.getAddresses(results);
+          if (!caseIds) {
+            this.getCasesV2();
+          }
+        }
+      });
+    }
   }
   async getCases() {
     const caseIds = await this.storageService.get('selected_cases_for_map');
@@ -99,17 +140,20 @@ export class MapViewPage implements OnInit {
             `${da.debtor.enforcement_addresses[0].address_ln2}, ` +
             `${da.debtor.enforcement_addresses[0].address_ln3}, ` +
             `${da.debtor.enforcement_addresses[0].address_postcode}`;
+          da.address_lat = `${da.debtor.enforcement_addresses[0].address_lat}`;
+          da.address_lng = `${da.debtor.enforcement_addresses[0].address_lng}`;
         } else if (da.debtor.addresses.length) {
           da.address_str = `${da.debtor.addresses[0].address_ln1}, ` +
             `${da.debtor.addresses[0].address_ln2}, ` +
             `${da.debtor.addresses[0].address_ln3}, ` +
             `${da.debtor.addresses[0].address_postcode}`;
+          da.address_lat = `${da.debtor.addresses[0].address_lat}`;
+          da.address_lng = `${da.debtor.addresses[0].address_lng}`;
         } else {
           da.address_str = '';
         }
 
         da.location = {};
-        console.log(da.address_str);
         if (da.address_str) {
           this.getGeocodesLatLongs(da, caseIndex);
         }
@@ -120,25 +164,40 @@ export class MapViewPage implements OnInit {
   }
 
   getGeocodesLatLongs(obj, caseIndex) {
-    this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
-      if (res.status === 'OK' && res.results && res.results[0]) {
-        obj.location = res.results[0]['geometry']['location'];
-        if (this.index === 0) {
-          this.centerLat = obj.location.lat;
-          this.centerLng = obj.location.lng;
-          this.initMap();
-          this.index++;
-        }
-        this.setCaseMarkers(obj);
-      } else {
-        if (this.index === 0 && caseIndex === this.cases.length - 1) {
-          this.initMap(); this.index++;
-        }
-        console.log(obj, res);
+    if(parseFloat(obj.address_lat) != 0 && parseFloat(obj.address_lng) != 0){
+      obj.location.lat = parseFloat(obj.address_lat); // Lat
+      obj.location.lng = parseFloat(obj.address_lng); // Long
+      if (this.index === 0) {
+        this.centerLat = obj.location.lat; // Lat
+        this.centerLng = obj.location.lng; // Long
+        this.initMap();
+        this.index++;
       }
-    }, err => {
-      console.log(err);
-    });
+      this.setCaseMarkers(obj);
+    } else {
+      if (this.index === 0 && caseIndex === this.cases.length - 1) {
+        this.initMap(); this.index++;
+      }
+    }
+    // this.caseService.geoCodeAddress(obj.address_str).subscribe((res: any) => {
+    //   if (res.status === 'OK' && res.results && res.results[0]) {
+    //     obj.location = res.results[0]['geometry']['location'];
+    //     if (this.index === 0) {
+    //       this.centerLat = obj.location.lat;
+    //       this.centerLng = obj.location.lng;
+    //       this.initMap();
+    //       this.index++;
+    //     }
+    //     this.setCaseMarkers(obj);
+    //   } else {
+    //     if (this.index === 0 && caseIndex === this.cases.length - 1) {
+    //       this.initMap(); this.index++;
+    //     }
+    //     console.log(obj, res);
+    //   }
+    // }, err => {
+    //   console.log(err);
+    // });
   }
 
   setCaseMarkers(obj) {
@@ -159,16 +218,18 @@ export class MapViewPage implements OnInit {
         content: contentString
       });
       google.maps.event.addDomListener(infowindow, 'domready', () => {
-        const btn = document.querySelector('.visitButton');
+        if(isVisit){
+          const btn = document.querySelector('.visitButton');
+          google.maps.event.addDomListener(btn, 'click', () => {
+            const caseId = btn.getAttribute('id');
+            if (caseId) {
+              this.setCaseForBackLink();
+  
+              this.router.navigate(['/home/visit-form/' + caseId]);
+            }
+          });
+        }
         const detailsButton = document.querySelector('.detailsButton');
-        google.maps.event.addDomListener(btn, 'click', () => {
-          const caseId = btn.getAttribute('id');
-          if (caseId) {
-            this.setCaseForBackLink();
-
-            this.router.navigate(['/home/visit-form/' + caseId]);
-          }
-        });
         google.maps.event.addDomListener(detailsButton, 'click', () => {
           const caseId = detailsButton.getAttribute('id');
           if (caseId) {
