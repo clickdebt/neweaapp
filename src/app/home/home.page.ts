@@ -104,11 +104,13 @@ export class HomePage implements OnInit {
           visitForm: this.visitService.getVisitForm(),
           filterMasterData: this.caseService.getFilterMasterData(),
           feeOptions: this.caseService.getFeeSchemeManagerLinks(),
+          exitcodes: this.caseService.getExitcodes(),
         }).subscribe(async (response: any) => {
           // await this.databaseService.setCases(response.cases.data, response.cases.linked, response.cases.allCases);
           await this.databaseService.setVisitForm(response.visitForm.data);
           await this.databaseService.setFilterMasterData(response.filterMasterData.data);
           await this.databaseService.setFeeOptions(response.feeOptions.data.FeeSchemeManagerLinks);
+          await this.databaseService.setExitcodes(response.exitcodes.data);
           const time = moment().format('YYYY-MM-DD HH:mm:ss');
           await this.databaseService.setDownloadStatus({
             status: true,
@@ -301,7 +303,7 @@ export class HomePage implements OnInit {
       if (count > 0) {
         for (let i = 0; i < count; i++) {
           this.caseService.getCases({ page: ++page, limit: this.limit }).subscribe(async (response: any) => {
-            await this.databaseService.setCases(response.data, response.linked, response.allCases);
+            if (response) await this.databaseService.setCases(response.data, response.linked, response.allCases);
             downloded += this.limit;
             if (downloded > total) {
               downloded = total;

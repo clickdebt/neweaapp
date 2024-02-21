@@ -72,4 +72,9 @@ export class CaseService {
     const apiURL = localStorage.getItem('server_url') + 'b/system/v3/fee/get_fee_sm_link';
     return this.http.get(apiURL);
   }
+
+  getExitcodes() {
+    const apiURL = localStorage.getItem('server_url') + 'b/system/v3/cases/get_exitcodes';
+    return this.http.get(apiURL);
+  }
 }
