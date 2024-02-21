@@ -402,12 +402,12 @@ export class DatabaseService {
       if (data.history && (data.history).length) {
         await this.storeToSqlite('history', data.history);
       }
-      if (data.exitCodeData) {
-        await this.setvisitOutcomes(data.exitCodeData);
-      }
-      if(data.paymentGatewayList){
-        await this.storageService.set('gateway', data.paymentGatewayList);
-      }
+      // if (data.exitCodeData) {
+      //   await this.setvisitOutcomes(data.exitCodeData);
+      // }
+      // if(data.paymentGatewayList){
+      //   await this.storageService.set('gateway', data.paymentGatewayList);
+      // }
       await Promise.all(promiseArray)
         .then((res: any) => {
           return res;
@@ -419,6 +419,15 @@ export class DatabaseService {
         });
     } catch (r) {
       console.log(r);
+    }
+  }
+
+  async setExitcodes(data) {
+    if (data.exitCodeData) {
+      await this.setvisitOutcomes(data.exitCodeData);
+    }
+    if(data.paymentGatewayList){
+      await this.storageService.set('gateway', data.paymentGatewayList);
     }
   }
 
