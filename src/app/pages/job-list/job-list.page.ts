@@ -227,26 +227,11 @@ export class JobListPage implements OnInit {
       page: this.page
     };
     // console.log(this.filters);
-    let skipIdList = [];
-    try {
-      // 0 => Pending, 1 => Completed, 2 => In Progress, 3 => Failed
-      const query = 'select options as aid from api_calls where is_sync in (0,2)';
-      let re = await this.databaseService.executeReadQuery(query);
-      let finalResult = await this.databaseService.extractResult(re);
-      finalResult.forEach(element => {
-        skipIdList.push(element.case_id);
-      });
-    } catch (error) {
-      console.log('error',error);
-    }
     Object.keys(this.filters).forEach(fil => {
       if (this.filters[fil] != undefined && this.filters[fil].length) {
         params[fil] = typeof this.filters[fil] == 'object' ? this.filters[fil].join() : this.filters[fil];
       }
     });
-    if (skipIdList != undefined && skipIdList.length) {
-      params['skipIdList'] = typeof skipIdList == 'object' ? skipIdList.join() : skipIdList;
-    }
     //not take case from api, take from sqlite/websql
     if (0 && this.networkService.getCurrentNetworkStatus() == 1) {
       // if (!this.busy) {
@@ -318,9 +303,6 @@ export class JobListPage implements OnInit {
               p.push('%' + params[key] + '%');
               p.push('%' + params[key] + '%');
               p.push(params[key] + '%');
-            } else if (key === 'skipIdList') {
-              let queryParam = params[key];
-              query += ` and id not in (${queryParam})`;
             }
           }
         }
@@ -358,6 +340,10 @@ export class JobListPage implements OnInit {
             }
           });
 
+          // To handle, in case of fetched cases are linked case, then it only show one record. So we can call again. 
+          if(this.cases.length <= this.limit && this.page < 5){
+            this.getCases('');
+          }
         }
         if (infiniteScrollEvent) {
           infiniteScrollEvent.target.complete();

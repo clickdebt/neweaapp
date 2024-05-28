@@ -161,6 +161,6 @@ export class CommonService {
     return result;
   }
   getAppVersion(){
-    return "v2.0.1";
+    return "v2.0.2";
   }
 }
