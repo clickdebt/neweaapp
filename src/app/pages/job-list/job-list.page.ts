@@ -273,6 +273,9 @@ export class JobListPage implements OnInit {
                 p.push('4');
               }
               query += ' and (' + vcquery + ') ';
+            } else if (key === 'brokenArrangementCounts') {
+              query += ' and broken_arrangement_count in ( ? ) ';
+              p.push(params[key]);
             } else if (key === 'stageType') {
               query += ' and stage_type in ( ? )';
               p.push(params[key]);

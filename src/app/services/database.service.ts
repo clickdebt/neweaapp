@@ -24,7 +24,7 @@ export class DatabaseService {
   private detailsReady: BehaviorSubject<boolean>;
   public lastUpdateTime: BehaviorSubject<any> = new BehaviorSubject(false);
   linkedIds = [];
-  version = 4;
+  version = 5;
   tables = ['rdebt_cases', 'rdebt_linked_cases', 'history', 'api_calls'];
   constructor(
     private platform: Platform,
@@ -113,7 +113,8 @@ export class DatabaseService {
       enforcement_addresses_postcode TEXT,
       debtor_name Text,
       data TEXT,
-      arranagement TEXT
+      arranagement TEXT,
+      broken_arrangement_count INTEGER
     );`;
 
     const rdebLinkedCases = `CREATE TABLE IF NOT EXISTS rdebt_linked_cases(
@@ -137,7 +138,8 @@ export class DatabaseService {
       enforcement_addresses_postcode Text,
       debtor_name Text,
       data TEXT,
-      arranagement TEXT
+      arranagement TEXT,
+      broken_arrangement_count INTEGER
     );`;
 
     const history = `CREATE TABLE IF NOT EXISTS history(
@@ -287,13 +289,13 @@ export class DatabaseService {
     ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
       client_id, current_status_id, current_stage_id, address_postcode,
-      enforcement_addresses_postcode, debtor_name,  data ) VALUES `;
+      enforcement_addresses_postcode, debtor_name,  data, broken_arrangement_count) VALUES `;
 
     let sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
     ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
       last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
       client_id, current_status_id, current_stage_id, address_postcode,
-      enforcement_addresses_postcode, debtor_name, data ) VALUES `;
+      enforcement_addresses_postcode, debtor_name, data, broken_arrangement_count) VALUES `;
 
     data.forEach((values) => {
 
@@ -303,7 +305,7 @@ export class DatabaseService {
           "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
           ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
           "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
-            "${encodeURI(JSON.stringify(values))}")`;
+            "${encodeURI(JSON.stringify(values))}", "${values.broken_arrangement_count}")`;
       sql.push(query);
       // this.executeQuery(query);
 
@@ -318,7 +320,7 @@ export class DatabaseService {
         "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
          ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
          "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
-          "${encodeURI(JSON.stringify(values))}")`);
+          "${encodeURI(JSON.stringify(values))}", "${values.broken_arrangement_count}")`);
     });
     sqlLinkedStart += sqlLinked.join(',');
     const promiseArray = [];

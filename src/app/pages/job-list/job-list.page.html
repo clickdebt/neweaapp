@@ -132,6 +132,18 @@
           </ion-list>
         </ion-col>
       </ion-row>
+      <ion-row>
+        <ion-col size-xs="12" *ngIf="filterMaster && filterMaster.brokenArrangementCounts">
+          <h6>Broken Arrangement Count</h6>
+          <ion-list class="filter-item-list">
+            <ion-item *ngFor="let entry of filterMaster.brokenArrangementCounts" class="filter-item-list-item" lines="none"
+              [ngClass]="{'active': entry.isChecked}">
+              <ion-label>{{entry.title}} ({{entry.count}})</ion-label>
+              <ion-checkbox slot="end" [(ngModel)]="entry.isChecked"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
     </ion-grid>
   </div>
   <div class="filter-footer">
