@@ -324,7 +324,7 @@ export class JobListPage implements OnInit {
           item = data.rows.item(i);
           item.data = JSON.parse(decodeURI(item.data));
 
-          let res = await this.getLinkedCasesSqlite(item);
+          let res = await this.getLinkedCasesSqlite(item, params);
           // console.log(res);
           if (res)
             results.push(item.data);
@@ -355,13 +355,86 @@ export class JobListPage implements OnInit {
     }
 
   }
-  async getLinkedCasesSqlite(item) {
+  async getLinkedCasesSqlite(item, params) {
     if (!(this.linkedIds.indexOf("" + item.id) == -1)) {
       return false;
     }
 
-    let query = 'select * from rdebt_linked_cases where (manual_link_id = ? or debtor_id = ? )and id != ?';
-    let p = [item.manual_link_id, item.data.debtor_id, item.id];
+    let query = 'select * from rdebt_linked_cases where 1 = 1';
+    let p = [];
+    if (item.manual_link_id) {
+      query += ' and manual_link_id = ?';
+      p.push(item.manual_link_id);
+    }
+  
+    if (item.data.debtor_id) {
+      query += ' and debtor_id = ?';
+      p.push(item.data.debtor_id);
+    }
+    query += ' and id != ? ';
+            p.push(item.id);
+
+
+    for (let key in params) {
+      if (params.hasOwnProperty(key) && params[key] !== '') {
+        if (key !== 'limit' && key !== 'page') {
+          if (key === 'stages') {
+            query += ' and current_stage_id in ( ? ) ';
+            p.push(params[key]);
+          } else if (key === 'schemes') {
+            query += ' and scheme_id in ( ? )';
+            p.push(params[key]);
+          } else if (key === 'statuses') {
+            query += ' and current_status_id in ( ? )';
+            p.push(params[key]);
+          } else if (key === 'clients') {
+            query += ' and client_id in ( ? )';
+            p.push(params[key]);
+          } else if (key === 'visitCounts') {
+            let vcquery = ' visitcount_total in ( ? ) ';
+            p.push(params[key]);
+            if (params[key].indexOf('4') !== -1) {
+              vcquery += ' or visitcount_total > ? ';
+              p.push('4');
+            }
+            query += ' and (' + vcquery + ') ';
+          } else if (key === 'brokenArrangementCounts') {
+            query += ' and broken_arrangement_count in ( ? ) ';
+            p.push(params[key]);
+          } else if (key === 'stageType') {
+            query += ' and stage_type in ( ? )';
+            p.push(params[key]);
+          } else if (key === 'outstandingAmount') {
+            const osfilter = params[key].split(',');
+            let osQuery = [];
+            osfilter.forEach(element => {
+              if (element.indexOf('-') !== -1) {
+                osQuery.push(' d_outstanding between ? and ? ');
+                const oa = element.split('-');
+                p.push(oa[0]);
+                p.push(oa[1]);
+              } else if (element.indexOf('>') !== -1) {
+                osQuery.push(' d_outstanding > ? ');
+                // ---------------------------------------------------------- get 2000 from >2000 string
+                p.push(2000);
+              } else if (element === 'equals to zero') {
+                osQuery.push(' d_outstanding = 0 ');
+              }
+            });
+            query += ' and ( ' + osQuery.join(' or ') + ') ';
+          } else if (key === 'q') {
+            query += ' and (id LIKE ? or ref LIKE ? or cl_ref LIKE ? or address_postcode LIKE ? or enforcement_addresses_postcode LIKE ? or debtor_name LIKE ? or custom5 LIKE ?) ';
+            p.push(params[key] + '%');
+            p.push('%' + params[key] + '%');
+            p.push('%' + params[key] + '%');
+            p.push('%' + params[key] + '%');
+            p.push('%' + params[key] + '%');
+            p.push('%' + params[key] + '%');
+            p.push(params[key] + '%');
+          }
+        }
+      }
+    }
     const results: any[] = [];
 
     await this.databaseService.executeReadQuery(query, p).then((data) => {
