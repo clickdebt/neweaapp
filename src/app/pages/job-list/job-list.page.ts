@@ -360,20 +360,20 @@ export class JobListPage implements OnInit {
       return false;
     }
 
-    let query = 'select * from rdebt_linked_cases where 1 = 1';
-    let p = [];
-    if (item.manual_link_id) {
-      query += ' and manual_link_id = ?';
-      p.push(item.manual_link_id);
-    }
-  
-    if (item.data.debtor_id) {
-      query += ' and debtor_id = ?';
-      p.push(item.data.debtor_id);
-    }
-    query += ' and id != ? ';
-            p.push(item.id);
+    let query = 'select * from rdebt_linked_cases where (manual_link_id = ? or debtor_id = ? )and id != ? ';
+    let p = [item.manual_link_id, item.data.debtor_id, item.id];
 
+    let linkedCaseBalancequery = `
+        SELECT SUM(d_outstanding) as linkedCaseBalance
+        FROM (
+            SELECT DISTINCT id 
+            FROM rdebt_linked_cases 
+            WHERE manual_link_id = ? OR debtor_id = ?
+        ) AS unique_cases
+        JOIN rdebt_linked_cases ON rdebt_linked_cases.id = unique_cases.id
+    `;
+    const linkedCaseBalanceResult = await this.databaseService.executeReadQuery(linkedCaseBalancequery,[item.manual_link_id, item.data.debtor_id]);
+    item.data.linkedCasesTotalBalance =  parseFloat(linkedCaseBalanceResult.rows.item(0).linkedCaseBalance).toFixed(2);
 
     for (let key in params) {
       if (params.hasOwnProperty(key) && params[key] !== '') {
@@ -446,17 +446,6 @@ export class JobListPage implements OnInit {
         results.push(link_item.data);
       }
       item.data.linked_cases = results;
-      let link_item_arr = []; // To remove duplicate records
-      let uniqueLinkedCases = results.filter((record)=>{
-        if(link_item_arr.indexOf(record.id) == -1){
-          link_item_arr.push(record.id);
-          return true;
-        }
-      });
-      item.data.linkedCasesTotalBalance =  parseFloat(item.data.d_outstanding) + uniqueLinkedCases.reduce((accumulator, currentValue) => {
-        return accumulator + parseFloat(currentValue.d_outstanding);
-      }, 0);
-      item.data.linkedCasesTotalBalance = item.data.linkedCasesTotalBalance.toFixed(2);
     });
     return true;
   }

@@ -24,7 +24,7 @@ export class DatabaseService {
   private detailsReady: BehaviorSubject<boolean>;
   public lastUpdateTime: BehaviorSubject<any> = new BehaviorSubject(false);
   linkedIds = [];
-  version = 5;
+  version = 6;
   tables = ['rdebt_cases', 'rdebt_linked_cases', 'history', 'api_calls'];
   constructor(
     private platform: Platform,
