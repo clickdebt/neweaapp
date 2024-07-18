@@ -38,7 +38,8 @@ export class MapViewPage implements OnInit {
   apiReq;
   icons = {
     red: 'assets/icon/pin-red.png',
-    grey: 'assets/icon/pin-grey.png'
+    grey: 'assets/icon/pin-grey.png',
+    blue: 'assets/icon/pin-blue.gif'
   };
   destination: string;
 
@@ -389,6 +390,37 @@ export class MapViewPage implements OnInit {
         this.addPolyPoints(e);
       });
       this.drawingManager.setDrawingMode(null);
+    });
+
+    // get live location
+    const locationButton = document.createElement("button");
+    const icon = document.createElement("ion-icon");
+    icon.setAttribute("name", "disc-outline");
+  
+    locationButton.classList.add("custom-map-control-button");
+    locationButton.appendChild(icon);
+    this.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(locationButton);
+
+    locationButton.addEventListener("click", () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position: GeolocationPosition) => {
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            new google.maps.Marker({
+              position: pos,
+              map: this.map,
+              title: "Current Location",
+              icon: this.icons.blue
+          });
+          this.map.setCenter(pos);
+          }
+        );
+      }else{
+        this.commonService.showToast("Please Enable your Location");
+      }
     });
   }
   addCirclePoints(event) {
