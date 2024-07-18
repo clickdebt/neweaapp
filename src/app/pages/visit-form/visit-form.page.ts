@@ -229,6 +229,9 @@ export class VisitFormPage implements OnInit {
       this.jsonString = this.jsonString.replace('{{scheme_manager_id}}', this.visitCaseData.scheme_manager_id);
     }
     this.jsonObject = JSON.parse(this.jsonString);
+    const validate = {
+      required: true,
+    };
     const visitOutcomeObj = {
       type: 'select',
       label: 'Visit Outcome',
@@ -237,7 +240,8 @@ export class VisitFormPage implements OnInit {
       data: this.resultobj,
       dataSrc: 'values',
       template: '<span>{{ item.label }}</span>',
-      input: true
+      input: true,
+      validate: validate,
     };
     const ComponentLength = this.jsonObject.components.length;
     this.jsonObject.components[ComponentLength - 1].components.push(visitOutcomeObj);
