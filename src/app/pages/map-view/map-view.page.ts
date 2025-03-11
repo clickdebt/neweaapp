@@ -404,7 +404,7 @@ export class MapViewPage implements OnInit {
     locationButton.addEventListener("click", () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (position: GeolocationPosition) => {
+          (position: any) => {
             const pos = {
               lat: position.coords.latitude,
               lng: position.coords.longitude,

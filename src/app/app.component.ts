@@ -27,11 +27,12 @@ export class AppComponent implements OnInit {
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
+    this.platform.ready().then(async () => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
       this.commonService.checkLocation();
       this.commonService.askUserPermissions();
+      await this.databaseService.initializeDatabase();
       this.networkService.onNetworkChange().subscribe(async (status: ConnectionStatus) => {
         if (status === ConnectionStatus.Online) {
           this.databaseService.checkApiPending('app');

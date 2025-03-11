@@ -39,8 +39,13 @@ export class DatabaseService {
     this.databaseReady = new BehaviorSubject(false);
     this.detailsReady = new BehaviorSubject(false);
 
-    this.platform.ready().then(async () => {
+  }
 
+  async initializeDatabase() {
+
+    await this.platform.ready();
+    try {
+      
       if(this.platform.is('android')){
         console.log('platform android');
       }
@@ -53,13 +58,13 @@ export class DatabaseService {
       if(this.platform.is('mobile')){
         console.log('platform mobile');
       }
-      if (!this.platform.is('android') || !this.platform.is('ios')) {
-        let db = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
-        this.database = browserDBInstance(db);
-        let readdb = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
-        this.readDatabase = browserDBInstance(readdb);
-        console.log('1');
-      } else {
+      // if (!this.platform.is('android') || !this.platform.is('ios')) {
+      //   let db = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
+      //   this.database = browserDBInstance(db);
+      //   let readdb = window.openDatabase('fieldAgentV3.db', '1.0', 'DEV', 5 * 1024 * 1024);
+      //   this.readDatabase = browserDBInstance(readdb);
+      //   console.log('1');
+      // } else {
         console.log('2');
         this.database = await this.sqlite.create({
           name: 'fieldAgentV3.db',
@@ -71,7 +76,7 @@ export class DatabaseService {
           location: 'default',
           key: 'u3a5wIA73vmG6ruB'
         });
-      }
+      // }
       const value = await this.storageService.get('database_filled');
       const storageVersion = await this.storageService.get('version');
       if (value && storageVersion && storageVersion == this.version) {
@@ -79,16 +84,13 @@ export class DatabaseService {
       } else {
         this.setUpDatabase();
       }
-      this.isApiPending.subscribe(res => {
-        this.savePendingApi(res);
-      })
-      // this.networkService.onNetworkChange().subscribe((response) => {
-      //   if (response === 1) {
-          
-      //   }
-      // });
+    } catch (error) {
+      console.log(error);
+    }
 
-    }).catch((error) => { });
+    this.isApiPending.subscribe((res) => {
+      this.savePendingApi(res);
+    })
   }
 
   async setUpDatabase() {
@@ -283,46 +285,6 @@ export class DatabaseService {
 
   async setCases(data, linked, allCases) {
     // const cases = this.parseCaseData(data, linked);
-    const sql = [];
-    const sqlLinked = [];
-    let sqlStart = `insert or replace INTO rdebt_cases
-    ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
-      last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, address_postcode,
-      enforcement_addresses_postcode, debtor_name,  data, broken_arrangement_count) VALUES `;
-
-    let sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
-    ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
-      last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
-      client_id, current_status_id, current_stage_id, address_postcode,
-      enforcement_addresses_postcode, debtor_name, data, broken_arrangement_count) VALUES `;
-
-    data.forEach((values) => {
-
-      const query = `(${values.id}, "${values.ref}", "${values.cl_ref}", ${values.scheme_id},  ${values.debtor_id},
-          "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
-          "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
-          "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
-          ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
-          "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
-            "${encodeURI(JSON.stringify(values))}", "${values.broken_arrangement_count}")`;
-      sql.push(query);
-      // this.executeQuery(query);
-
-    });
-    sqlStart += sql.join(',');
-
-    linked.forEach((values) => {
-
-      sqlLinked.push(`(${values.id}, "${values.ref}", "${values.cl_ref}", ${values.scheme_id}, ${values.debtor_id},
-        "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
-        "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
-        "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
-         ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
-         "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
-          "${encodeURI(JSON.stringify(values))}", "${values.broken_arrangement_count}")`);
-    });
-    sqlLinkedStart += sqlLinked.join(',');
     const promiseArray = [];
 
     if (allCases) {
@@ -339,12 +301,43 @@ export class DatabaseService {
       promiseArray.push(this.executeQuery(delHistoryQuery));
     }
 
-    if (data.length) {
+    data.forEach((values) => {
+
+      let sqlStart = `insert or replace INTO rdebt_cases
+        ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
+        last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
+        client_id, current_status_id, current_stage_id, address_postcode,
+        enforcement_addresses_postcode, debtor_name, data, broken_arrangement_count) VALUES 
+        (${values.id}, "${values.ref}", "${values.cl_ref}", ${values.scheme_id},  ${values.debtor_id},
+        "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
+        "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
+        "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
+        ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
+        "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
+        "${encodeURI(JSON.stringify(values)).replace(/--/g, '/**/')}", "${values.broken_arrangement_count}")`;
+
       promiseArray.push(this.executeQuery(sqlStart));
-    }
-    if (linked.length) {
-      promiseArray.push(this.executeQuery(sqlLinkedStart));
-    }
+
+    });
+
+    linked.forEach((values) => {
+
+      let sqlLinkedStart = `insert or replace INTO rdebt_linked_cases
+        ( id, ref, cl_ref, scheme_id, debtor_id, date, d_outstanding, visitcount_total,
+        last_allocated_date, custom5, manual_link_id, hold_until, stage_type,
+        client_id, current_status_id, current_stage_id, address_postcode,
+        enforcement_addresses_postcode, debtor_name, data, broken_arrangement_count) VALUES 
+        (${values.id}, "${values.ref}", "${values.cl_ref}", ${values.scheme_id},  ${values.debtor_id},
+        "${values.date}", ${values.d_outstanding}, ${values.visitcount_total},
+        "${values.last_allocated_date}", "${values.custom5}", ${values.manual_link_id},
+        "${values.hold_until}", "${values.stage.stage_type.stage_type}", ${values.client_id}, ${values.current_status_id},
+        ${values.current_stage_id},"${values.debtor.addresses[0].address_postcode}",
+        "${values.debtor.enforcement_addresses[0].address_postcode}","${values.debtor.debtor_name}",
+        "${encodeURI(JSON.stringify(values)).replace(/--/g, '/**/')}", "${values.broken_arrangement_count}")`;
+
+        promiseArray.push(this.executeQuery(sqlLinkedStart));
+    });
+
     await Promise.all(promiseArray)
       .then((res: any) => {
         // console.log(res);
@@ -555,7 +548,7 @@ export class DatabaseService {
   checkApiPending(source= 'false') {
     
     this.getApiStored().then(data => {
-      if (data.rows.length > 0) {
+      if (data.rows && data.rows.length > 0) {
         this.changeIsApiPending(true);
       }
     })

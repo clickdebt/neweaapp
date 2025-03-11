@@ -316,7 +316,7 @@ export class JobListPage implements OnInit {
       query += ' LIMIT ' + this.limit + ' OFFSET ' + (this.limit * (this.page - 1));
       // console.log(query);
       this.databaseService.executeReadQuery(query, p).then(async (data) => {
-        if(data == false) this.router.navigate(['/home/dashboard']);
+        if(data == false || !data.rows) this.router.navigate(['/home/dashboard']);
 
         let results: any[] = [];
         let item;

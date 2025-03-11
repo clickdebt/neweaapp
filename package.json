@@ -82,7 +82,7 @@
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-file": "^7.0.0",
     "cordova-plugin-file-transfer": "git+https://github.com/apache/cordova-plugin-file-transfer.git",
-    "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
+    "cordova-plugin-googlemaps": "^2.7.1",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
     "cordova-plugin-nativeaudio": "^3.0.9",
     "cordova-plugin-navigationbar": "^1.0.31",
